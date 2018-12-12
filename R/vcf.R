@@ -422,7 +422,7 @@ wrapper <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 	{
 		o <- extract_from_bcf(snplist, bcf, tempname)
 		missing_snps <- snplist[!snplist %in% o$V3]
-		ld <- get_ld_proxies(missing_snps, bcf, args[['bfile']], tempname)
+		ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname)
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
 		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "B", "SE", "PVAL", "N", "AF")
@@ -432,7 +432,7 @@ wrapper <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 
 	if(proxies == "only")
 	{
-		ld <- get_ld_proxies(snplist, bcf, args[['bfile']], tempname)
+		ld <- get_ld_proxies(snplist, bcf, bfile, tempname)
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
 		return(a)
