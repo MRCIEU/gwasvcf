@@ -58,6 +58,7 @@ get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 
 	cmd <- paste0("bcftools query -f'%ID\n' ", bcf, " > ", searchspacename)
 	system(cmd)
+	print(head(rsids))
 	write.table(rsids, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
 	cmd <- paste0("cat ", targetsname, " ", searchspacename, " > ", searchspacename1)
 	system(cmd)
@@ -191,9 +192,10 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 			missing_snps <- snplist[!snplist %in% o$V3]
 			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname)
 		} else {
+			print(head(snplist))
 			id1 <- paste(snplist[,1], snplist[,2], snplist[,3], snplist[,4])
 			missing_snps <- snplist[!id1 %in% paste(o$V1, o$V2, o$V4, o$V5),]
-			ld <- get_ld_proxies(missing_snps[,5], bcf, bfile, tempname)
+			ld <- get_ld_proxies(missing_snps[,6], bcf, bfile, tempname)
 		}
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
@@ -208,7 +210,7 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 		{
 			ld <- get_ld_proxies(snplist, bcf, bfile, tempname)
 		} else {
-			ld <- get_ld_proxies(snplist[,5], bcf, bfile, tempname)
+			ld <- get_ld_proxies(snplist[,6], bcf, bfile, tempname)
 		}
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
