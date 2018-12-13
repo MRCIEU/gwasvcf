@@ -35,11 +35,11 @@ snplist <- scan(args[['snplist']], what=character())
 
 # Test Different proxy options
 
-o1 <- wrapper(bcf, snplist, tempname, "yes", args[["bfile"]], args[["vcf_ref"]])
+o1 <- extract(bcf, snplist, tempname, "yes", args[["bfile"]], args[["vcf_ref"]])
 dim(o1)
-o2 <- wrapper(bcf, snplist, tempname, "no", args[["bfile"]])
+o2 <- extract(bcf, snplist, tempname, "no", args[["bfile"]])
 dim(o2)
-o3 <- wrapper(bcf, snplist, tempname, "only", args[["bfile"]], args[["vcf_ref"]])
+o3 <- extract(bcf, snplist, tempname, "only", args[["bfile"]], args[["vcf_ref"]])
 dim(o3)
 
 
