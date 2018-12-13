@@ -192,7 +192,7 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname)
 		} else {
 			id1 <- paste(snplist[,1], snplist[,2], snplist[,3], snplist[,4])
-			missing_snps <- snplist[!id1 %in% paste(o$V1, o$V2, o$V4, o$V5)]
+			missing_snps <- snplist[!id1 %in% paste(o$V1, o$V2, o$V4, o$V5),]
 			ld <- get_ld_proxies(missing_snps[,5], bcf, bfile, tempname)
 		}
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
@@ -215,6 +215,7 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 		return(a)
 	}
 }
+
 
 
 

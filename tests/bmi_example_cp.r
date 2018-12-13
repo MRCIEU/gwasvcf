@@ -26,11 +26,11 @@ parser$add_argument('--instrument-list', required=FALSE)
 
 # args <- parser$parse_args()
 setwd("~/mr-eve/gwas-instrument-subsets/scripts")
-args <- parser$parse_args(c("--bfile", "../../vcf-reference-datasets/ukb/ukb_ref", "--gwas-id", "2", "--snplist", "temp1.txt", "--no-clean", "--out", "out", "--bcf-dir", "../../gwas-files", "--vcf-ref", "../../vcf-reference-datasets/1000g/1kg_v3_nomult.bcf", "--get-proxies"))
+args <- parser$parse_args(c("--bfile", "../../vcf-reference-datasets/ukb/ukb_ref", "--gwas-id", "2", "--snplist", "temp2.txt", "--no-clean", "--out", "out", "--bcf-dir", "../../gwas-files", "--vcf-ref", "../../vcf-reference-datasets/1000g/1kg_v3_nomult.bcf", "--get-proxies"))
 print(args)
 tempname <- tempfile(pattern="extract", tmpdir=dirname(args[['out']]))
 bcf <- file.path(args[['bcf_dir']], args[['gwas_id']], "harmonised.bcf")
-snplist <- scan(args[['snplist']], what=character())
+snplist <- fread(args[['snplist']], header=FALSE, sep="\t")
 
 
 # Test Different proxy options

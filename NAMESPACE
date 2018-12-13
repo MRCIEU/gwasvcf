@@ -2,11 +2,11 @@
 
 export(align_proxies)
 export(check_bcftools)
+export(extract)
 export(extract_from_bcf)
 export(get_ld_proxies)
 export(is_forward_strand)
 export(make_vcf)
 export(vcf_header)
-export(wrapper)
 export(write_out)
 export(write_vcf)
