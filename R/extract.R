@@ -47,7 +47,7 @@ extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %
 #'
 #' @export
 #' @return data frame
-get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6)
+get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	require(dplyr)
 	require(data.table)
@@ -71,7 +71,8 @@ get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 		" --ld-window-kb ", tag_kb,
 		" --ld-window-r2 ", tag_r2,
 		" --ld-window ", tag_nsnp,
-		" --out ", targetsname
+		" --out ", targetsname,
+		" --threads ", threads
 	)
 	system(cmd)
 
@@ -165,7 +166,7 @@ is_palindrome <- function(a1, a2)
 #'
 #' @export
 #' @return
-extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6)
+extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.vector(snplist))
 	{
@@ -190,11 +191,11 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 		if(rsid)
 		{
 			missing_snps <- snplist[!snplist %in% o$V3]
-			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname)
+			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname, threads=threads)
 		} else {
 			id1 <- paste(snplist[,1], snplist[,2], snplist[,3], snplist[,4])
 			missing_snps <- snplist[!id1 %in% paste(o$V1, o$V2, o$V4, o$V5),]
-			ld <- get_ld_proxies(missing_snps[,5], bcf, bfile, tempname)
+			ld <- get_ld_proxies(missing_snps[,6], bcf, bfile, tempname, threads=threads)
 		}
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
@@ -207,9 +208,9 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 	{
 		if(rsid)
 		{
-			ld <- get_ld_proxies(snplist, bcf, bfile, tempname)
+			ld <- get_ld_proxies(snplist, bcf, bfile, tempname, threads=threads)
 		} else {
-			ld <- get_ld_proxies(snplist[,6], bcf, bfile, tempname)
+			ld <- get_ld_proxies(snplist[,6], bcf, bfile, tempname, threads=threads)
 		}
 		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
