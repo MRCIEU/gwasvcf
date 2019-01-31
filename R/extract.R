@@ -4,11 +4,12 @@
 #' @param snplist list of rs IDs or table of chrom and pos
 #' @param bcf bcf file name
 #' @param out temporary filename
-#' @param sel='%CHROM %POS %ID %REF %ALT %B %SE %PVAL %N %AF\n' What to extract from bcf
+#' @param sel='%CHROM %POS %ID %REF %ALT %B %SE %L10PVAL %N %AF\n' What to extract from bcf
+#' @param logpval Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in bcf to retain precision)
 #'
 #' @export
 #' @return data frame
-extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %B %SE %PVAL %N %AF\n')
+extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %B %SE %L10PVAL %N %AF\n', logpval=FALSE)
 {
 	require(data.table)
 	snplistname <- paste0(out, ".snplist")
@@ -28,6 +29,11 @@ extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %
 	}
 	system(cmd)
 	o <- data.table::fread(extractname, header=FALSE, sep=" ", na.strings=".")
+	if(logpval)
+	{
+		which({gsub("[[:space:]]", "", sel) %>% strsplit(sel, split="%")}[[1]] == "L10PVAL") - 1
+		o[,8] <- 10^-o[,8]
+	}
 	message("Extracted ", nrow(o), " out of ", nsnp, " SNPs")
 	unlink(extractname)
 	unlink(snplistname)

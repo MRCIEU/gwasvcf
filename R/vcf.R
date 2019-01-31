@@ -89,7 +89,7 @@ vcf_header <- function(build='b37', meta_data)
 	info <- c(
 		'##INFO=<ID=B,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele(s)">',
 		'##INFO=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">',
-		'##INFO=<ID=PVAL,Number=A,Type=Float,Description="P-value for effect estimate">',
+		'##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">',
 		'##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">',
 		'##INFO=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
 
@@ -119,7 +119,7 @@ vcf_header <- function(build='b37', meta_data)
 #' @param FILTER Vector of filter values. Can be NAs.
 #' @param B Vector of effects for each SNP, relative to the ALT allele
 #' @param SE Vector of standard errors
-#' @param PVAL Vector
+#' @param PVAL Vector (Note this should ideally be double precision to avoid loss of information)
 #' @param AF Vector of allele frequencies for the alternative allele
 #' @param N Vector of total sample size for trait
 #' @param build="b37" Used in CHROM and POS. This argument used to generate the header. Must be 'b37' or 'b38'.
@@ -149,15 +149,15 @@ make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 
 	fixed <- dplyr::data_frame(CHROM, POS, ID, REF, ALT, QUAL, FILTER)
 
-	info <- list(B=B, SE=SE, AF=AF, PVAL=PVAL, N=N)
+	info <- list(B=B, SE=SE, AF=AF, L10PVAL=-log10(PVAL), N=N)
 	for(i in names(info))
 	{
 		x <- as.character(info[[i]])
-		x[is.na(x)] <- "."
+		x[!is.finite(x)] <- "."
 		info[[i]] <- paste0(i, "=", x)
 	}
 	fixed$INFO <- paste(
-		info$B, info$SE, info$PVAL, info$AF, info$N, sep=";"
+		info$B, info$SE, info$L10PVAL, info$AF, info$N, sep=";"
 	)
 	fixed <- dplyr::arrange(fixed, CHROM, POS)
 	fixed$CHROM <- as.character(fixed$CHROM)
