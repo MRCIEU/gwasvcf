@@ -26,7 +26,7 @@ make_vcf(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 
 \item{SE}{Vector of standard errors}
 
-\item{PVAL}{Vector}
+\item{PVAL}{Vector (Note this should ideally be double precision to avoid loss of information)}
 
 \item{AF}{Vector of allele frequencies for the alternative allele}
 

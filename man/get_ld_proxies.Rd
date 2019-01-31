@@ -5,7 +5,7 @@
 \title{Find LD proxies for a set of SNPs}
 \usage{
 get_ld_proxies(rsids, bcf, bfile, out, tag_kb = 5000, tag_nsnp = 5000,
-  tag_r2 = 0.6)
+  tag_r2 = 0.6, threads = 1)
 }
 \arguments{
 \item{rsids}{list of rs IDs}

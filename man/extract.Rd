@@ -5,7 +5,7 @@
 \title{Extract SNPs from bcf file}
 \usage{
 extract(bcf, snplist, tempname, proxies = "yes", bfile, vcf_ref,
-  tag_kb = 5000, tag_nsnp = 5000, tag_r2 = 0.6)
+  tag_kb = 5000, tag_nsnp = 5000, tag_r2 = 0.6, threads = 1)
 }
 \arguments{
 \item{bcf}{vcf file name}
