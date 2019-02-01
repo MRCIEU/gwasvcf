@@ -7,9 +7,6 @@ suppressPackageStartupMessages({
 	library(unixtools)
 })
 
-library(devtools)
-load_all()
-
 # create parser object
 parser <- ArgumentParser()
 parser$add_argument('--ref_file', required=TRUE)
