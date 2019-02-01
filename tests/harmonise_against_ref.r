@@ -65,14 +65,14 @@ names(metadata.input) <- paste0("input.", names(metadata.input))
 
 ao <- TwoSampleMR::available_outcomes(NULL)
 metadata.gwas <- as.list(subset(ao, id == args[["mrbase_id"]]))
-names(metadata.gwas) <- paste0("gwas.", names(metadata.gwas))
 metadata.gwas[['path']] <- NULL
 metadata.gwas[['filename']] <- NULL
+names(metadata.gwas) <- paste0("gwas.", names(metadata.gwas))
 
 metadata.counts <- as.list(attr(harmonised, "log"))
+metadata.counts[['id.exposure']] <- NULL
+metadata.counts[['id.outcome']] <- NULL
 names(metadata.counts) <- paste0("counts.", names(metadata.counts))
-matadata.counts[['id.exposure']] <- NULL
-matadata.counts[['id.outcome']] <- NULL
 
 metadata <- c(metadata.input, metadata.gwas, metadata.counts)
 str(metadata)
