@@ -83,7 +83,7 @@ is_forward_strand <- function(gwas_snp, gwas_a1, gwas_a2, ref_snp, ref_a1, ref_a
 #'
 #' @export
 #' @return Vector of strings to be used in vcfR package
-vcf_header <- function(build='b37', meta_data)
+vcf_header <- function(build='b37', meta_data, zflag=FALSE)
 {
 	stopifnot(build %in% c("b37", "b38"))
 	info <- c(
@@ -92,6 +92,10 @@ vcf_header <- function(build='b37', meta_data)
 		'##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">',
 		'##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">',
 		'##INFO=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
+	if(zflag)
+	{
+		info <- c(info, '##INFO=<ID=ZVALUE,Number=A,Type=Float,Description="Z-score provided if BETA and SE derived from this">')
+	}
 
 	# From fai files here http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/
 	chr <- c(1:22, "X", "Y", "MT")
@@ -127,7 +131,7 @@ vcf_header <- function(build='b37', meta_data)
 #'
 #' @export
 #' @return vcfR object (with empty gt slot)
-make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N, build="b37", meta_data)
+make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N, ZVALUE, build="b37", meta_data)
 {
 	requireNamespace("dplyr", quietly=TRUE)
 	stopifnot(all(!is.na(CHROM)))
@@ -146,19 +150,26 @@ make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 	stopifnot(length(PVAL) == length(CHROM))
 	stopifnot(length(AF) == length(CHROM))
 	stopifnot(length(N) == length(CHROM))
+	stopifnot(length(ZVALUE) == length(CHROM))
 
 	fixed <- dplyr::data_frame(CHROM, POS, ID, REF, ALT, QUAL, FILTER)
 
 	info <- list(B=B, SE=SE, AF=AF, L10PVAL=-log10(PVAL), N=N)
+	zflag <- FALSE
+	if(!all(is.na(ZVALUE)))
+	{
+		info$ZVALUE <- ZVALUE
+		zflag <- TRUE
+	}
+
 	for(i in names(info))
 	{
 		x <- as.character(info[[i]])
-		x[!is.finite(x)] <- "."
+		x[!is.finite(info[[i]])] <- "."
 		info[[i]] <- paste0(i, "=", x)
 	}
-	fixed$INFO <- paste(
-		info$B, info$SE, info$L10PVAL, info$AF, info$N, sep=";"
-	)
+	fixed$INFO <- tidyr::unite(as.data.frame(info), info, sep=";")[,1]
+
 	fixed <- dplyr::arrange(fixed, CHROM, POS)
 	fixed$CHROM <- as.character(fixed$CHROM)
 	fixed$POS <- as.character(fixed$POS)
@@ -168,9 +179,10 @@ make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 	fixed$QUAL <- as.character(fixed$QUAL)
 	fixed$FILTER <- as.character(fixed$FILTER)
 	fixed[is.na(fixed)] <- "."
-	
+	str(fixed)
+
 	vcf <- new(Class="vcfR")
-	vcf@meta <- vcf_header(build, meta_data)
+	vcf@meta <- vcf_header(build, meta_data, zflag)
 	vcf@fix <- as.matrix(fixed)
 	vcf@gt <- matrix("a", nrow=0, ncol=0)
 	return(vcf)

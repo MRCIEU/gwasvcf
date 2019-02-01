@@ -101,6 +101,14 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 	o$eaf.outcome[!is.finite(o$eaf.outcome)] <- NA
 	o$info.outcome[!is.finite(o$info.outcome)] <- NA
 	o$z.outcome[!is.finite(o$z.outcome)] <- NA
+	if(all(is.na(o$info.outcome)))
+	{
+		o <- subset(o, select=-c(info.outcome))
+	}
+	if(all(is.na(o$z.outcome)))
+	{
+		o <- subset(o, select=-c(z.outcome))
+	}
 	jlog[['variants_not_read']] <- nrow(dat) - nrow(o)
 	ind <- is.finite(o$beta.outcome) & is.finite(o$pval.outcome)
 	o <- o[ind,]
@@ -179,18 +187,19 @@ harmonise_against_ref <- function(gwas, reference)
 	jlog[['harmonised_variants']] <- sum(dat$mr_keep)
 	jlog[['variants_not_harmonised']] <- sum(!dat$mr_keep)
 
-	gwas_h <- dat %$%
-		dplyr::data_frame(
-			ID=SNP,
-			ALT=effect_allele.exposure,
-			REF=other_allele.exposure,
-			BETA=beta.outcome,
-			SE=se.outcome,
-			PVALUE=pval.outcome,
-			AF=eaf.outcome,
-			N=samplesize.outcome) %>%
-		dplyr::inner_join(subset(ref, select=c(SNP,other_allele.exposure,effect_allele.exposure,chr.exposure,pos.exposure)), by=c("ID"="SNP", "REF"="other_allele.exposure", "ALT"="effect_allele.exposure"))
-	jlog[['total_remaining_variants']] <- nrow(gwas_h)
-	attr(gwas_h, "log") <- jlog
-	return(gwas_h)
+	cols <- c("SNP"="ID", "effect_allele.exposure"="ALT", "other_allele.exposure"="REF", "beta.outcome"="BETA", "se.outcome"="SE", "pval.outcome"="PVALUE", "eaf.outcome"="AF", "samplesize.outcome"="N", "z.outcome"="ZVALUE", "info.outcome"="INFO")
+	if(! "z.outcome" %in% names(dat)) dat$z.outcome <- NA
+	if(! "info.outcome" %in% names(dat)) dat$info.outcome <- NA
+
+	dat <- subset(dat, select=names(cols))
+	names(dat) <- cols
+
+	names(ref)[names(ref) == "chr.exposure"] <- "CHROM"
+	names(ref)[names(ref) == "pos.exposure"] <- "POS"
+
+	dat <- dat %>%
+		dplyr::inner_join(subset(ref, select=c(SNP,other_allele.exposure,effect_allele.exposure,CHROM,POS)), by=c("ID"="SNP", "REF"="other_allele.exposure", "ALT"="effect_allele.exposure"))
+	jlog[['total_remaining_variants']] <- nrow(dat)
+	attr(dat, "log") <- jlog
+	return(dat)
 }
