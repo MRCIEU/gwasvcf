@@ -30,3 +30,28 @@ Rscript harmonise_against_ref.r \
 --out_type bcf
 ```
 
+
+---
+
+# GWAS BCF specification
+
+Storing GWAS summary data in BCF format has the advantage that
+
+- it uses a pre-existing, well known and well defined format
+- many tools exist that can be used for manipulation
+- binary format is fast and relatively small
+- indexing makes looking up by chromosome and position extremely fast
+- indexing time is very fast
+- we can treat each GWAS as a distinct unit rather than storing everything in a database which is less nimble
+
+## Metadata
+
+- Contig information provides build and genome reference
+- Provide MR-Base GWAS ID in the form of `##gwas.id=<mrbid>`
+- Provide information about QC and harmonising against reference procedure in the form of `##counts.<metric>=<value>`
+
+
+## Fields
+
+To do
+

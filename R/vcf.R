@@ -87,14 +87,14 @@ vcf_header <- function(build='b37', meta_data, zflag=FALSE)
 {
 	stopifnot(build %in% c("b37", "b38"))
 	info <- c(
-		'##INFO=<ID=B,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele(s)">',
+		'##INFO=<ID=EFFECT,Number=A,Type=Float,Description="Effect size estimate relative to the alternative allele(s)">',
 		'##INFO=<ID=SE,Number=A,Type=Float,Description="Standard error of effect size estimate">',
 		'##INFO=<ID=L10PVAL,Number=A,Type=Float,Description="-log10 p-value for effect estimate">',
 		'##INFO=<ID=AF,Number=A,Type=Float,Description="Alternate allele frequency">',
 		'##INFO=<ID=N,Number=A,Type=Float,Description="Sample size used to estimate genetic effect">')
 	if(zflag)
 	{
-		info <- c(info, '##INFO=<ID=ZVALUE,Number=A,Type=Float,Description="Z-score provided if BETA and SE derived from this">')
+		info <- c(info, '##INFO=<ID=ZSCORE,Number=A,Type=Float,Description="Z-score provided if EFFECT and SE derived from this">')
 	}
 
 	# From fai files here http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/
@@ -121,9 +121,9 @@ vcf_header <- function(build='b37', meta_data, zflag=FALSE)
 #' @param ALT Vector of effect alleles - known also as alternative allele
 #' @param QUAL Vector of quality values. Can be NAs.
 #' @param FILTER Vector of filter values. Can be NAs.
-#' @param B Vector of effects for each SNP, relative to the ALT allele
+#' @param EFFECT Vector of effects for each SNP, relative to the ALT allele
 #' @param SE Vector of standard errors
-#' @param PVAL Vector (Note this should ideally be double precision to avoid loss of information)
+#' @param PVAL Vector (Note this should ideally be double precision to avoid loss of information). If a p-value = 0 we store this as a -log10 p-value = 999
 #' @param AF Vector of allele frequencies for the alternative allele
 #' @param N Vector of total sample size for trait
 #' @param build="b37" Used in CHROM and POS. This argument used to generate the header. Must be 'b37' or 'b38'.
@@ -131,7 +131,7 @@ vcf_header <- function(build='b37', meta_data, zflag=FALSE)
 #'
 #' @export
 #' @return vcfR object (with empty gt slot)
-make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N, ZVALUE, build="b37", meta_data)
+make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, EFFECT, SE, PVAL, AF, N, ZSCORE, build="b37", meta_data)
 {
 	requireNamespace("dplyr", quietly=TRUE)
 	stopifnot(all(!is.na(CHROM)))
@@ -145,20 +145,20 @@ make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 	stopifnot(length(ALT) == length(CHROM))
 	stopifnot(length(QUAL) == length(CHROM))
 	stopifnot(length(FILTER) == length(CHROM))
-	stopifnot(length(B) == length(CHROM))
+	stopifnot(length(EFFECT) == length(CHROM))
 	stopifnot(length(SE) == length(CHROM))
 	stopifnot(length(PVAL) == length(CHROM))
 	stopifnot(length(AF) == length(CHROM))
 	stopifnot(length(N) == length(CHROM))
-	stopifnot(length(ZVALUE) == length(CHROM))
+	stopifnot(length(ZSCORE) == length(CHROM))
 
 	fixed <- dplyr::data_frame(CHROM, POS, ID, REF, ALT, QUAL, FILTER)
 
-	info <- list(B=B, SE=SE, AF=AF, L10PVAL=-log10(PVAL), N=N)
+	info <- list(EFFECT=EFFECT, SE=SE, AF=AF, L10PVAL=-log10(PVAL), N=N)
 	zflag <- FALSE
-	if(!all(is.na(ZVALUE)))
+	if(!all(is.na(ZSCORE)))
 	{
-		info$ZVALUE <- ZVALUE
+		info$ZSCORE <- ZSCORE
 		zflag <- TRUE
 	}
 
@@ -168,6 +168,7 @@ make_vcf <- function(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 		x[!is.finite(info[[i]])] <- "."
 		info[[i]] <- paste0(i, "=", x)
 	}
+	info$L10PVAL[PVAL == 0] <- "L10PVAL=999.0"
 	fixed$INFO <- tidyr::unite(as.data.frame(info), info, sep=";")[,1]
 
 	fixed <- dplyr::arrange(fixed, CHROM, POS)
