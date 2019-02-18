@@ -4,7 +4,7 @@
 \alias{vcf_header}
 \title{Generate VCF header based on genome build}
 \usage{
-vcf_header(build = "b37", meta_data)
+vcf_header(build = "b37", meta_data, zflag = FALSE)
 }
 \arguments{
 \item{meta_data}{Named list of attributes regarding the dataset}

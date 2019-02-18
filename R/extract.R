@@ -4,18 +4,17 @@
 #' @param snplist list of rs IDs or table of chrom and pos
 #' @param bcf bcf file name
 #' @param out temporary filename
-#' @param sel='%CHROM %POS %ID %REF %ALT %B %SE %L10PVAL %N %AF\n' What to extract from bcf
+#' @param sel='%CHROM %POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n' What to extract from bcf
 #' @param logpval Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in bcf to retain precision)
 #'
 #' @export
 #' @return data frame
-extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %B %SE %L10PVAL %N %AF\n', logpval=FALSE)
+extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n', logpval=FALSE)
 {
 	require(data.table)
 	snplistname <- paste0(out, ".snplist")
 	extractname <- paste0(out, ".extract")
 
-	
 	if(is.vector(snplist))
 	{
 		write.table(snplist, file=snplistname, row=F, col=F, qu=F, sep="\t")
@@ -64,7 +63,6 @@ get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 
 	cmd <- paste0("bcftools query -f'%ID\n' ", bcf, " > ", searchspacename)
 	system(cmd)
-	print(head(rsids))
 	write.table(rsids, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
 	cmd <- paste0("cat ", targetsname, " ", searchspacename, " > ", searchspacename1)
 	system(cmd)
@@ -119,12 +117,12 @@ align_proxies <- function(ld, e, vcf_ref=NULL, tempfile=NULL)
 	temp <- subset(temp, (V4 == B1 & V5 == B2) | (V4 == B2 & V5 == B1))
 	sw <- temp$V4 == temp$B1
 	temp$V6[sw] <- temp$V6[sw] * -1
-	r <- temp %$% data_frame(ID = SNP_A, CHROM = CHR_A, POS = BP_A, REF = A1, ALT = A2, B = V6, SE = V7, PVAL = V8, N = V9, AF = MAF_B, proxy.chrom = CHR_B, proxy.pos = BP_B, proxy.id = V3)
+	r <- temp %$% data_frame(ID = SNP_A, CHROM = CHR_A, POS = BP_A, REF = A1, ALT = A2, EFFECT = V6, SE = V7, PVAL = V8, N = V9, AF = MAF_B, proxy.chrom = CHR_B, proxy.pos = BP_B, proxy.id = V3)
 	ref <- extract_from_bcf(subset(r, select=c(CHROM, POS)), vcf_ref, tempfile, '%CHROM %POS %ID %REF %ALT\n')
 
 	a1 <- merge(r, ref, by.x="ID", by.y="V3")
 	i <- a1$REF == a1$V4
-	a1$B[i] <- a1$B[i] * -1
+	a1$EFFECT[i] <- a1$EFFECT[i] * -1
 	tt <- a1$REF[i]
 	a1$REF[i] <- a1$ALT[i]
 	a1$ALT[i] <- tt
@@ -185,7 +183,7 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 	if(proxies == "no")
 	{
 		o <- extract_from_bcf(snplist, bcf, tempname)
-		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "B", "SE", "PVAL", "N", "AF")
+		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "EFFECT", "SE", "PVAL", "N", "AF")
 		o$proxy.chrom <- o$proxy.pos <- o$proxy.id <- NA
 		return(o)
 	}
@@ -193,21 +191,23 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 	if(proxies == "yes")
 	{
 		o <- extract_from_bcf(snplist, bcf, tempname)
+		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "EFFECT", "SE", "PVAL", "N", "AF")
 
 		if(rsid)
 		{
-			missing_snps <- snplist[!snplist %in% o$V3]
-			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname, threads=threads)
+			missing_snps <- snplist[!snplist %in% o$ID]
 		} else {
 			id1 <- paste(snplist[,1], snplist[,2], snplist[,3], snplist[,4])
-			missing_snps <- snplist[!id1 %in% paste(o$V1, o$V2, o$V4, o$V5),]
-			ld <- get_ld_proxies(missing_snps[,6], bcf, bfile, tempname, threads=threads)
+			missing_snps <- snplist[!id1 %in% paste(o$CHROM, o$POS, o$REF, o$ALT),][[6]]
 		}
-		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
-		a <- align_proxies(ld, e, vcf_ref, tempname)
-		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "B", "SE", "PVAL", "N", "AF")
-		final <- bind_rows(a,o) %>% arrange(CHROM, POS)
-		return(final)
+		if(length(missing_snps) > 0)
+		{
+			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname, threads=threads)
+			e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
+			a <- align_proxies(ld, e, vcf_ref, tempname)
+			o <- bind_rows(a,o)
+		}
+		return(o %>% arrange(CHROM, POS))
 	}
 
 	if(proxies == "only")

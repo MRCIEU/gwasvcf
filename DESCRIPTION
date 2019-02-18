@@ -1,6 +1,6 @@
 Package: gwasvcftools
 Title: Tools for dealing with GWAS summary data in VCF format
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: person("Gibran", "Hemani", email = "explodecomputer@gmail.com", role = c("aut", "cre"))
 Description: Tools for dealing with GWAS summary data in VCF format
 Depends: 

@@ -5,7 +5,7 @@
 \title{Extract SNPs from vcf}
 \usage{
 extract_from_bcf(snplist, bcf, out,
-  sel = "\%CHROM \%POS \%ID \%REF \%ALT \%B \%SE \%L10PVAL \%N \%AF\\n",
+  sel = "\%CHROM \%POS \%ID \%REF \%ALT \%EFFECT \%SE \%L10PVAL \%N \%AF\\n",
   logpval = FALSE)
 }
 \arguments{
@@ -17,7 +17,7 @@ extract_from_bcf(snplist, bcf, out,
 
 \item{logpval}{Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in bcf to retain precision)}
 
-\item{sel='%CHROM}{%POS %ID %REF %ALT %B %SE %L10PVAL %N %AF\n' What to extract from bcf}
+\item{sel='%CHROM}{%POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n' What to extract from bcf}
 }
 \value{
 data frame

@@ -4,8 +4,8 @@
 \alias{make_vcf}
 \title{Generate VCF format from GWAS summary dataset}
 \usage{
-make_vcf(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
-  build = "b37", meta_data)
+make_vcf(CHROM, POS, ID, REF, ALT, QUAL, FILTER, EFFECT, SE, PVAL, AF, N,
+  ZSCORE, build = "b37", meta_data)
 }
 \arguments{
 \item{CHROM}{Vector of chromosome names}
@@ -22,11 +22,11 @@ make_vcf(CHROM, POS, ID, REF, ALT, QUAL, FILTER, B, SE, PVAL, AF, N,
 
 \item{FILTER}{Vector of filter values. Can be NAs.}
 
-\item{B}{Vector of effects for each SNP, relative to the ALT allele}
+\item{EFFECT}{Vector of effects for each SNP, relative to the ALT allele}
 
 \item{SE}{Vector of standard errors}
 
-\item{PVAL}{Vector (Note this should ideally be double precision to avoid loss of information)}
+\item{PVAL}{Vector (Note this should ideally be double precision to avoid loss of information). If a p-value = 0 we store this as a -log10 p-value = 999}
 
 \item{AF}{Vector of allele frequencies for the alternative allele}
 
