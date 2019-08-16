@@ -15,6 +15,9 @@ align_proxies(ld, e, vcf_ref = NULL, tempfile = NULL)
 
 \item{tempfile}{temporary files for use for extractions}
 }
+\value{
+data frame
+}
 \description{
 Takes output from get_ld_proxies and extract_from_bcf to make sure effect estimates are relative to the correct proxy alleles
 }

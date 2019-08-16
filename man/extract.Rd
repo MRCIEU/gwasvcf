@@ -26,6 +26,9 @@ extract(bcf, snplist, tempname, proxies = "yes", bfile, vcf_ref,
 
 \item{tag_r2=0.6}{Proxy parameter}
 }
+\value{
+data frame
+}
 \description{
 Finds proxies if necessary
 }

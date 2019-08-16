@@ -4,7 +4,7 @@
 #' @param snplist list of rs IDs or table of chrom and pos
 #' @param bcf bcf file name
 #' @param out temporary filename
-#' @param sel='%CHROM %POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n' What to extract from bcf
+#' @param sel='\%CHROM \%POS \%ID \%REF \%ALT \%EFFECT \%SE \%L10PVAL \%N \%AF\n' What to extract from bcf
 #' @param logpval Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in bcf to retain precision)
 #'
 #' @export
@@ -106,7 +106,7 @@ get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 #' @param tempfile temporary files for use for extractions
 #'
 #' @export
-#' @return
+#' @return data frame
 align_proxies <- function(ld, e, vcf_ref=NULL, tempfile=NULL)
 {
 	require(dplyr)
@@ -169,7 +169,7 @@ is_palindrome <- function(a1, a2)
 #' @param tag_r2=0.6 Proxy parameter
 #'
 #' @export
-#' @return
+#' @return data frame
 extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.vector(snplist))
