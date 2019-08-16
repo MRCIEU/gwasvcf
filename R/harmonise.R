@@ -22,7 +22,8 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 {
 	if(gzipped)
 	{
-		dat <- data.table::fread(paste0("gunzip -c ", filename), header=FALSE, skip=skip, sep=delimiter)
+		# dat <- data.table::fread(paste0("gunzip -c ", filename), header=FALSE, skip=skip, sep=delimiter)
+		dat <- data.table::fread(filename, header=FALSE, skip=skip, sep=delimiter)
 	} else {
 		dat <- data.table::fread(filename, header=FALSE, skip=skip, sep=delimiter)
 	}
@@ -95,6 +96,7 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 		info_col=names(dat)[info],
 		z_col=names(dat)[z],
 	)
+	print(head(o))
 	o$beta.outcome[!is.finite(o$beta.outcome)] <- NA
 	o$se.outcome[!is.finite(o$se.outcome)] <- NA
 	o$pval.outcome[!is.finite(o$pval.outcome)] <- NA
@@ -202,4 +204,40 @@ harmonise_against_ref <- function(gwas, reference)
 	jlog[['total_remaining_variants']] <- nrow(dat)
 	attr(dat, "log") <- jlog
 	return(dat)
+}
+
+
+
+#' Create format for HPC pipeline 
+#'
+#' Takes raw files and aligns them to reference. Important if files don't have chr:pos already
+#'
+#' @param harmonsied Output from /code{harmonise_against_ref}
+#' @param path Path to write out json file and txt file
+#'
+#' @export
+#' @return NULL
+write_out <- function(harmonsied, path)
+{
+	j <- list(
+		chr_col = 10,
+		pos_col = 11,
+		snp_col = 0,
+		ea_col = 2,
+		oa_col = 1,
+		beta_col = 3,
+		se_col = 4,
+		ncontrol_col = 7,
+		pval_col = 5,
+		eaf_col = 6,
+		delimiter = " ",
+		header = TRUE,
+		build = "GRCh37"
+	)
+	if(!all(is.na(harmonised$ZVALUE))) j$imp_z_col <- 8
+	if(!all(is.na(harmonised$INFO))) j$imp_z_col <- 9
+	if(!all(is.na(harmonised$NCASE))) j$ncase_col <- which(names(harmonised) == "NCASE")
+
+	write_json(j, paste0(path, ".json"))
+	write.table(harmonised, file=paste0(path, ".txt"), row=FALSE, col=TRUE, qu=FALSE)
 }

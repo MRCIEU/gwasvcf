@@ -3,8 +3,10 @@ suppressPackageStartupMessages({
 	library(argparse)
 	library(dplyr)
 	library(TwoSampleMR)
-	library(gwasvcftools)
+	# library(gwasvcftools)
 	library(unixtools)
+	library(devtools)
+	load_all()
 })
 
 # create parser object
@@ -58,6 +60,8 @@ ref <- read_reference(args[["ref_file"]], gwas$SNP, args[["out"]])
 
 # Harmonise
 harmonised <- harmonise_against_ref(gwas, ref)
+save(harmonised, file="temp.rdata")
+q()
 
 # Gather metadata
 metadata.input <- args
