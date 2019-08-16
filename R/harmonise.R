@@ -238,6 +238,6 @@ write_out <- function(harmonsied, path)
 	if(!all(is.na(harmonised$INFO))) j$imp_z_col <- 9
 	if(!all(is.na(harmonised$NCASE))) j$ncase_col <- which(names(harmonised) == "NCASE")
 
-	write_json(j, paste0(path, ".json"))
+	write_json(j, paste0(path, ".json"), auto_unbox=TRUE)
 	write.table(harmonised, file=paste0(path, ".txt"), row=FALSE, col=TRUE, qu=FALSE)
 }
