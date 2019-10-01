@@ -2,14 +2,14 @@
 #'
 #'
 #' @param snplist list of rs IDs or table of chrom and pos
-#' @param bcf bcf file name
+#' @param vcf vcf file name
 #' @param out temporary filename
-#' @param sel='\%CHROM \%POS \%ID \%REF \%ALT \%EFFECT \%SE \%L10PVAL \%N \%AF\n' What to extract from bcf
-#' @param logpval Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in bcf to retain precision)
+#' @param sel='\%CHROM \%POS \%ID \%REF \%ALT \%EFFECT \%SE \%L10PVAL \%N \%AF\n' What to extract from vcf
+#' @param logpval Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in vcf to retain precision)
 #'
 #' @export
 #' @return data frame
-extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n', logpval=FALSE)
+extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n', logpval=FALSE)
 {
 	require(data.table)
 	snplistname <- paste0(out, ".snplist")
@@ -19,12 +19,12 @@ extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %
 	{
 		write.table(snplist, file=snplistname, row=F, col=F, qu=F, sep="\t")
 		nsnp <- length(snplist)
-		cmd <- paste0("bcftools view -i'ID=@", out, ".snplist' ", bcf, " | bcftools query -f'", sel, "' > ", extractname)
+		cmd <- paste0("bcftools view -i'ID=@", out, ".snplist' ", vcf, " | bcftools query -f'", sel, "' > ", extractname)
 	} else {
 		stopifnot(is.data.frame(snplist))
 		write.table(snplist[,1:2], file=snplistname, row=F, col=F, qu=F, sep="\t")
 		nsnp <- nrow(snplist)
-		cmd <- paste0("bcftools query -R ", snplistname, " -f'", sel, "' ", bcf, " > ", extractname)
+		cmd <- paste0("bcftools query -R ", snplistname, " -f'", sel, "' ", vcf, " > ", extractname)
 	}
 	system(cmd)
 	o <- data.table::fread(extractname, header=FALSE, sep=" ", na.strings=".")
@@ -43,7 +43,7 @@ extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %
 #' Find LD proxies for a set of SNPs
 #'
 #' @param rsids list of rs IDs
-#' @param bcf vcf file name
+#' @param vcf vcf file name
 #' @param bfile ld reference panel
 #' @param out temporary output file
 #' @param tag_kb=5000 Proxy parameter
@@ -52,7 +52,7 @@ extract_from_bcf <- function(snplist, bcf, out, sel='%CHROM %POS %ID %REF %ALT %
 #'
 #' @export
 #' @return data frame
-get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	require(dplyr)
 	require(data.table)
@@ -61,7 +61,7 @@ get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 	targetsname <- paste0(out, ".targets")
 	outname <- paste0(out, ".targets.ld.gz")
 
-	cmd <- paste0("bcftools query -f'%ID\n' ", bcf, " > ", searchspacename)
+	cmd <- paste0("bcftools query -f'%ID\n' ", vcf, " > ", searchspacename)
 	system(cmd)
 	write.table(rsids, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
 	cmd <- paste0("cat ", targetsname, " ", searchspacename, " > ", searchspacename1)
@@ -98,10 +98,10 @@ get_ld_proxies <- function(rsids, bcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 
 #' Align proxies
 #'
-#' Takes output from get_ld_proxies and extract_from_bcf to make sure effect estimates are relative to the correct proxy alleles
+#' Takes output from get_ld_proxies and extract_from_vcf to make sure effect estimates are relative to the correct proxy alleles
 #'
 #' @param ld output from get_ld_proxies
-#' @param e output from extract_from_bcf
+#' @param e output from extract_from_vcf
 #' @param vcf_ref Optional, if provided then final dataset is aligned to reference
 #' @param tempfile temporary files for use for extractions
 #'
@@ -118,7 +118,7 @@ align_proxies <- function(ld, e, vcf_ref=NULL, tempfile=NULL)
 	sw <- temp$V4 == temp$B1
 	temp$V6[sw] <- temp$V6[sw] * -1
 	r <- temp %$% data_frame(ID = SNP_A, CHROM = CHR_A, POS = BP_A, REF = A1, ALT = A2, EFFECT = V6, SE = V7, PVAL = V8, N = V9, AF = MAF_B, proxy.chrom = CHR_B, proxy.pos = BP_B, proxy.id = V3)
-	ref <- extract_from_bcf(subset(r, select=c(CHROM, POS)), vcf_ref, tempfile, '%CHROM %POS %ID %REF %ALT\n')
+	ref <- extract_from_vcf(subset(r, select=c(CHROM, POS)), vcf_ref, tempfile, '%CHROM %POS %ID %REF %ALT\n')
 
 	a1 <- merge(r, ref, by.x="ID", by.y="V3")
 	i <- a1$REF == a1$V4
@@ -154,11 +154,11 @@ is_palindrome <- function(a1, a2)
 	(a1 == "G" & a2 == "C")
 }
 
-#' Extract SNPs from bcf file
+#' Extract SNPs from vcf file
 #'
 #' Finds proxies if necessary
 #'
-#' @param bcf vcf file name
+#' @param vcf vcf file name
 #' @param snplist list of rs IDs or data frame of chrom and pos
 #' @param tempname Temporary file
 #' @param proxies="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
@@ -170,7 +170,7 @@ is_palindrome <- function(a1, a2)
 #'
 #' @export
 #' @return data frame
-extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+extract <- function(vcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.vector(snplist))
 	{
@@ -182,7 +182,7 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 	stopifnot(proxies %in% c("yes", "no", "only"))
 	if(proxies == "no")
 	{
-		o <- extract_from_bcf(snplist, bcf, tempname)
+		o <- extract_from_vcf(snplist, vcf, tempname)
 		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "EFFECT", "SE", "PVAL", "N", "AF")
 		o$proxy.chrom <- o$proxy.pos <- o$proxy.id <- NA
 		return(o)
@@ -190,7 +190,7 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 
 	if(proxies == "yes")
 	{
-		o <- extract_from_bcf(snplist, bcf, tempname)
+		o <- extract_from_vcf(snplist, vcf, tempname)
 		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "EFFECT", "SE", "PVAL", "N", "AF")
 
 		if(rsid)
@@ -202,8 +202,8 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 		}
 		if(length(missing_snps) > 0)
 		{
-			ld <- get_ld_proxies(missing_snps, bcf, bfile, tempname, threads=threads)
-			e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
+			ld <- get_ld_proxies(missing_snps, vcf, bfile, tempname, threads=threads)
+			e <- extract_from_vcf(ld$SNP_B, vcf, tempname)
 			a <- align_proxies(ld, e, vcf_ref, tempname)
 			o <- bind_rows(a,o)
 		}
@@ -214,11 +214,11 @@ extract <- function(bcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_k
 	{
 		if(rsid)
 		{
-			ld <- get_ld_proxies(snplist, bcf, bfile, tempname, threads=threads)
+			ld <- get_ld_proxies(snplist, vcf, bfile, tempname, threads=threads)
 		} else {
-			ld <- get_ld_proxies(snplist[,6], bcf, bfile, tempname, threads=threads)
+			ld <- get_ld_proxies(snplist[,6], vcf, bfile, tempname, threads=threads)
 		}
-		e <- extract_from_bcf(ld$SNP_B, bcf, tempname)
+		e <- extract_from_vcf(ld$SNP_B, vcf, tempname)
 		a <- align_proxies(ld, e, vcf_ref, tempname)
 		return(a)
 	}

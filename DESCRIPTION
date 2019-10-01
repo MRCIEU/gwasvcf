@@ -7,7 +7,7 @@ Depends:
   R (>= 3.4.4),
   dplyr,
   magrittr,
-  vcfR,
+  VariantAnnotation,
   data.table,
   tidyr,
   methods,

@@ -178,7 +178,7 @@ read_reference <- function(reference_file, snplist, outfile, remove_dup_rsids=TR
 harmonise_against_ref <- function(gwas, reference)
 {
 	# Check strand
-	action <- gwasvcftools::is_forward_strand(gwas$SNP, gwas$effect_allele.outcome, gwas$other_allele.outcome, reference$SNP, reference$other_allele.exposure, reference$effect_allele.exposure, threshold=0.9)
+	action <- is_forward_strand(gwas$SNP, gwas$effect_allele.outcome, gwas$other_allele.outcome, reference$SNP, reference$other_allele.exposure, reference$effect_allele.exposure, threshold=0.9)
 
 	# Harmonise
 	dat <- TwoSampleMR::harmonise_data(reference, gwas, action)
@@ -243,4 +243,79 @@ write_out <- function(harmonised, path)
 	write.table(harmonised, gz1, row=FALSE, col=TRUE, qu=FALSE)
 	close(gz1)
 
+}
+
+
+#' Check a GWAS dataset against a reference known to be on the forward strand
+#'
+#' 
+#' Assuming reference data is all on forward strand, check if 
+#' the GWAS is also.
+#' Use some threshold e.g. if more than 90% of alleles don't 
+#' need to be flipped then it's likely that the dataset is on
+#' the forward strand
+#'
+#' This function can be used to evaluate how strict harmonisation should be
+#' The trade off if you assume we are not on the forward strand then palindromic SNPs are dropped within a particular frequency range
+#' But you could instead have some small probability of error for whether palindromic SNPs are on the forward strand, and avoid dropping too many variants.
+#'
+#' @param gwas_snp Vector of SNP names for the dataset being checked
+#' @param gwas_a1 Vector of alleles
+#' @param gwas_a2 Vector of alleles
+#' @param ref_snp Vector of SNP names for the reference dataset
+#' @param ref_a1 Vector of alleles
+#' @param ref_a2 Vector of alleles
+#' @param threshold=0.9 If the proportion of allele strands match is above this threshold, then declare the dataset to be on the forward strand
+#'
+#' @export
+#' @return 1 = Forward strand; 2 = Not on forward strand
+is_forward_strand <- function(gwas_snp, gwas_a1, gwas_a2, ref_snp, ref_a1, ref_a2, threshold=0.9)
+{
+	requireNamespace("dplyr", quietly=TRUE)
+	if(is.null(gwas_a1) | is.null(gwas_a2))
+	{
+		message("No info for both GWAS alleles")
+		return(2)
+	}
+
+	if(1-(sum(is.na(gwas_a1)) / length(gwas_a1)) < threshold)
+	{
+		message("Too many missing values for gwas A1")
+		return(2)
+	}
+	if(1-(sum(is.na(gwas_a2)) / length(gwas_a2)) < threshold)
+	{
+		message("Too many missing values for gwas A2")
+		return(2)
+	}
+
+	g <- dplyr::data_frame(SNP=gwas_snp, A1=toupper(gwas_a1), A2=toupper(gwas_a2)) %>%
+    		subset(!is.na(SNP) & !is.na(A1) & !is.na(A2))
+	r <- dplyr::data_frame(SNP=ref_snp, A1=toupper(ref_a1), A2=toupper(ref_a2))
+
+	gr <- dplyr::inner_join(g,r,by="SNP")
+	index <- (gr$A1.x == gr$A1.y & gr$A2.x == gr$A2.y) | (gr$A1.x == gr$A2.y & gr$A2.x == gr$A1.y)
+	diff <- gr[!index,]
+	diff$A1.x[diff$A1.x == "C"] <- "g"
+	diff$A1.x[diff$A1.x == "G"] <- "c"
+	diff$A1.x[diff$A1.x == "T"] <- "a"
+	diff$A1.x[diff$A1.x == "A"] <- "t"
+	diff$A2.x[diff$A2.x == "C"] <- "g"
+	diff$A2.x[diff$A2.x == "G"] <- "c"
+	diff$A2.x[diff$A2.x == "T"] <- "a"
+	diff$A2.x[diff$A2.x == "A"] <- "t"
+	diff$A1.x <- toupper(diff$A1.x)
+	diff$A2.x <- toupper(diff$A2.x)
+
+	index2 <- (diff$A1.x == diff$A1.y & diff$A2.x == diff$A2.y) | (diff$A1.x == diff$A2.y & diff$A2.x == diff$A1.y)
+
+	# Number that match initially
+	message("SNPs that match: ", sum(index))
+	message("SNPs that match after flipping: ", sum(index2))
+	message("SNPs that never match: ", sum(!index2))
+
+	prop <- 1 - sum(index2) / sum(index)
+	message("Proportion on forward strand: ", prop)
+
+	return(ifelse(prop > threshold, 1, 2))
 }
