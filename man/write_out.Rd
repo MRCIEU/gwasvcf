@@ -4,12 +4,12 @@
 \alias{write_out}
 \title{Write to neo4j csv format}
 \usage{
-write_out(harmonsied, path)
+write_out(harmonised, path)
 
-write_out(harmonsied, path)
+write_out(harmonised, path)
 }
 \arguments{
-\item{harmonsied}{Output from /code{harmonise_against_ref}}
+\item{harmonised}{Output from /code{harmonise_against_ref}}
 
 \item{path}{Path to write out json file and txt file}
 

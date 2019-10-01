@@ -9,7 +9,7 @@ align_proxies(ld, e, vcf_ref = NULL, tempfile = NULL)
 \arguments{
 \item{ld}{output from get_ld_proxies}
 
-\item{e}{output from extract_from_bcf}
+\item{e}{output from extract_from_vcf}
 
 \item{vcf_ref}{Optional, if provided then final dataset is aligned to reference}
 
@@ -19,5 +19,5 @@ align_proxies(ld, e, vcf_ref = NULL, tempfile = NULL)
 data frame
 }
 \description{
-Takes output from get_ld_proxies and extract_from_bcf to make sure effect estimates are relative to the correct proxy alleles
+Takes output from get_ld_proxies and extract_from_vcf to make sure effect estimates are relative to the correct proxy alleles
 }

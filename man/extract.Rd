@@ -2,13 +2,13 @@
 % Please edit documentation in R/extract.R
 \name{extract}
 \alias{extract}
-\title{Extract SNPs from bcf file}
+\title{Extract SNPs from vcf file}
 \usage{
-extract(bcf, snplist, tempname, proxies = "yes", bfile, vcf_ref,
+extract(vcf, snplist, tempname, proxies = "yes", bfile, vcf_ref,
   tag_kb = 5000, tag_nsnp = 5000, tag_r2 = 0.6, threads = 1)
 }
 \arguments{
-\item{bcf}{vcf file name}
+\item{vcf}{vcf file name}
 
 \item{snplist}{list of rs IDs or data frame of chrom and pos}
 

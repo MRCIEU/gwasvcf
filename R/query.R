@@ -62,13 +62,28 @@ query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="hg19")
 }
 
 
-query_rsid_file <- function(rsid, vcffile)
+query_rsid_file <- function(rsid, vcffile, id=NULL, build="hg19")
 {
+	vcf <- TabixFile(vcffile)
+	# if(is.null(id)) id <- samples(header(vcf))
+	# stopifnot(length(id) == 1)
+	fil <- function(x)
+	{
+		as.vector(rowRanges(x) %in% rsid)
+	}
 
+	tempfile <- tempfile()
+	filterVcf(tab, build, tempfile, prefilters=FilterRules(list(fil=fil)), verbose=TRUE)
+	o <- readVcf(tempfile)
+	unlink(tempfile)
+
+	# Grep isn't matching on exact word so do second pass here
+	o <- query_rsid_vcf(o, rsid)
+	return(o)
 }
 
 
-query_pval_file <- function(pval, vcffile)
+query_pval_file <- function(pval, vcffile, id=NULL, build="hg19")
 {
 
 }
@@ -81,9 +96,9 @@ query_chrompos_vcf <- function(chrompos, vcffile)
 }
 
 
-query_rsid_vcf <- function(rsid, vcffile)
+query_rsid_vcf <- function(rsid, vcf)
 {
-
+	vcf[rownames(vcf) %in% rsid,]
 }
 
 
