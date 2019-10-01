@@ -9,7 +9,7 @@
 #'
 #' @export
 #' @return data frame
-extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT %EFFECT %SE %L10PVAL %N %AF\n', logpval=FALSE)
+extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT [%ES %SE %LP %SS %AF]\n', logpval=FALSE)
 {
 	require(data.table)
 	snplistname <- paste0(out, ".snplist")
@@ -30,7 +30,7 @@ extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT %
 	o <- data.table::fread(extractname, header=FALSE, sep=" ", na.strings=".")
 	if(logpval)
 	{
-		which({gsub("[[:space:]]", "", sel) %>% strsplit(sel, split="%")}[[1]] == "L10PVAL") - 1
+		which({gsub("[[:space:]]", "", sel) %>% strsplit(sel, split="%")}[[1]] == "LP") - 1
 		o[,8] <- 10^-o[,8]
 	}
 	message("Extracted ", nrow(o), " out of ", nsnp, " SNPs")

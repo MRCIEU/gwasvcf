@@ -9,4 +9,13 @@ test_that("parse_chrompos", {
 })
 
 
+test_that("granges_from_vcf", {
+	v <- readVcf(system.file("data","data.vcf.gz", package="gwasvcftools"))
+	g <- granges_from_vcf(v)
+	expect_equal(length(g), length(v))
+})
 
+
+test_that("", {
+	
+})

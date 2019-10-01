@@ -4,6 +4,14 @@ granges_from_df <- function(df)
 }
 
 
+#' Parse chromosome:position
+#'
+#' Takes data frame or vector of chromosome position ranges and parses to granges object
+#'
+#' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
+#'
+#' @export
+#' @return GRanges object
 parse_chrompos <- function(chrompos)
 {
 
@@ -33,6 +41,13 @@ parse_chrompos <- function(chrompos)
 }
 
 
+#' Convert vcf format to granges format
+#'
+#' @param vcf Output from readVcf
+#' @param id Only accepts one ID, so specify here if there are multiple GWAS datasets in the vcf
+#'
+#' @export
+#' @return GRanges object
 granges_from_vcf <- function(vcf, id=NULL)
 {
 	if(is.null(id))
@@ -40,10 +55,10 @@ granges_from_vcf <- function(vcf, id=NULL)
 		id <- samples(header(vcf))
 	}
 	stopifnot(length(id) == 1)
-	out <- VariantAnnotation::expand(vcf[,geno]) %>% 
+	out <- VariantAnnotation::expand(vcf) %>% 
 	geno() %>%
 	as.list() %>%
-	lapply(., unlist) %>%
+	lapply(., function(x) x[,id, drop=TRUE]) %>%
 	bind_cols()
 	a <- rowRanges(vcf)
 	values(a) <- cbind(values(a), out)
@@ -53,20 +68,36 @@ granges_from_vcf <- function(vcf, id=NULL)
 }
 
 
+#' Query vcf file, extracting by chromosome and position
+#'
+#'
+#' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
+#' @param vcffile Path to .vcf.gz GWAS summary data file
+#' @param build="hg19" Build of vcffile
+#'
+#' @export
+#' @return VCF object
 query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="hg19")
 {
 	chrompos <- parse_chrompos(chrompos)
 	tab <- TabixFile(vcffile)
 	vcf <- readVcf(tab, build, param=chrompos)
-	granges_from_vcf(vcf, id)
+	return(vcf)
 }
 
 
-query_rsid_file <- function(rsid, vcffile, id=NULL, build="hg19")
+#' Query vcf file, extracting by rsid
+#'
+#' @param rsid Vector of rsids. Use DBSNP build (???)
+#' @param vcffile Path to .vcf.gz GWAS summary data file
+#' @param build="hg19" Build of vcffile
+#'
+#' @export
+#' @return VCF object
+query_rsid_file <- function(rsid, vcffile, build="hg19")
 {
+	message("Note, this is much slower than searching by chromosome/position (e.g. see query_chrompos_file)")
 	vcf <- TabixFile(vcffile)
-	# if(is.null(id)) id <- samples(header(vcf))
-	# stopifnot(length(id) == 1)
 	fil <- function(x)
 	{
 		as.vector(rowRanges(x) %in% rsid)
