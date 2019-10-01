@@ -212,12 +212,12 @@ harmonise_against_ref <- function(gwas, reference)
 #'
 #' Takes raw files and aligns them to reference. Important if files don't have chr:pos already
 #'
-#' @param harmonsied Output from /code{harmonise_against_ref}
+#' @param harmonised Output from /code{harmonise_against_ref}
 #' @param path Path to write out json file and txt file
 #'
 #' @export
 #' @return NULL
-write_out <- function(harmonsied, path)
+write_out <- function(harmonised, path)
 {
 	j <- list(
 		chr_col = 10,
@@ -239,5 +239,8 @@ write_out <- function(harmonsied, path)
 	if(!all(is.na(harmonised$NCASE))) j$ncase_col <- which(names(harmonised) == "NCASE")
 
 	write_json(j, paste0(path, ".json"), auto_unbox=TRUE)
-	write.table(harmonised, file=paste0(path, ".txt"), row=FALSE, col=TRUE, qu=FALSE)
+	gz1 <- gzfile(paste0(path, ".txt.gz"), "w")
+	write.table(harmonised, gz1, row=FALSE, col=TRUE, qu=FALSE)
+	close(gz1)
+
 }
