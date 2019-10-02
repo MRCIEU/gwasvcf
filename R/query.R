@@ -1,3 +1,25 @@
+detect_os <- function()
+{
+	switch(Sys.info()[['sysname']],
+	Windows= {print("I'm a Windows PC.")},
+	Linux  = {print("I'm a penguin.")},
+	Darwin = {print("I'm a Mac.")})
+}
+
+#' Find binary for bcftools
+#'
+#' @param 
+#'
+#' @export
+#' @return
+get_bcftools_binary <- function()
+{
+	switch(Sys.info()[['sysname']],
+		Windows = { stop("Sorry, bcftools binary is not available for Windows at the moment. Use the other native functions for querying, or for faster speeds use this package on Mac or Linux")},
+		Linux = { system.file("bin", "bcftools_linux", package="gwasvcftools") },
+		Darwin = { system.file("bin", "bcftools_darwin", package="gwasvcftools") })
+}
+
 granges_from_df <- function(df)
 {
 	GRanges(seqnames=df$chrom, ranges=IRanges(start=df$start, end=df$end))
@@ -100,46 +122,144 @@ query_rsid_file <- function(rsid, vcffile, build="hg19")
 	vcf <- TabixFile(vcffile)
 	fil <- function(x)
 	{
-		as.vector(rowRanges(x) %in% rsid)
+		grepl(paste(rsid, collapse="|"), x)
 	}
 
 	tempfile <- tempfile()
-	filterVcf(tab, build, tempfile, prefilters=FilterRules(list(fil=fil)), verbose=TRUE)
+	filterVcf(vcf, build, tempfile, prefilters=FilterRules(list(fil=fil)), verbose=TRUE)
 	o <- readVcf(tempfile)
 	unlink(tempfile)
 
 	# Grep isn't matching on exact word so do second pass here
-	o <- query_rsid_vcf(o, rsid)
+	o <- query_rsid_vcf(rsid, o)
 	return(o)
 }
 
 
+#' Query pval from vcf file
+#'
+#' @param pval P-value threshold (NOT -log10)
+#' @param vcffile Path to tabix indexed vcf file
+#' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
+#' @param build="hg19"
+#'
+#' @export
+#' @return VCF object
 query_pval_file <- function(pval, vcffile, id=NULL, build="hg19")
 {
-
+	if(is.null(id))
+	{
+		id <- samples(scanVcfHeader(vcffile))
+	}
+	stopifnot(length(id) == 1)
+	message("Filtering p-value based on id ", id)
+	message("Note, this is much slower than searching by chromosome/position (e.g. see query_chrompos_file)")
+	vcf <- TabixFile(vcffile)
+	fil <- function(x)
+	{
+		geno(x)$LP[,id,drop=TRUE] > -log10(pval)
+	}
+	tempfile <- tempfile()
+	filterVcf(vcf, build, tempfile, filters=FilterRules(list(fil=fil)), verbose=TRUE)
+	o <- readVcf(tempfile)
+	unlink(tempfile)
+	return(o)
 }
 
 
-query_chrompos_vcf <- function(chrompos, vcffile)
+#' Query chrompos from vcf object
+#'
+#' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
+#' @param vcf VCF object (e.g. from readVcf)
+#'
+#' @export
+#' @return VCF object
+query_chrompos_vcf <- function(chrompos, vcf)
 {
 	chrompos <- parse_chrompos(chrompos)
-		
+	i <- IRanges::findOverlaps(SummarizedExperiment::rowRanges(vcf), chrompos) %>% S4Vectors::queryHits() %>% unique %>% sort
+	vcf[i,]
 }
 
 
+#' Query rsid from vcf object
+#'
+#' @param rsid Vector of rsids
+#' @param vcf VCF object (e.g. from readVcf)
+#'
+#' @export
+#' @return VCF object
 query_rsid_vcf <- function(rsid, vcf)
 {
 	vcf[rownames(vcf) %in% rsid,]
 }
 
 
-query_pval_vcf <- function(pval, vcffile)
+#' Query based on p-value threshold from vcf
+#'
+#' @param pval P-value threshold (NOT -log10)
+#' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
+#' @param vcf VCF object (e.g. from readVcf)
+#'
+#' @export
+#' @return VCF object
+query_pval_vcf <- function(pval, vcf, id=NULL)
 {
-
+	if(is.null(id))
+	{
+		id <- samples(header(vcf))
+	}
+	stopifnot(length(id) == 1)
+	colid <- which(samples(header(vcf)) == id)
+	vcf[geno(vcf)$LP[,colid,drop=TRUE] > -log10(pval),]
 }
 
+## Using bcftools
 
+query_rsid_bcftools <- function(rsid, vcffile)
+{
+	bcftools <- get_bcftools_binary()
+	tmp <- tempfile()
+	write.table(unique(rsid), file=paste0(tmp, ".snplist"), row=F, col=F, qu=F)
+	cmd <- sprintf("%s view -i'ID=@%s.snplist' %s > %s.vcf", bcftools, tmp, vcffile, tmp)
+	system(cmd)
+	o <- readVcf(paste0(tmp, ".vcf"))
+	unlink(paste0(tmp, ".vcf"))
+	unlink(paste0(tmp, ".snplist"))
+	return(o)
+}
 
+query_pval_bcftools <- function(pval, vcffile, id=NULL)
+{
+	bcftools <- get_bcftools_binary()
+	if(is.null(id))
+	{
+		id <- samples(scanVcfHeader(vcffile))
+	}
+	stopifnot(length(id) == 1)	
+	tmp <- tempfile()
+	write.table(unique(rsid), file=paste0(tmp, ".snplist"), row=F, col=F, qu=F)
+	cmd <- sprintf("%s view -s %s -i 'FORMAT/LP > %s' %s > %s.vcf", bcftools, id, -log10(pval), vcffile, tmp)
+	system(cmd)
+	o <- readVcf(paste0(tmp, ".vcf"))
+	unlink(paste0(tmp, ".vcf"))
+	unlink(paste0(tmp, ".snplist"))
+	return(o)
+}
 
+query_chrompos_bcftools <- function(chrompos, vcffile)
+{
+	bcftools <- get_bcftools_binary()
+	chrompos <- parse_chrompos(chrompos)
+	chrompos %>% as.data.frame
+	tmp <- tempfile()
+	write.table(as.data.frame(chrompos)[,1:3], file=paste0(tmp, ".snplist"), sep="\t", row=F, col=F, qu=F)
 
+	cmd <- sprintf("%s view -R %s.snplist %s > %s.vcf", bcftools, tmp, vcffile, tmp)
+	system(cmd)
+	o <- readVcf(paste0(tmp, ".vcf"))
+	unlink(paste0(tmp, ".vcf"))
+	unlink(paste0(tmp, ".snplist"))
+	return(o)
+}
 
