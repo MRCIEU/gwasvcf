@@ -19,12 +19,12 @@ extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT [
 	{
 		write.table(snplist, file=snplistname, row=F, col=F, qu=F, sep="\t")
 		nsnp <- length(snplist)
-		cmd <- paste0("bcftools view -i'ID=@", out, ".snplist' ", vcf, " | bcftools query -f'", sel, "' > ", extractname)
+		cmd <- stringf("%s view -i'ID=@%s.snplist' %s | %s query -f'%s' > %s", get_bcftools_binary(), out, vcf, get_bcftools_binary(), sel, extractname)
 	} else {
 		stopifnot(is.data.frame(snplist))
 		write.table(snplist[,1:2], file=snplistname, row=F, col=F, qu=F, sep="\t")
 		nsnp <- nrow(snplist)
-		cmd <- paste0("bcftools query -R ", snplistname, " -f'", sel, "' ", vcf, " > ", extractname)
+		cmd <- stringf("%s query -R %s -f'%s' %s > %s", get_bcftools_binary(), snplistname, sel, vcf, extractname)
 	}
 	system(cmd)
 	o <- data.table::fread(extractname, header=FALSE, sep=" ", na.strings=".")
@@ -67,10 +67,10 @@ get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 	cmd <- paste0("cat ", targetsname, " ", searchspacename, " > ", searchspacename1)
 	system(cmd)
 
-	cmd <- paste0(
-		"plink --bfile ", bfile, 
+	cmd <- paste0(get_plink_binary(),
+		" --bfile ", bfile, 
 		" --extract ", searchspacename1,
-		" --r2 in-phase with-freqs gz",
+		" --r in-phase with-freqs gz",
 		" --ld-snp-list ", targetsname,
 		" --ld-window-kb ", tag_kb,
 		" --ld-window-r2 ", tag_r2,
@@ -86,7 +86,7 @@ get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_data_frame
 	names(temp) <- c("A1", "B1", "A2", "B2")
 	ld <- cbind(ld, temp) %>% as_data_frame()
-	ld <- arrange(ld, desc(R2)) %>%
+	ld <- arrange(ld, desc(abs(R))) %>%
 		dplyr::filter(!duplicated(SNP_A))
 	unlink(searchspacename)
 	unlink(searchspacename1)

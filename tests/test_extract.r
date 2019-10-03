@@ -38,3 +38,12 @@ a <- extract(
 )
 
 
+
+
+library(devtools)
+load_all()
+a <- TwoSampleMR::extract_instruments(2)
+fn <- system.file("data","IEU-a-2.vcf.gz", package="gwasvcftools")
+ldref <- "~/repo/mr-base-api/app/ld_files/data_maf0.01_rs"
+
+o <- get_ld_proxies(a$SNP, fn, ldref, tempfile())
