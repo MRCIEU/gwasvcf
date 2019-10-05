@@ -5,7 +5,7 @@
 \title{Extract SNPs from vcf}
 \usage{
 extract_from_vcf(snplist, vcf, out,
-  sel = "\%CHROM \%POS \%ID \%REF \%ALT \%EFFECT \%SE \%L10PVAL \%N \%AF\\n",
+  sel = "\%CHROM \%POS \%ID \%REF \%ALT [\%ES \%SE \%LP \%SS \%AF]\\n",
   logpval = FALSE)
 }
 \arguments{
