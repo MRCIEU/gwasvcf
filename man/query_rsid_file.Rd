@@ -4,7 +4,7 @@
 \alias{query_rsid_file}
 \title{Query vcf file, extracting by rsid}
 \usage{
-query_rsid_file(rsid, vcffile, id = NULL, build = "hg19")
+query_rsid_file(rsid, vcffile, id = NULL, build = "GRCh37")
 }
 \arguments{
 \item{rsid}{Vector of rsids. Use DBSNP build (???)}
@@ -13,7 +13,7 @@ query_rsid_file(rsid, vcffile, id = NULL, build = "hg19")
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
-\item{build="hg19"}{Build of vcffile}
+\item{build="GRCh37"}{Build of vcffile}
 }
 \value{
 VCF object

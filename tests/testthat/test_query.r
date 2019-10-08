@@ -1,8 +1,66 @@
 context("Querying vcf files")
 library(gwasvcftools)
 
+
 fn <- system.file("data","data.vcf.gz", package="gwasvcftools")
 vcf <- readVcf(fn)
+
+
+
+test_that("query_gwas", {
+	chrompos<- c("1:800000-1000000")
+	rsid <- c("rs3128126", "rs3121561", "rs3813193")
+	id <- "IEU-a-2"
+	pval <- 0.2
+
+	expect_true({
+		a = query_gwas(fn, chrompos=chrompos, os="Darwin")
+		b = query_gwas(fn, chrompos=chrompos, os="Windows")
+		c = query_gwas(fn, chrompos=chrompos, id=id, os="Darwin")
+		d = query_gwas(fn, chrompos=chrompos, id=id, os="Windows")
+		a == b && b == c && c == d
+	})
+
+	expect_true({
+		a = query_gwas(fn, rsid=rsid, os="Darwin")
+		b = query_gwas(fn, rsid=rsid, os="Windows")
+		c = query_gwas(fn, rsid=rsid, id=id, os="Darwin")
+		d = query_gwas(fn, rsid=rsid, id=id, os="Windows")
+		a == b && b == c && c == d
+	})
+
+	expect_true({
+		a = query_gwas(fn, pval=pval, os="Darwin")
+		b = query_gwas(fn, pval=pval, os="Windows")
+		c = query_gwas(fn, pval=pval, id=id, os="Darwin")
+		d = query_gwas(fn, pval=pval, id=id, os="Windows")
+		a == b && b == c && c == d
+	})
+
+	expect_true({
+		a = query_gwas(vcf, chrompos=chrompos, os="Darwin")
+		b = query_gwas(vcf, chrompos=chrompos, os="Windows")
+		c = query_gwas(vcf, chrompos=chrompos, id=id, os="Darwin")
+		d = query_gwas(vcf, chrompos=chrompos, id=id, os="Windows")
+		a == b && b == c && c == d
+	})
+
+	expect_true({
+		a = query_gwas(vcf, rsid=rsid, os="Darwin")
+		b = query_gwas(vcf, rsid=rsid, os="Windows")
+		c = query_gwas(vcf, rsid=rsid, id=id, os="Darwin")
+		d = query_gwas(vcf, rsid=rsid, id=id, os="Windows")
+		a == b && b == c && c == d
+	})
+
+	expect_true({
+		a = query_gwas(vcf, pval=pval, os="Darwin")
+		b = query_gwas(vcf, pval=pval, os="Windows")
+		c = query_gwas(vcf, pval=pval, id=id, os="Darwin")
+		d = query_gwas(vcf, pval=pval, id=id, os="Windows")
+		a == b && b == c && c == d
+	})
+})
 
 
 test_that("parse_chrompos", {

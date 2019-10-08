@@ -9,70 +9,67 @@
 #' @param rsid Vector of rsids
 #' @param pval  P-value threshold (NOT -log10)
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="hg19" Build of vcffile
+#' @param build="GRCh37" Build of vcffile
+#' @param os The operating system. Default is as detected. Determines the method used to perform query
 #'
 #' @export
 #' @return vcf object
-query_gwas <- function(vcf=NULL, vcffile=NULL, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build="hg19")
+query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build="GRCh37", os=Sys.info()[['sysname']])
 {
-	if(is.null(vcf) & is.null(vcffile))
+	if(is.character(vcf))
 	{
-		stop("Must specify vcf or vcffile")
+		stopifnot(file.exists(vcf))
+		fileflag <- TRUE
+	} else {
+		stopifnot(class(vcf) %in% c("CollapsedVCF", "ExpandedVCF"))
+		fileflag <- FALSE
 	}
-	if(!is.null(vcf) & !is.null(vcffile))
-	{
-		stop("Must specify vcf or vcffile, not both")
-	}
-	if(!is.null(vcf) & !is.null(vcffile))
-	{
-		stop("Must specify vcf or vcffile, not both")
-	}
-	if(sum(c(!is.null(chrompos), !is.null(rsid), !is.null(pval)) != 1))
+	if(sum(c(!is.null(chrompos), !is.null(rsid), !is.null(pval))) != 1)
 	{
 		stop("Must specify filters only for one of chrompos, rsid or pval")
 	}
 
 	if(!is.null(chrompos))
 	{
-		if(!is.null(vcf))
+		if(!fileflag)
 		{
 			return(query_chrompos_vcf(chrompos, vcf))
 		} else {
-			if(Sys.info()[['sysname']] == "Windows")
+			if(os == "Windows")
 			{
-				return(query_chrompos_file(chrompos, vcf, id))
+				return(query_chrompos_file(chrompos, vcf, id, build))
 			} else {
-				return(query_chrompos_bcftool(chrompos, vcf, id, build))
+				return(query_chrompos_bcftools(chrompos, vcf, id))
 			}
 		}
 	}
 
 	if(!is.null(rsid))
 	{
-		if(!is.null(vcf))
+		if(!fileflag)
 		{
 			return(query_rsid_vcf(rsid, vcf))
 		} else {
-			if(Sys.info()[['sysname']] == "Windows")
+			if(os == "Windows")
 			{
-				return(query_rsid_file(rsid, vcf, id))
+				return(query_rsid_file(rsid, vcf, id, build))
 			} else {
-				return(query_rsid_bcftool(rsid, vcf, id, build))
+				return(query_rsid_bcftools(rsid, vcf, id))
 			}
 		}
 	}
 
 	if(!is.null(pval))
 	{
-		if(!is.null(vcf))
+		if(!fileflag)
 		{
 			return(query_pval_vcf(pval, vcf, id))
 		} else {
-			if(Sys.info()[['sysname']] == "Windows")
+			if(os == "Windows")
 			{
-				return(query_pval_file(pval, vcf, id))
+				return(query_pval_file(pval, vcf, id, build))
 			} else {
-				return(query_pval_bcftool(pval, vcf, id, build))
+				return(query_pval_bcftools(pval, vcf, id))
 			}
 		}		
 	}
@@ -154,7 +151,7 @@ parse_chrompos <- function(chrompos)
 #'
 #' @export
 #' @return GRanges object
-granges_from_vcf <- function(vcf, id=NULL)
+vcf_to_granges <- function(vcf, id=NULL)
 {
 	if(is.null(id))
 	{
@@ -164,7 +161,35 @@ granges_from_vcf <- function(vcf, id=NULL)
 	out <- VariantAnnotation::expand(vcf) %>% 
 	geno() %>%
 	as.list() %>%
-	lapply(., function(x) x[,id, drop=TRUE]) %>%
+	lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
+	bind_cols()
+	a <- rowRanges(vcf)
+	a$ALT <- unlist(a$ALT)
+	values(a) <- cbind(values(a), out)
+	values(a)$id <- id
+
+	return(a)
+}
+
+
+#' Convert vcf format to granges format
+#'
+#' @param vcf Output from readVcf
+#' @param id Only accepts one ID, so specify here if there are multiple GWAS datasets in the vcf
+#'
+#' @export
+#' @return GRanges object
+vcf_to_tibble <- function(vcf, id=NULL)
+{
+	if(is.null(id))
+	{
+		id <- samples(header(vcf))
+	}
+	stopifnot(length(id) == 1)
+	out <- VariantAnnotation::expand(vcf) %>% 
+	geno() %>%
+	as.list() %>%
+	lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
 	bind_cols()
 	a <- rowRanges(vcf)
 	values(a) <- cbind(values(a), out)
@@ -174,24 +199,25 @@ granges_from_vcf <- function(vcf, id=NULL)
 }
 
 
+
 #' Query vcf file, extracting by chromosome and position
 #'
 #'
 #' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
 #' @param vcffile Path to .vcf.gz GWAS summary data file
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="hg19" Build of vcffile
+#' @param build="GRCh37" Build of vcffile
 #'
 #' @export
 #' @return VCF object
-query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="hg19")
+query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="GRCh37")
 {
 	chrompos <- parse_chrompos(chrompos)
 	if(!is.null(id))
 	{
-		param <- scanVcfParam(which=chrompos, samples=id)
+		param <- ScanVcfParam(which=chrompos, samples=id)
 	} else {
-		param <- scanVcfParam(which=chrompos)
+		param <- ScanVcfParam(which=chrompos)
 	}
 	tab <- TabixFile(vcffile)
 	vcf <- readVcf(tab, build, param=chrompos)
@@ -204,11 +230,11 @@ query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="hg19")
 #' @param rsid Vector of rsids. Use DBSNP build (???)
 #' @param vcffile Path to .vcf.gz GWAS summary data file
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="hg19" Build of vcffile
+#' @param build="GRCh37" Build of vcffile
 #'
 #' @export
 #' @return VCF object
-query_rsid_file <- function(rsid, vcffile, id=NULL, build="hg19")
+query_rsid_file <- function(rsid, vcffile, id=NULL, build="GRCh37")
 {
 	message("Note, this is much slower than searching by chromosome/position (e.g. see query_chrompos_file)")
 	vcf <- TabixFile(vcffile)
@@ -221,7 +247,7 @@ query_rsid_file <- function(rsid, vcffile, id=NULL, build="hg19")
 	filterVcf(vcf, build, tempfile, prefilters=FilterRules(list(fil=fil)), verbose=TRUE)
 	if(!is.null(id))
 	{
-		o <- readVcf(tempfile, param=scanVcfParam(samples=id))
+		o <- readVcf(tempfile, param=ScanVcfParam(samples=id))
 	} else {
 		o <- readVcf(tempfile)
 	}
@@ -238,11 +264,11 @@ query_rsid_file <- function(rsid, vcffile, id=NULL, build="hg19")
 #' @param pval P-value threshold (NOT -log10)
 #' @param vcffile Path to tabix indexed vcf file
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="hg19"
+#' @param build="GRCh37"
 #'
 #' @export
 #' @return VCF object
-query_pval_file <- function(pval, vcffile, id=NULL, build="hg19")
+query_pval_file <- function(pval, vcffile, id=NULL, build="GRCh37")
 {
 	if(is.null(id))
 	{
@@ -384,7 +410,7 @@ query_pval_bcftools <- function(pval, vcffile, id=NULL)
 #'
 #' @export
 #' @return vcf object
-query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
+query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL, build="GRCh37")
 {
 	bcftools <- get_bcftools_binary()
 	if(is.null(id))

@@ -4,11 +4,11 @@
 \alias{get_ld_proxies}
 \title{Find LD proxies for a set of SNPs}
 \usage{
-get_ld_proxies(rsids, vcf, bfile, out, tag_kb = 5000, tag_nsnp = 5000,
-  tag_r2 = 0.6, threads = 1)
+get_ld_proxies(rsid, vcf, bfile, out = tempfile(), tag_kb = 5000,
+  tag_nsnp = 5000, tag_r2 = 0.6, threads = 1)
 }
 \arguments{
-\item{rsids}{list of rs IDs}
+\item{rsid}{list of rs IDs}
 
 \item{vcf}{vcf file name}
 

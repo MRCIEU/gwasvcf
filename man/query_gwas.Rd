@@ -4,13 +4,11 @@
 \alias{query_gwas}
 \title{Query data from vcf file}
 \usage{
-query_gwas(vcf = NULL, vcffile = NULL, chrompos = NULL,
-  rsid = NULL, pval = NULL, id = NULL, build = "hg19")
+query_gwas(vcf, chrompos = NULL, rsid = NULL, pval = NULL,
+  id = NULL, build = "GRCh37", os = Sys.info()[["sysname"]])
 }
 \arguments{
 \item{vcf}{VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf}
-
-\item{vcffile}{Path to .vcf.gz GWAS summary data file}
 
 \item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.}
 
@@ -20,7 +18,11 @@ query_gwas(vcf = NULL, vcffile = NULL, chrompos = NULL,
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
-\item{build="hg19"}{Build of vcffile}
+\item{os}{The operating system. Default is as detected. Determines the method used to perform query}
+
+\item{vcffile}{Path to .vcf.gz GWAS summary data file}
+
+\item{build="GRCh37"}{Build of vcffile}
 }
 \value{
 vcf object

@@ -1,6 +1,21 @@
 # gwasvcftools
 
-Some utilities to create and query GWAS BCF files. These files are used to store GWAS summary data, and are not used to store genotype data. They are used for the utility of being able to quickly extract metadata from the fixed fields.
+Some utilities to create and query GWAS VCF files. These files are used to store GWAS summary data, and are not used to store genotype data. They are used for the utility of being able to quickly extract metadata from the fixed fields.
+
+
+## Reference datasets
+
+1kg vcf harmonised against human genome reference:
+
+
+1kg European reference panel:
+
+```
+get -O app/ld_files.tgz https://www.dropbox.com/s/yuo7htp80hizigy/ld_files.tgz?dl=0
+tar xzvf app/ld_files.tgz -C app/
+rm app/ld_files.tgz
+```
+
 
 ## Example
 

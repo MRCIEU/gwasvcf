@@ -4,7 +4,7 @@
 \alias{query_pval_file}
 \title{Query pval from vcf file}
 \usage{
-query_pval_file(pval, vcffile, id = NULL, build = "hg19")
+query_pval_file(pval, vcffile, id = NULL, build = "GRCh37")
 }
 \arguments{
 \item{pval}{P-value threshold (NOT -log10)}
@@ -13,7 +13,7 @@ query_pval_file(pval, vcffile, id = NULL, build = "hg19")
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
-\item{build="hg19"}{}
+\item{build="GRCh37"}{}
 }
 \value{
 VCF object

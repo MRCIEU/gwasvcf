@@ -4,7 +4,7 @@
 \alias{query_chrompos_file}
 \title{Query vcf file, extracting by chromosome and position}
 \usage{
-query_chrompos_file(chrompos, vcffile, id = NULL, build = "hg19")
+query_chrompos_file(chrompos, vcffile, id = NULL, build = "GRCh37")
 }
 \arguments{
 \item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.}
@@ -13,7 +13,7 @@ query_chrompos_file(chrompos, vcffile, id = NULL, build = "hg19")
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
-\item{build="hg19"}{Build of vcffile}
+\item{build="GRCh37"}{Build of vcffile}
 }
 \value{
 VCF object

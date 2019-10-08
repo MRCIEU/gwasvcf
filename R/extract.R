@@ -42,7 +42,7 @@ extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT [
 
 #' Find LD proxies for a set of SNPs
 #'
-#' @param rsids list of rs IDs
+#' @param rsid list of rs IDs
 #' @param vcf vcf file name
 #' @param bfile ld reference panel
 #' @param out temporary output file
@@ -52,7 +52,7 @@ extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT [
 #'
 #' @export
 #' @return data frame
-get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+get_ld_proxies <- function(rsid, vcf, bfile, out=tempfile(), tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	require(dplyr)
 	require(data.table)
@@ -63,17 +63,17 @@ get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 
 	cmd <- paste0("bcftools query -f'%ID\n' ", vcf, " > ", searchspacename)
 	system(cmd)
-	write.table(rsids, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
+	write.table(rsid, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
 	cmd <- paste0("cat ", targetsname, " ", searchspacename, " > ", searchspacename1)
 	system(cmd)
 
 	cmd <- paste0(get_plink_binary(),
 		" --bfile ", bfile, 
 		" --extract ", searchspacename1,
+		" --keep-allele-order ",
 		" --r in-phase with-freqs gz",
 		" --ld-snp-list ", targetsname,
 		" --ld-window-kb ", tag_kb,
-		" --ld-window-r2 ", tag_r2,
 		" --ld-window ", tag_nsnp,
 		" --out ", targetsname,
 		" --threads ", threads
@@ -81,11 +81,12 @@ get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 	system(cmd)
 
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
+		dplyr::filter(R^2 > tag_r2) %>%
 		dplyr::filter(SNP_A != SNP_B) %>%
 		dplyr::mutate(PHASE=gsub("/", "", PHASE))
-	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_data_frame
+	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_tibble
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% as_data_frame()
+	ld <- cbind(ld, temp) %>% as_tibble()
 	ld <- arrange(ld, desc(abs(R))) %>%
 		dplyr::filter(!duplicated(SNP_A))
 	unlink(searchspacename)
@@ -94,137 +95,87 @@ get_ld_proxies <- function(rsids, vcf, bfile, out, tag_kb=5000, tag_nsnp=5000, t
 	unlink(paste0(targetsname, c(".log", ".nosex")))
 	unlink(outname)
 	return(ld)
+	index <- ld$R < 0
+	temp <- ld$B1[index]
+	ld$B1[index] <- ld$B2[index]
+	ld$B2[index] <- temp
+	ld$R[index] <- ld$R[index] * -1
+	return(ld)
 }
 
-#' Align proxies
-#'
-#' Takes output from get_ld_proxies and extract_from_vcf to make sure effect estimates are relative to the correct proxy alleles
-#'
-#' @param ld output from get_ld_proxies
-#' @param e output from extract_from_vcf
-#' @param vcf_ref Optional, if provided then final dataset is aligned to reference
-#' @param tempfile temporary files for use for extractions
-#'
-#' @export
-#' @return data frame
-align_proxies <- function(ld, e, vcf_ref=NULL, tempfile=NULL)
-{
-	require(dplyr)
-	require(magrittr)
-	temp <- merge(e, ld, by.x="V3", by.y="SNP_B")
-	if(nrow(temp) == 0)
-
-	temp <- subset(temp, (V4 == B1 & V5 == B2) | (V4 == B2 & V5 == B1))
-	sw <- temp$V4 == temp$B1
-	temp$V6[sw] <- temp$V6[sw] * -1
-	r <- temp %$% data_frame(ID = SNP_A, CHROM = CHR_A, POS = BP_A, REF = A1, ALT = A2, EFFECT = V6, SE = V7, PVAL = V8, N = V9, AF = MAF_B, proxy.chrom = CHR_B, proxy.pos = BP_B, proxy.id = V3)
-	ref <- extract_from_vcf(subset(r, select=c(CHROM, POS)), vcf_ref, tempfile, '%CHROM %POS %ID %REF %ALT\n')
-
-	a1 <- merge(r, ref, by.x="ID", by.y="V3")
-	i <- a1$REF == a1$V4
-	a1$EFFECT[i] <- a1$EFFECT[i] * -1
-	tt <- a1$REF[i]
-	a1$REF[i] <- a1$ALT[i]
-	a1$ALT[i] <- tt
-	a1 <- subset(a1, select = -c(V1, V2, V4, V5))
-	return(a1)
-}
-
-#' Write to neo4j csv format
-#'
-#' @param x data frame
-#' @param basename Filename to write to
-#' @param header=FALSE Whether to also write a header
-#'
-#' @export
-#' @return NULL
-write_out <- function(x, basename, header=FALSE)
-{
-	g <- gzfile(basename, "w")
-	write.table(x, g, row.names=FALSE, col.names=FALSE, na="", sep=",")
-	close(g)
-	if(header) write.table(x[0,], file=paste0(basename, "_header.csv"), row.names=FALSE, col.names=TRUE, sep=",")
-}
-
-is_palindrome <- function(a1, a2)
-{
-	(a1 == "A" & a2 == "T") |
-	(a1 == "T" & a2 == "A") |
-	(a1 == "C" & a2 == "G") |
-	(a1 == "G" & a2 == "C")
-}
 
 #' Extract SNPs from vcf file
 #'
 #' Finds proxies if necessary
 #'
 #' @param vcf vcf file name
-#' @param snplist list of rs IDs or data frame of chrom and pos
-#' @param tempname Temporary file
-#' @param proxies="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
+#' @param rsid list of rs IDs
 #' @param bfile ld reference panel
+#' @param proxies="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
 #' @param vcf_ref Optional, if provided then final dataset is aligned to reference
 #' @param tag_kb=5000 Proxy parameter
 #' @param tag_nsnp=5000 Proxy parameter
 #' @param tag_r2=0.6 Proxy parameter
+#' @param threads=1
 #'
 #' @export
 #' @return data frame
-extract <- function(vcf, snplist, tempname, proxies="yes", bfile, vcf_ref, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
-	if(is.vector(snplist))
-	{
-		rsid <- TRUE
-	} else {
-		stopifnot(is.data.frame(snplist))
-		rsid <- FALSE
-	}
-	stopifnot(proxies %in% c("yes", "no", "only"))
-	if(proxies == "no")
-	{
-		o <- extract_from_vcf(snplist, vcf, tempname)
-		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "EFFECT", "SE", "PVAL", "N", "AF")
-		o$proxy.chrom <- o$proxy.pos <- o$proxy.id <- NA
-		return(o)
-	}
 
-	if(proxies == "yes")
+	if(proxies=="yes")
 	{
-		o <- extract_from_vcf(snplist, vcf, tempname)
-		names(o) <- c("CHROM", "POS", "ID", "REF", "ALT", "EFFECT", "SE", "PVAL", "N", "AF")
-
-		if(rsid)
+		o <- query_gwas(vcf, rsid=rsid)
+		missing <- rsid[!rsid %in% names(o)]
+		if(length(missing) != 0)
 		{
-			missing_snps <- snplist[!snplist %in% o$ID]
+			ld <- get_ld_proxies(missing, vcf, bfile, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 		} else {
-			id1 <- paste(snplist[[1]], snplist[[2]], snplist[[3]], snplist[[4]])
-			missing_snps <- snplist[!id1 %in% paste(o$CHROM, o$POS, o$REF, o$ALT),][[6]]
+			return(o)
 		}
-		if(length(missing_snps) > 0)
-		{
-			ld <- get_ld_proxies(missing_snps, vcf, bfile, tempname, threads=threads)
-			e <- extract_from_vcf(ld$SNP_B, vcf, tempname)
-			a <- align_proxies(ld, e, vcf_ref, tempname)
-			o <- bind_rows(a,o)
-		}
-		return(o %>% arrange(CHROM, POS))
+	} else if(proxies == "only") {
+		ld <- get_ld_proxies(rsid, vcf, bfile, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+	} else if(proxies == "no") {
+		o <- query_gwas(vcf, rsid=rsid)
+		return(o)
+	} else {
+		stop('proxies must be "yes", "no" or "only"')
 	}
+
+	e <- query_gwas(vcf, rsid=ld$SNP_B)
+	e <- e[names(e) %in% ld$SNP_B, ]
+	index <- match(names(e), ld$SNP_B)
+	ld <- ld[index,]
+	stopifnot(all(ld$SNP_B == names(e)))
+	sign_index <- rowRanges(e)$REF == ld$B1
+
+	gr <- GRanges(ld$CHR_A, IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A)) %>% sort
+	prox <- VCF(
+		rowRanges = gr,
+		colData = colData(e),
+		info = info(e),
+		exptData = list(
+			header = header(e), 
+			fixed = DataFrame(paramRangeID=as.factor(rep(NA, nrow(ld))),  REF=DNAStringSet(ld$A1), ALT=DNAStringSetList(as.list(ld$A2)), QUAL=as.numeric(NA), FILTER="PASS")
+		),
+		geno = SimpleList(
+			lapply(geno(e), `dimnames<-`, NULL)
+		)
+	)
+
+	geno(prox)$ES[!sign_index] <- {unlist(geno(prox)$ES[!sign_index]) * -1} %>% as.list
+	geno(prox)$PR <- matrix(ld$SNP_B, length(ld$SNP_B), 1)
+	geno(header(prox)) <- rbind(geno(header(prox)), 
+		DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid")
+	)
 
 	if(proxies == "only")
 	{
-		if(rsid)
-		{
-			ld <- get_ld_proxies(snplist, vcf, bfile, tempname, threads=threads)
-		} else {
-			ld <- get_ld_proxies(snplist[,6], vcf, bfile, tempname, threads=threads)
-		}
-		e <- extract_from_vcf(ld$SNP_B, vcf, tempname)
-		a <- align_proxies(ld, e, vcf_ref, tempname)
-		return(a)
+		return(prox)
+	} else {
+		geno(o)$PR <- matrix(rep(NA, length(o)), length(o), 1)
+		geno(header(o)) <- rbind(geno(header(o)), DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid"))
+		return(BiocGenerics::rbind(o, prox))
 	}
 }
-
-
-
-
 
