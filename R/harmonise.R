@@ -132,42 +132,21 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 #'
 #' @export
 #' @return data frame
-read_reference <- function(reference_file, snplist, outfile, remove_dup_rsids=TRUE)
+read_reference <- function(reference_file, rsid=NULL, chrompos=NULL, remove_dup_rsids=TRUE)
 {
-	stopifnot(check_bcftools() == 0)
-	out1 <- paste0(outfile, ".snplist")
-	out2 <- paste0(outfile, ".ref")
-	write.table(snplist, file=out1, row=F, col=F, qu=F)
-
-	a <- query_gwas(reference_file, snplist)
-
-	# Extract relevent info
-	cmd <- paste0("time bcftools view -i'ID=@", out1, "' ", reference_file, " | bcftools query -f'%CHROM\t%POS\t%ID\t%REF\t%ALT\t%AF\n' > ", out2)
-	print(cmd)
-	system(cmd)
-	unlink(out1)
-	a <- data.table::fread(out2, header=FALSE, sep="\t")
-	unlink(out2)
-	names(a) <- c("CHROM", "POS", "ID", "REF", "ALT", "AF")
-
+	if(!is.null(rsid))
+	{
+		a <- query_gwas(reference_file, rsid=rsid)
+	} else if(!is.null(chrompos)) {
+		a <- query_gwas(reference_file, chrompos=chrompos)
+	} else {
+		a <- query_gwas(reference_file, chrompos=chrompos)
+	}
 	if(remove_dup_rsids)
 	{
-		a <- subset(a, !duplicated(ID))
+		a <- a[!duplicated(names(a)), ]
 	}
-	a$beta <- 1
-	a$se <- 0.1
-	a$pval <- 0.1
-	a <- TwoSampleMR::format_data(
-		a,
-		type="exposure",
-		snp_col="ID",
-		effect_allele_col="ALT",
-		other_allele_col="REF",
-		eaf_col="AF",
-		chr_col="CHROM",
-		pos_col="POS"
-	)
-	return(a)
+	return(format_from_vcf(a))
 }
 
 #' Harmonise gwas alleles to be same as reference
@@ -206,6 +185,45 @@ harmonise_against_ref <- function(gwas, reference)
 	jlog[['total_remaining_variants']] <- nrow(dat)
 	attr(dat, "log") <- jlog
 	return(dat)
+}
+
+
+#' Create exposure or outcome data format for TwoSampleMR from vcf
+#'
+#' @param vcf VCF object
+#' @param type="exposure" or "outcome"
+#'
+#' @export
+#' @return
+format_from_vcf <- function(vcf, type="exposure")
+{
+	a <- vcf %>% vcf_to_granges
+	a$SNP <- names(a)
+	a <- as_tibble(a)
+	if(!"ES" %in% names(a)) a$ES <- NA
+	if(!"SE" %in% names(a)) a$SE <- NA
+	if(!"LP" %in% names(a)) a$LP <- NA
+	if(!"SS" %in% names(a)) a$SS <- NA
+	if(!"NC" %in% names(a)) a$NC <- NA
+	if(!"id" %in% names(a)) a$id <- NA
+	a$LP <- 10^-a$LP
+	a$NCONT <- a$SS - a$NC
+	format_data(
+		a, type=type,
+		snp_col="SNP",
+		effect_allele_col="ALT",
+		other_allele_col="REF",
+		eaf_col="AF",
+		chr_col="CHROM",
+		pos_col="POS",
+		beta_col="ES",
+		se_col="SE",
+		pval_col="LP",
+		samplesize_col="SS",
+		ncase_col="NC",
+		ncontrol_col="NCONT",
+		phenotype_col="id"
+	)
 }
 
 

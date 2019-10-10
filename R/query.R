@@ -158,21 +158,26 @@ vcf_to_granges <- function(vcf, id=NULL)
 		id <- samples(header(vcf))
 	}
 	stopifnot(length(id) == 1)
-	out <- VariantAnnotation::expand(vcf) %>% 
-	geno() %>%
-	as.list() %>%
-	lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
-	bind_cols()
 	a <- rowRanges(vcf)
 	a$ALT <- unlist(a$ALT)
-	values(a) <- cbind(values(a), out)
-	values(a)$id <- id
 
-	return(a)
+	if(length(geno(vcf)) == 0)
+	{
+		return(a)
+	} else {
+		out <- VariantAnnotation::expand(vcf) %>% 
+			geno() %>%
+			as.list() %>%
+			lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
+			bind_cols()
+		values(a) <- cbind(values(a), out)
+		values(a)$id <- id
+		return(a)
+	}
 }
 
 
-#' Convert vcf format to granges format
+#' Convert vcf format to tibble (data frame)
 #'
 #' @param vcf Output from readVcf
 #' @param id Only accepts one ID, so specify here if there are multiple GWAS datasets in the vcf
@@ -181,21 +186,9 @@ vcf_to_granges <- function(vcf, id=NULL)
 #' @return GRanges object
 vcf_to_tibble <- function(vcf, id=NULL)
 {
-	if(is.null(id))
-	{
-		id <- samples(header(vcf))
-	}
-	stopifnot(length(id) == 1)
-	out <- VariantAnnotation::expand(vcf) %>% 
-	geno() %>%
-	as.list() %>%
-	lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
-	bind_cols()
-	a <- rowRanges(vcf)
-	values(a) <- cbind(values(a), out)
-	values(a)$id <- id
-
-	return(a)
+	a <- vcf_to_granges(vcf, id)
+	a$SNP <- names(a)
+	return(as_tibble(a))
 }
 
 
