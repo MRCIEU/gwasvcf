@@ -139,6 +139,8 @@ read_reference <- function(reference_file, snplist, outfile, remove_dup_rsids=TR
 	out2 <- paste0(outfile, ".ref")
 	write.table(snplist, file=out1, row=F, col=F, qu=F)
 
+	a <- query_gwas(reference_file, snplist)
+
 	# Extract relevent info
 	cmd <- paste0("time bcftools view -i'ID=@", out1, "' ", reference_file, " | bcftools query -f'%CHROM\t%POS\t%ID\t%REF\t%ALT\t%AF\n' > ", out2)
 	print(cmd)
@@ -319,3 +321,87 @@ is_forward_strand <- function(gwas_snp, gwas_a1, gwas_a2, ref_snp, ref_a1, ref_a
 
 	return(ifelse(prop > threshold, 1, 2))
 }
+
+
+
+check_null <- function(x, n)
+{
+	if(is.null(x))
+	{
+		return(rep(NA))
+	}
+}
+
+#' <brief desc>
+#'
+#' <full description>
+#'
+#' @param dat <what param does>
+#' @param snp_col <what param does>
+#' @param chrom_col <what param does>
+#' @param pos_col <what param does>
+#' @param nea_col <what param does>
+#' @param ea_col <what param does>
+#' @param ea_af_col <what param does>
+#' @param effect_col <what param does>
+#' @param se_col <what param does>
+#' @param pval_col <what param does>
+#' @param n_col <what param does>
+#' @param ncase_col <what param does>
+#' @param info_col <what param does>
+#' @param z_col <what param does>
+#'
+#' @export
+#' @return
+create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, se=NULL, pval=NULL, n=NULL, ncase=NULL, name=NULL)
+{
+	stopifnot(length(chrom) == length(pos))
+	if(is.null(snp))
+	{
+		snp <- paste0(chrom, ":", pos)
+	}
+	nsnp <- length(chrom)
+	gen <- list()
+	if(!is.null(ea_af)) gen$AF <- matrix(ea_af, nsnp)
+	if(!is.null(effect)) gen$ES <- matrix(effect, nsnp)
+	if(!is.null(se)) gen$SE <- matrix(se, nsnp)
+	if(!is.null(pval)) gen$LP <- matrix(-log10(pval), nsnp)
+	if(!is.null(n)) gen$SS <- matrix(n, nsnp)
+	if(!is.null(ncase)) gen$NC <- matrix(ncase, nsnp)
+	gen <- SimpleList(gen)
+
+	gr <- GRanges(chrom, IRanges(start=pos, end=pos + pmax(nchar(nea), nchar(ea)) - 1, names=snp))
+	coldata <- S4Vectors::DataFrame(Samples = length(name), row.names=name)
+
+	header <- VCFHeader(
+		header = DataFrameList(
+			fileformat = DataFrame(Value="VCFv4.2", row.names="fileformat")
+		),
+		sample = name
+	)
+	geno(header) <- DataFrame(
+		Number = c("A", "A", "A", "A", "A", "A"),
+		Type = c("Float", "Float", "Float", "Float", "Float", "Float"),
+		Description = c(
+			"Effect size estimate relative to the alternative allele",
+			"Standard error of effect size estimate",
+			"-log10 p-value for effect estimate",
+			"Alternate allele frequency in the association study",
+			"Sample size used to estimate genetic effect",
+			"Number of cases used to estimate genetic effect"
+		),
+		row.names=c("ES", "SE", "LP", "AF", "SS", "NC")
+	) %>% subset(., rownames(.) %in% names(gen))
+
+	vcf <- VCF(
+		rowRanges = gr,
+		colData = coldata,
+		exptData = list(
+			header = header,
+			fixed = DataFrame(REF=DNAStringSet(nea), ALT=DNAStringSetList(as.list(ea)), QUAL=as.numeric(NA), FILTER="PASS")
+		),
+		geno = gen
+	)
+	return(vcf)
+}
+

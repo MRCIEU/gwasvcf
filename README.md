@@ -8,13 +8,36 @@ Some utilities to create and query GWAS VCF files. These files are used to store
 1kg vcf harmonised against human genome reference:
 
 
-1kg European reference panel:
+1kg European reference panel for LD:
 
 ```
 get -O app/ld_files.tgz https://www.dropbox.com/s/yuo7htp80hizigy/ld_files.tgz?dl=0
 tar xzvf app/ld_files.tgz -C app/
 rm app/ld_files.tgz
 ```
+
+
+
+## Getting started
+
+
+### Reading in everything
+
+```r
+vcf <- readVcf("")
+```
+
+### Reading in with filters
+
+```r
+vcf <- query_vcf("", rsid=c())
+vcf <- query_vcf("", pval=)
+vcf <- query_vcf("", chrompos=)
+```
+
+### A note about chrompos
+
+Can specify specific sites, or ranges
 
 
 ## Example

@@ -1,45 +1,3 @@
-#' Extract SNPs from vcf 
-#'
-#'
-#' @param snplist list of rs IDs or table of chrom and pos
-#' @param vcf vcf file name
-#' @param out temporary filename
-#' @param sel='\%CHROM \%POS \%ID \%REF \%ALT \%EFFECT \%SE \%L10PVAL \%N \%AF\n' What to extract from vcf
-#' @param logpval Whether to return -log10 or standard p-value. Default is standard (though it is stored as logged in vcf to retain precision)
-#'
-#' @export
-#' @return data frame
-extract_from_vcf <- function(snplist, vcf, out, sel='%CHROM %POS %ID %REF %ALT [%ES %SE %LP %SS %AF]\n', logpval=FALSE)
-{
-	require(data.table)
-	snplistname <- paste0(out, ".snplist")
-	extractname <- paste0(out, ".extract")
-
-	if(is.vector(snplist))
-	{
-		write.table(snplist, file=snplistname, row=F, col=F, qu=F, sep="\t")
-		nsnp <- length(snplist)
-		cmd <- stringf("%s view -i'ID=@%s.snplist' %s | %s query -f'%s' > %s", get_bcftools_binary(), out, vcf, get_bcftools_binary(), sel, extractname)
-	} else {
-		stopifnot(is.data.frame(snplist))
-		write.table(snplist[,1:2], file=snplistname, row=F, col=F, qu=F, sep="\t")
-		nsnp <- nrow(snplist)
-		cmd <- stringf("%s query -R %s -f'%s' %s > %s", get_bcftools_binary(), snplistname, sel, vcf, extractname)
-	}
-	system(cmd)
-	o <- data.table::fread(extractname, header=FALSE, sep=" ", na.strings=".")
-	if(logpval)
-	{
-		which({gsub("[[:space:]]", "", sel) %>% strsplit(sel, split="%")}[[1]] == "LP") - 1
-		o[,8] <- 10^-o[,8]
-	}
-	message("Extracted ", nrow(o), " out of ", nsnp, " SNPs")
-	unlink(extractname)
-	unlink(snplistname)
-	return(o)
-}
-
-
 #' Find LD proxies for a set of SNPs
 #'
 #' @param rsid list of rs IDs
@@ -149,7 +107,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	stopifnot(all(ld$SNP_B == names(e)))
 	sign_index <- rowRanges(e)$REF == ld$B1
 
-	gr <- GRanges(ld$CHR_A, IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A)) %>% sort
+	gr <- GRanges(ld$CHR_A, IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A))
 	prox <- VCF(
 		rowRanges = gr,
 		colData = colData(e),
