@@ -5,22 +5,20 @@ Some utilities to create and query GWAS VCF files. These files are used to store
 
 ## Reference datasets
 
-Example vcf (GIANT 2010 BMI):
+Example GWAS VCF (GIANT 2010 BMI):
 
-```
-wget -O IEU-a-2.vcf.gz https://www.dropbox.com/s/9bl20x537315f7u/IEU-a-2.vcf.gz?dl=0
-wget -O IEU-a-2.vcf.gz.tbi https://www.dropbox.com/s/dkrqqbeg3pswl1b/IEU-a-2.vcf.gz.tbi?dl=0
-```
+- [http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz](http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz)
+- [http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz.tbi](http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz.tbi)
 
 1kg European reference panel for LD:
 
-```
-wget -O ld_files.tgz https://www.dropbox.com/s/yuo7htp80hizigy/ld_files.tgz?dl=0
-tar xzvf ld_files.tgz -C app/
-rm ld_files.tgz
-```
+- [http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz](http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz)
 
-1kg vcf harmonised against human genome reference: (PENDING)
+1kg vcf harmonised against human genome reference:
+
+- [http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz](http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz)
+- [http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz.tbi](http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz.tbi)
+
 
 ## Getting started
 
