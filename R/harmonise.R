@@ -28,8 +28,6 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 		dat <- data.table::fread(filename, header=FALSE, skip=skip, sep=delimiter)
 	}
 	nc <- ncol(dat)
-	jlog <- list()
-	jlog[['total_variants']] <- nrow(dat)
 
 	if(snp == 0)
 	{
@@ -111,13 +109,9 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 	{
 		o <- subset(o, select=-c(z.outcome))
 	}
-	jlog[['variants_not_read']] <- nrow(dat) - nrow(o)
 	ind <- is.finite(o$beta.outcome) & is.finite(o$pval.outcome)
 	o <- o[ind,]
-	jlog[['variants_with_missing_stats']] <- sum(!ind)
-	jlog[['variants_with_missing_pvals']] <- sum(is.na(o$pval.outcome))
 	o <- subset(o, !is.na(pval.outcome))
-	attr(o, "log") <- jlog
 	return(o)
 }
 
@@ -163,13 +157,6 @@ harmonise_against_ref <- function(gwas, reference)
 
 	# Harmonise
 	dat <- TwoSampleMR::harmonise_data(reference, gwas, action)
-	jlog <- c(
-		attr(gwas, "log"),
-		as.list(attr(dat, "log"))
-	)
-	jlog[['harmonised_variants']] <- sum(dat$mr_keep)
-	jlog[['variants_not_harmonised']] <- sum(!dat$mr_keep)
-
 	cols <- c("SNP"="ID", "effect_allele.exposure"="ALT", "other_allele.exposure"="REF", "beta.outcome"="BETA", "se.outcome"="SE", "pval.outcome"="PVALUE", "eaf.outcome"="AF", "samplesize.outcome"="N", "z.outcome"="ZVALUE", "info.outcome"="INFO")
 	if(! "z.outcome" %in% names(dat)) dat$z.outcome <- NA
 	if(! "info.outcome" %in% names(dat)) dat$info.outcome <- NA
@@ -182,8 +169,6 @@ harmonise_against_ref <- function(gwas, reference)
 
 	dat <- dat %>%
 		dplyr::inner_join(subset(ref, select=c(SNP,other_allele.exposure,effect_allele.exposure,CHROM,POS)), by=c("ID"="SNP", "REF"="other_allele.exposure", "ALT"="effect_allele.exposure"))
-	jlog[['total_remaining_variants']] <- nrow(dat)
-	attr(dat, "log") <- jlog
 	return(dat)
 }
 
