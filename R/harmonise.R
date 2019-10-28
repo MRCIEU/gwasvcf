@@ -244,10 +244,14 @@ write_out <- function(harmonised, path)
 	if(!all(is.na(harmonised$NCASE))) j$ncase_col <- which(names(harmonised) == "NCASE")
 
 	write_json(j, paste0(path, ".json"), auto_unbox=TRUE)
-	gz1 <- gzfile(paste0(path, ".txt.gz"), "w")
-	write.table(harmonised, gz1, row=FALSE, col=TRUE, qu=FALSE)
-	close(gz1)
-
+	if(grepl(".gz$", path))
+	{
+		gz1 <- gzfile(path, "w")
+		write.table(harmonised, gz1, row=FALSE, col=TRUE, qu=FALSE)
+		close(gz1)
+	} else {
+		write.table(harmonised, path, row=FALSE, col=TRUE, qu=FALSE)
+	}
 }
 
 
