@@ -2,7 +2,7 @@
 % Please edit documentation in R/query.R
 \name{vcf_to_tibble}
 \alias{vcf_to_tibble}
-\title{Convert vcf format to granges format}
+\title{Convert vcf format to tibble (data frame)}
 \usage{
 vcf_to_tibble(vcf, id = NULL)
 }
@@ -15,5 +15,5 @@ vcf_to_tibble(vcf, id = NULL)
 GRanges object
 }
 \description{
-Convert vcf format to granges format
+Convert vcf format to tibble (data frame)
 }
