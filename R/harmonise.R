@@ -156,7 +156,7 @@ harmonise_against_ref <- function(gwas, reference)
 	action <- is_forward_strand(gwas$SNP, gwas$effect_allele.outcome, gwas$other_allele.outcome, reference$SNP, reference$other_allele.exposure, reference$effect_allele.exposure, threshold=0.9)
 
 	# Harmonise
-	dat <- TwoSampleMR::harmonise_data(reference, gwas, action)
+	dat <- suppressMessages(TwoSampleMR::harmonise_data(reference, gwas, action))
 	cols <- c("SNP"="ID", "effect_allele.exposure"="ALT", "other_allele.exposure"="REF", "beta.outcome"="BETA", "se.outcome"="SE", "pval.outcome"="PVALUE", "eaf.outcome"="AF", "samplesize.outcome"="N", "z.outcome"="ZVALUE", "info.outcome"="INFO")
 	if(! "z.outcome" %in% names(dat)) dat$z.outcome <- NA
 	if(! "info.outcome" %in% names(dat)) dat$info.outcome <- NA
@@ -319,11 +319,11 @@ is_forward_strand <- function(gwas_snp, gwas_a1, gwas_a2, ref_snp, ref_a1, ref_a
 	index2 <- (diff$A1.x == diff$A1.y & diff$A2.x == diff$A2.y) | (diff$A1.x == diff$A2.y & diff$A2.x == diff$A1.y)
 
 	# Number that match initially
-	message("SNPs that match: ", sum(index))
-	message("SNPs that match after flipping: ", sum(index2))
-	message("SNPs that never match: ", sum(!index2))
+	message("SNPs that match: ", sum(index, na.rm=TRUE))
+	message("SNPs that match after flipping: ", sum(index2, na.rm=TRUE))
+	message("SNPs that never match: ", sum(!index2, na.rm=TRUE))
 
-	prop <- 1 - sum(index2) / sum(index)
+	prop <- 1 - sum(index2, na.rm=TRUE) / sum(index, na.rm=TRUE)
 	message("Proportion on forward strand: ", prop)
 
 	return(ifelse(prop > threshold, 1, 2))
