@@ -195,7 +195,7 @@ harmonise_against_ref <- function(gwas, reference)
 #'
 #' @export
 #' @return
-format_from_vcf <- function(vcf, type="exposure")
+vcf_to_TwoSampleMR <- function(vcf, type="exposure")
 {
 	a <- vcf %>% vcf_to_granges
 	a$SNP <- names(a)
@@ -208,7 +208,7 @@ format_from_vcf <- function(vcf, type="exposure")
 	if(!"id" %in% names(a)) a$id <- NA
 	a$LP <- 10^-a$LP
 	a$NCONT <- a$SS - a$NC
-	format_data(
+	TwoSampleMR::format_data(
 		a, type=type,
 		snp_col="SNP",
 		effect_allele_col="ALT",
