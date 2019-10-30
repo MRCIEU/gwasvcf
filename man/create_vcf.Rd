@@ -2,41 +2,44 @@
 % Please edit documentation in R/harmonise.R
 \name{create_vcf}
 \alias{create_vcf}
-\title{<brief desc>}
+\title{Create GWAS vcf}
 \usage{
 create_vcf(chrom, pos, nea, ea, snp = NULL, ea_af = NULL,
   effect = NULL, se = NULL, pval = NULL, n = NULL, ncase = NULL,
   name = NULL)
 }
 \arguments{
-\item{dat}{<what param does>}
+\item{dat}{data frame}
 
-\item{snp_col}{<what param does>}
+\item{snp_col}{snp_col}
 
-\item{chrom_col}{<what param does>}
+\item{chrom_col}{chrom_col}
 
-\item{pos_col}{<what param does>}
+\item{pos_col}{pos_col}
 
-\item{nea_col}{<what param does>}
+\item{nea_col}{nea_col}
 
-\item{ea_col}{<what param does>}
+\item{ea_col}{ea_col}
 
-\item{ea_af_col}{<what param does>}
+\item{ea_af_col}{ea_af_col}
 
-\item{effect_col}{<what param does>}
+\item{effect_col}{effect_col}
 
-\item{se_col}{<what param does>}
+\item{se_col}{se_col}
 
-\item{pval_col}{<what param does>}
+\item{pval_col}{pval_col}
 
-\item{n_col}{<what param does>}
+\item{n_col}{n_col}
 
-\item{ncase_col}{<what param does>}
+\item{ncase_col}{ncase_col}
 
-\item{info_col}{<what param does>}
+\item{info_col}{info_col}
 
-\item{z_col}{<what param does>}
+\item{z_col}{z_col}
+}
+\value{
+vcf object
 }
 \description{
-<full description>
+Create GWAS vcf
 }

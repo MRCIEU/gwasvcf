@@ -16,8 +16,6 @@ proxy_match(vcf, rsid, bfile, proxies = "yes", tag_kb = 5000,
 
 \item{proxies="yes"}{If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes}
 
-\item{vcf_ref}{Optional, if provided then final dataset is aligned to reference}
-
 \item{tag_kb=5000}{Proxy parameter}
 
 \item{tag_nsnp=5000}{Proxy parameter}

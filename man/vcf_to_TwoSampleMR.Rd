@@ -11,6 +11,9 @@ vcf_to_TwoSampleMR(vcf, type = "exposure")
 
 \item{type="exposure"}{or "outcome"}
 }
+\value{
+data frame
+}
 \description{
 Create exposure or outcome data format for TwoSampleMR from vcf
 }

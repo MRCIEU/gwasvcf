@@ -1,33 +1,35 @@
 #' Find LD proxies for a set of SNPs
 #'
 #' @param rsid list of rs IDs
-#' @param vcf vcf file name
 #' @param bfile ld reference panel
-#' @param out temporary output file
 #' @param tag_kb=5000 Proxy parameter
 #' @param tag_nsnp=5000 Proxy parameter
 #' @param tag_r2=0.6 Proxy parameter
+#' @param searchspace Optional list of rs IDs to use as potential proxies 
+#' @param threads Number of threads to use (=1)
+#' @param out temporary output file
 #'
 #' @export
 #' @return data frame
-get_ld_proxies <- function(rsid, vcf, bfile, out=tempfile(), tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, out=tempfile())
 {
 	require(dplyr)
 	require(data.table)
 	searchspacename <- paste0(out, ".searchspace")
-	searchspacename1 <- paste0(out, ".searchspace1")
 	targetsname <- paste0(out, ".targets")
 	outname <- paste0(out, ".targets.ld.gz")
-
-	cmd <- paste0("bcftools query -f'%ID\n' ", vcf, " > ", searchspacename)
-	system(cmd)
 	write.table(rsid, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
-	cmd <- paste0("cat ", targetsname, " ", searchspacename, " > ", searchspacename1)
-	system(cmd)
-
+	if(!is.null(searchspace))
+	{
+		stopifnot(is.character(searchspace))
+		write.table(c(rsid, searchspace), file=searchspacename, row=F, col=F, qu=F)
+		extract_param <- paste0(" --extract ", searchspacename)
+	} else {
+		extract_param <- " "
+	}
 	cmd <- paste0(get_plink_binary(),
 		" --bfile ", bfile, 
-		" --extract ", searchspacename1,
+		extract_param,
 		" --keep-allele-order ",
 		" --r in-phase with-freqs gz",
 		" --ld-snp-list ", targetsname,
@@ -42,13 +44,16 @@ get_ld_proxies <- function(rsid, vcf, bfile, out=tempfile(), tag_kb=5000, tag_ns
 		dplyr::filter(R^2 > tag_r2) %>%
 		dplyr::filter(SNP_A != SNP_B) %>%
 		dplyr::mutate(PHASE=gsub("/", "", PHASE))
+	if(nrow(ld) == 0)
+	{
+		return(ld)
+	}
 	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_tibble
 	names(temp) <- c("A1", "B1", "A2", "B2")
 	ld <- cbind(ld, temp) %>% as_tibble()
 	ld <- arrange(ld, desc(abs(R))) %>%
 		dplyr::filter(!duplicated(SNP_A))
 	unlink(searchspacename)
-	unlink(searchspacename1)
 	unlink(targetsname)
 	unlink(paste0(targetsname, c(".log", ".nosex")))
 	unlink(outname)
@@ -70,7 +75,6 @@ get_ld_proxies <- function(rsid, vcf, bfile, out=tempfile(), tag_kb=5000, tag_ns
 #' @param rsid list of rs IDs
 #' @param bfile ld reference panel
 #' @param proxies="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
-#' @param vcf_ref Optional, if provided then final dataset is aligned to reference
 #' @param tag_kb=5000 Proxy parameter
 #' @param tag_nsnp=5000 Proxy parameter
 #' @param tag_r2=0.6 Proxy parameter
@@ -81,18 +85,55 @@ get_ld_proxies <- function(rsid, vcf, bfile, out=tempfile(), tag_kb=5000, tag_ns
 proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 
+	os <- Sys.info()[['sysname']]
 	if(proxies=="yes")
 	{
 		o <- query_gwas(vcf, rsid=rsid)
 		missing <- rsid[!rsid %in% names(o)]
 		if(length(missing) != 0)
 		{
-			ld <- get_ld_proxies(missing, vcf, bfile, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+			searchspacename <- tempfile()
+			if(is.character(vcf))
+			{
+				if(os != "Windows")
+				{
+					cmd <- paste0(get_bcftools_binary(), " query -f'%ID\n' ", vcf, " > ", searchspacename)
+					system(cmd)
+					searchspace <- scan(searchspacename, what="character")
+				} else {
+					searchspace <- NULL
+				}				
+			} else {
+				searchspace <- names(rowRanges(vcf))
+			}
+			ld <- get_ld_proxies(missing, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
+			if(nrow(ld) == 0)
+			{
+				return(o)
+			}
 		} else {
 			return(o)
 		}
 	} else if(proxies == "only") {
-		ld <- get_ld_proxies(rsid, vcf, bfile, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+			searchspacename <- tempfile()
+			if(is.character(vcf))
+			{
+				if(os != "Windows")
+				{
+					cmd <- paste0(get_bcftools_binary(), " query -f'%ID\n' ", vcf, " > ", searchspacename)
+					system(cmd)
+					searchspace <- scan(searchspacename, what="character")
+				} else {
+					searchspace <- NULL
+				}				
+			} else {
+				searchspace <- names(rowRanges(vcf))
+			}
+		ld <- get_ld_proxies(rsid, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
+		if(nrow(ld) == 0)
+		{
+			return(VCF())
+		}
 	} else if(proxies == "no") {
 		o <- query_gwas(vcf, rsid=rsid)
 		return(o)

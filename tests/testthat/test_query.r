@@ -71,8 +71,8 @@ test_that("parse_chrompos", {
 })
 
 
-test_that("granges_from_vcf", {
-	g <- granges_from_vcf(vcf)
+test_that("vcf_to_granges", {
+	g <- vcf_to_granges(vcf)
 	expect_equal(length(g), length(vcf))
 })
 

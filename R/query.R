@@ -9,12 +9,18 @@
 #' @param rsid Vector of rsids
 #' @param pval  P-value threshold (NOT -log10)
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="GRCh37" Build of vcffile
+#' @param build ="GRCh37" Build of vcffile
 #' @param os The operating system. Default is as detected. Determines the method used to perform query
+#' @param proxies ="no" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes. Currently only possible if querying rsid.
+#' @param bfile =path to plink bed/bim/fam ld reference panel
+#' @param tag_kb =5000 Proxy parameter
+#' @param tag_nsnp =5000 Proxy parameter
+#' @param tag_r2 =0.6 Proxy parameter
+#' @param threads =1 NUmber of threads
 #'
 #' @export
 #' @return vcf object
-query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build="GRCh37", os=Sys.info()[['sysname']])
+query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.character(vcf))
 	{
@@ -27,6 +33,14 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 	if(sum(c(!is.null(chrompos), !is.null(rsid), !is.null(pval))) != 1)
 	{
 		stop("Must specify filters only for one of chrompos, rsid or pval")
+	}
+
+	if(proxies != "no")
+	{
+		if(is.null(rsid))
+		{
+			stop("Proxies can only be searched for if rsid query specified")
+		}
 	}
 
 	if(!is.null(chrompos))
@@ -46,6 +60,11 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 
 	if(!is.null(rsid))
 	{
+		stopifnot(proxies %in% c("yes", "no", "only"))
+		if(proxies != "no")
+		{
+			return(proxy_match(vcf, rsid, bfile=bfile, proxies=proxies, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads))
+		}
 		if(!fileflag)
 		{
 			return(query_rsid_vcf(rsid, vcf))
@@ -101,7 +120,7 @@ get_plink_binary <- function()
 		Darwin = { system.file("bin", "plink_Darwin", package="gwasvcftools") })
 }
 
-granges_from_df <- function(df)
+df_to_granges <- function(df)
 {
 	GRanges(seqnames=df$chrom, ranges=IRanges(start=df$start, end=df$end))
 }
@@ -124,7 +143,7 @@ parse_chrompos <- function(chrompos)
 	} else if(is.data.frame(chrompos)) {
 		stopifnot(is.data.frame(chrompos))
 		stopifnot(all(c("chrom", "start", "end") %in% names(chrompos)))
-		return(granges_from_df(chrompos))
+		return(df_to_granges(chrompos))
 	} else if(!is.character(chrompos)) {
 		stop("chrompos must be data frame with columns chrom, start, end, or character vector of <chr:pos> or <chr:start-end>")
 	}
@@ -140,7 +159,7 @@ parse_chrompos <- function(chrompos)
 	pos2[i] <- sapply(temp, function(x) {x[2]})
 	pos1 <- as.numeric(pos1)
 	pos2 <- as.numeric(pos2)
-	return(granges_from_df(data.frame(chrom, start=pos1, end=pos2, stringsAsFactors=FALSE)))
+	return(df_to_granges(data.frame(chrom, start=pos1, end=pos2, stringsAsFactors=FALSE)))
 }
 
 

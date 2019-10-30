@@ -1,24 +1,42 @@
 context("Getting LD proxies")
 library(gwasvcftools)
 
+vcffile <- system.file("data","data.vcf.gz", package="gwasvcftools")
+vcf <- readVcf(vcffile)
+bfile <- system.file("data","eur.bed", package="gwasvcftools") %>% gsub(".bed", "", .)
 
+test_that("query", {
+	a <- query_gwas(vcffile, rsid="rs4970420")
+	expect_equal(nrow(a), 1)
 
-vcf <- "~/data/gwas/IEU-a-2.vcf.gz"
-bfile <- "~/data/ld_files/data_maf0.01_rs_ref"
-rsid <- TwoSampleMR::extract_instruments(2)$SNP
+	a <- query_gwas(vcf, rsid="rs4970420")
+	expect_equal(nrow(a), 1)
 
-a <- proxy_match(vcf, rsid, bfile, proxies="only")
-b <- query_gwas(vcf, rsid=rsid)
-index <- match(names(b), names(a))
-names(b) == names(a)[index]
-all(sign(vcf_to_granges(b)$ES) == sign(vcf_to_granges(a)$ES[index]), na.rm=T)
+	a <- query_gwas(vcffile, rsid="rs4442317")
+	expect_equal(nrow(a), 0)
 
+	a <- query_gwas(vcf, rsid="rs4442317")
+	expect_equal(nrow(a), 0)
 
-rsid <- c("rs12659333","rs13328017","rs28616030","rs60199041","rs2963074", "rs61980157","rs4864550","rs1396028","rs6486162","rs56102775", "rs147785482","rs7044202","rs619228","rs5755921", "rs377394")
-a <- proxy_match(vcf, rsid, bfile, proxies="yes")
-b <- query_gwas(vcf, rsid=rsid)
-index <- match(names(b), names(a))
-names(b) == names(a)[index]
-all(sign(vcf_to_granges(b)$ES) == sign(vcf_to_granges(a)$ES[index]), na.rm=T)
+	a <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", bfile=bfile, tag_r2=0.05)
+	expect_equal(nrow(a), 1)
 
+	a <- query_gwas(vcf, rsid="rs4442317", proxies="yes", bfile=bfile, tag_r2=0.05)
+	expect_equal(nrow(a), 1)
 
+	a <- query_gwas(vcffile, rsid="rs9729550", proxies="only", bfile=bfile, tag_r2=0.05)
+	expect_equal(nrow(a), 1)
+
+	a <- query_gwas(vcf, rsid="rs9729550", proxies="only", bfile=bfile, tag_r2=0.05)
+	expect_equal(nrow(a), 1)
+
+})
+
+test_that("alignment", {
+	rsid <- names(rowRanges(vcf))
+	a <- proxy_match(vcf, rsid, bfile, proxies="only")
+	b <- query_gwas(vcf, rsid=rsid)
+	index <- match(names(b), names(a))
+	names(b) == names(a)[index]
+	expect_true(cor(vcf_to_granges(b)$ES, vcf_to_granges(a)$ES[index], use="pair") > 0.5)
+})

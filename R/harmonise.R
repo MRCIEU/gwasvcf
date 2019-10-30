@@ -179,7 +179,7 @@ harmonise_against_ref <- function(gwas, reference)
 #' @param type="exposure" or "outcome"
 #'
 #' @export
-#' @return
+#' @return data frame
 vcf_to_TwoSampleMR <- function(vcf, type="exposure")
 {
 	a <- vcf %>% vcf_to_granges
@@ -339,27 +339,25 @@ check_null <- function(x, n)
 	}
 }
 
-#' <brief desc>
+#' Create GWAS vcf
 #'
-#' <full description>
-#'
-#' @param dat <what param does>
-#' @param snp_col <what param does>
-#' @param chrom_col <what param does>
-#' @param pos_col <what param does>
-#' @param nea_col <what param does>
-#' @param ea_col <what param does>
-#' @param ea_af_col <what param does>
-#' @param effect_col <what param does>
-#' @param se_col <what param does>
-#' @param pval_col <what param does>
-#' @param n_col <what param does>
-#' @param ncase_col <what param does>
-#' @param info_col <what param does>
-#' @param z_col <what param does>
+#' @param dat data frame
+#' @param snp_col snp_col
+#' @param chrom_col chrom_col
+#' @param pos_col pos_col
+#' @param nea_col nea_col
+#' @param ea_col ea_col
+#' @param ea_af_col ea_af_col
+#' @param effect_col effect_col
+#' @param se_col se_col
+#' @param pval_col pval_col
+#' @param n_col n_col
+#' @param ncase_col ncase_col
+#' @param info_col info_col
+#' @param z_col z_col
 #'
 #' @export
-#' @return
+#' @return vcf object
 create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, se=NULL, pval=NULL, n=NULL, ncase=NULL, name=NULL)
 {
 	stopifnot(length(chrom) == length(pos))
