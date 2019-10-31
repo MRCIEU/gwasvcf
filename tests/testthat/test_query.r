@@ -18,7 +18,7 @@ test_that("query_gwas", {
 		b = query_gwas(fn, chrompos=chrompos, os="Windows")
 		c = query_gwas(fn, chrompos=chrompos, id=id, os="Darwin")
 		d = query_gwas(fn, chrompos=chrompos, id=id, os="Windows")
-		a == b && b == c && c == d
+		all(a == b) && all(b == c) && all(c == d)
 	})
 
 	expect_true({
@@ -26,7 +26,7 @@ test_that("query_gwas", {
 		b = query_gwas(fn, rsid=rsid, os="Windows")
 		c = query_gwas(fn, rsid=rsid, id=id, os="Darwin")
 		d = query_gwas(fn, rsid=rsid, id=id, os="Windows")
-		a == b && b == c && c == d
+		all(a == b) && all(b == c) && all(c == d)
 	})
 
 	expect_true({
@@ -34,7 +34,7 @@ test_that("query_gwas", {
 		b = query_gwas(fn, pval=pval, os="Windows")
 		c = query_gwas(fn, pval=pval, id=id, os="Darwin")
 		d = query_gwas(fn, pval=pval, id=id, os="Windows")
-		a == b && b == c && c == d
+		all(a == b) && all(b == c) && all(c == d)
 	})
 
 	expect_true({
@@ -42,7 +42,7 @@ test_that("query_gwas", {
 		b = query_gwas(vcf, chrompos=chrompos, os="Windows")
 		c = query_gwas(vcf, chrompos=chrompos, id=id, os="Darwin")
 		d = query_gwas(vcf, chrompos=chrompos, id=id, os="Windows")
-		a == b && b == c && c == d
+		all(a == b) && all(b == c) && all(c == d)
 	})
 
 	expect_true({
@@ -50,7 +50,7 @@ test_that("query_gwas", {
 		b = query_gwas(vcf, rsid=rsid, os="Windows")
 		c = query_gwas(vcf, rsid=rsid, id=id, os="Darwin")
 		d = query_gwas(vcf, rsid=rsid, id=id, os="Windows")
-		a == b && b == c && c == d
+		all(a == b) && all(b == c) && all(c == d)
 	})
 
 	expect_true({
@@ -58,7 +58,7 @@ test_that("query_gwas", {
 		b = query_gwas(vcf, pval=pval, os="Windows")
 		c = query_gwas(vcf, pval=pval, id=id, os="Darwin")
 		d = query_gwas(vcf, pval=pval, id=id, os="Windows")
-		a == b && b == c && c == d
+		all(a == b) && all(b == c) && all(c == d)
 	})
 })
 
