@@ -1,8 +1,8 @@
 context("Querying vcf files")
-library(gwasvcftools)
+library(gwasvcf)
 
 
-fn <- system.file("data","data.vcf.gz", package="gwasvcftools")
+fn <- system.file("data","data.vcf.gz", package="gwasvcf")
 vcf <- readVcf(fn)
 
 

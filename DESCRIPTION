@@ -1,10 +1,10 @@
-Package: gwasvcftools
+Package: gwasvcf
 Title: Tools for dealing with GWAS summary data in VCF format
 Version: 0.1.0
 Authors@R: person("Gibran", "Hemani", email = "explodecomputer@gmail.com", role = c("aut", "cre"))
 Description: Tools for dealing with GWAS summary data in VCF format
 Depends: 
-  R (>= 3.4.4),
+  R (>= 3.5.0),
   dplyr,
   magrittr,
   VariantAnnotation,
@@ -14,7 +14,7 @@ Depends:
   utils
 License: What license is it under?
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 RoxygenNote: 6.1.1
 Suggests: 
     testthat

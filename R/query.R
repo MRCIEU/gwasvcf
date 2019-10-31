@@ -1,4 +1,3 @@
-
 #' Query data from vcf file
 #'
 #' Read in GWAS summary data with filters on datasets (if multiple datasets per file) and/or chromosome/position, rsids or pvalues. Chooses most optimal choice for the detected operating system. Typically chrompos searches are the fastest. On Windows, rsid or pvalue filters from a file will be slow. 
@@ -49,7 +48,7 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 		{
 			return(query_chrompos_vcf(chrompos, vcf))
 		} else {
-			if(os == "Windows")
+			if(!check_bcftools())
 			{
 				return(query_chrompos_file(chrompos, vcf, id, build))
 			} else {
@@ -69,7 +68,7 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 		{
 			return(query_rsid_vcf(rsid, vcf))
 		} else {
-			if(os == "Windows")
+			if(!check_bcftools())
 			{
 				return(query_rsid_file(rsid, vcf, id, build))
 			} else {
@@ -84,7 +83,7 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 		{
 			return(query_pval_vcf(pval, vcf, id))
 		} else {
-			if(os == "Windows")
+			if(!check_bcftools())
 			{
 				return(query_pval_file(pval, vcf, id, build))
 			} else {
@@ -96,29 +95,6 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 
 
 
-#' Find binary for bcftools
-#'
-#' @export
-#' @return Path to bcftools
-get_bcftools_binary <- function()
-{
-	switch(Sys.info()[['sysname']],
-		Windows = { stop("Sorry, bcftools binary is not available for Windows at the moment. Use the other native functions for querying, or for faster speeds use this package on Mac or Linux")},
-		Linux = { system.file("bin", "bcftools_Linux", package="gwasvcftools") },
-		Darwin = { system.file("bin", "bcftools_Darwin", package="gwasvcftools") })
-}
-
-#' Find binary for plink
-#'
-#' @export
-#' @return Path to plink
-get_plink_binary <- function()
-{
-	switch(Sys.info()[['sysname']],
-		Windows = { system.file("bin", "plink.exe", package="gwasvcftools") },
-		Linux = { system.file("bin", "plink_Linux", package="gwasvcftools") },
-		Darwin = { system.file("bin", "plink_Darwin", package="gwasvcftools") })
-}
 
 df_to_granges <- function(df)
 {
@@ -372,7 +348,8 @@ query_pval_vcf <- function(pval, vcf, id=NULL)
 #' @return VCF object
 query_rsid_bcftools <- function(rsid, vcffile, id=NULL)
 {
-	bcftools <- get_bcftools_binary()
+	stopifnot(check_bcftools())
+	bcftools <- options()$tools_bcftools
 	if(is.null(id))
 	{
 		id <- samples(scanVcfHeader(vcffile))
@@ -398,7 +375,8 @@ query_rsid_bcftools <- function(rsid, vcffile, id=NULL)
 #' @return vcf object
 query_pval_bcftools <- function(pval, vcffile, id=NULL)
 {
-	bcftools <- get_bcftools_binary()
+	stopifnot(check_bcftools())
+	bcftools <- options()$tools_bcftools
 	if(is.null(id))
 	{
 		id <- samples(scanVcfHeader(vcffile))
@@ -424,7 +402,8 @@ query_pval_bcftools <- function(pval, vcffile, id=NULL)
 #' @return vcf object
 query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL, build="GRCh37")
 {
-	bcftools <- get_bcftools_binary()
+	stopifnot(check_bcftools())
+	bcftools <- options()$tools_bcftools
 	if(is.null(id))
 	{
 		id <- samples(scanVcfHeader(vcffile))

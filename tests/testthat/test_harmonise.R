@@ -1,8 +1,8 @@
 context("Creating and harmonising data")
-library(gwasvcftools)
+library(gwasvcf)
 library(magrittr)
 
-fn <- system.file("data","data.vcf.gz", package="gwasvcftools")
+fn <- system.file("data","data.vcf.gz", package="gwasvcf")
 V <- readVcf(fn) 
 vv <- V %>% vcf_to_granges %>% as_tibble
 

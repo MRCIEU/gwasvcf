@@ -1,4 +1,4 @@
 library(testthat)
-library(gwasvcftools)
+library(gwasvcf)
 
-test_check("gwasvcftools")
+test_check("gwasvcf")

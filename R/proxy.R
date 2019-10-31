@@ -13,6 +13,7 @@
 #' @return data frame
 get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, out=tempfile())
 {
+	stopifnot(check_plink())
 	require(dplyr)
 	require(data.table)
 	searchspacename <- paste0(out, ".searchspace")
@@ -27,7 +28,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	} else {
 		extract_param <- " "
 	}
-	cmd <- paste0(get_plink_binary(),
+	cmd <- paste0(options()$tools_plink,
 		" --bfile ", bfile, 
 		extract_param,
 		" --keep-allele-order ",
@@ -43,26 +44,22 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
 		dplyr::filter(R^2 > tag_r2) %>%
 		dplyr::filter(SNP_A != SNP_B) %>%
-		dplyr::mutate(PHASE=gsub("/", "", PHASE))
+		dplyr::mutate(PHASE=gsub("/", "", PHASE)) %>%
+		subset(., nchar(PHASE) == 4)
 	if(nrow(ld) == 0)
 	{
 		return(ld)
 	}
-	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_tibble
+	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_tibble(., .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% as_tibble()
-	ld <- arrange(ld, desc(abs(R))) %>%
-		dplyr::filter(!duplicated(SNP_A))
+	ld <- cbind(ld, temp) %>% as_tibble(., .name_repair="minimal")
+	# ld <- arrange(ld, desc(abs(R))) %>%
+	# 	dplyr::filter(!duplicated(SNP_A))
+	ld <- arrange(ld, desc(abs(R)))
 	unlink(searchspacename)
 	unlink(targetsname)
 	unlink(paste0(targetsname, c(".log", ".nosex")))
 	unlink(outname)
-	return(ld)
-	index <- ld$R < 0
-	temp <- ld$B1[index]
-	ld$B1[index] <- ld$B2[index]
-	ld$B2[index] <- temp
-	ld$R[index] <- ld$R[index] * -1
 	return(ld)
 }
 
@@ -95,9 +92,9 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			searchspacename <- tempfile()
 			if(is.character(vcf))
 			{
-				if(os != "Windows")
+				if(check_bcftools())
 				{
-					cmd <- paste0(get_bcftools_binary(), " query -f'%ID\n' ", vcf, " > ", searchspacename)
+					cmd <- paste0(options()$tools_bcftools, " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
 					searchspace <- scan(searchspacename, what="character")
 				} else {
@@ -118,9 +115,9 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			searchspacename <- tempfile()
 			if(is.character(vcf))
 			{
-				if(os != "Windows")
+				if(check_bcftools())
 				{
-					cmd <- paste0(get_bcftools_binary(), " query -f'%ID\n' ", vcf, " > ", searchspacename)
+					cmd <- paste0(options()$tools_bcftools, " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
 					searchspace <- scan(searchspacename, what="character")
 				} else {
@@ -140,8 +137,17 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	} else {
 		stop('proxies must be "yes", "no" or "only"')
 	}
-
+	if(!is.null(searchspace))
+	{
+		ld <- ld %>% dplyr::filter(!duplicated(SNP_A))
+	}
 	e <- query_gwas(vcf, rsid=ld$SNP_B)
+
+	if(is.null(searchspace))
+	{
+		ld <- subset(ld, SNP_B %in% names(e)) %>%
+			dplyr::filter(!duplicated(SNP_A))		
+	}
 	e <- e[names(e) %in% ld$SNP_B, ]
 	index <- match(names(e), ld$SNP_B)
 	ld <- ld[index,]
@@ -149,31 +155,32 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	sign_index <- rowRanges(e)$REF == ld$B1
 
 	gr <- GRanges(ld$CHR_A, IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A))
+	fixeddat <- DataFrame(paramRangeID=as.factor(rep(NA, nrow(ld))),  REF=DNAStringSet(ld$A1), ALT=DNAStringSetList(as.list(ld$A2)), QUAL=as.numeric(NA), FILTER="PASS")
 	prox <- VCF(
 		rowRanges = gr,
 		colData = colData(e),
 		info = info(e),
 		exptData = list(
 			header = header(e), 
-			fixed = DataFrame(paramRangeID=as.factor(rep(NA, nrow(ld))),  REF=DNAStringSet(ld$A1), ALT=DNAStringSetList(as.list(ld$A2)), QUAL=as.numeric(NA), FILTER="PASS")
+			fixed = fixeddat
 		),
 		geno = SimpleList(
 			lapply(geno(e), `dimnames<-`, NULL)
 		)
 	)
 
-	geno(prox)$ES[!sign_index] <- {unlist(geno(prox)$ES[!sign_index]) * -1} %>% as.list
-	geno(prox)$PR <- matrix(ld$SNP_B, length(ld$SNP_B), 1)
 	geno(header(prox)) <- rbind(geno(header(prox)), 
 		DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid")
 	)
+	geno(prox)$ES[!sign_index] <- {unlist(geno(prox)$ES[!sign_index]) * -1} %>% as.list
+	geno(prox)$PR <- matrix(ld$SNP_B, length(ld$SNP_B), 1)
 
 	if(proxies == "only")
 	{
 		return(prox)
 	} else {
-		geno(o)$PR <- matrix(rep(NA, length(o)), length(o), 1)
 		geno(header(o)) <- rbind(geno(header(o)), DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid"))
+		geno(o)$PR <- matrix(rep(NA, length(o)), length(o), 1)
 		return(BiocGenerics::rbind(o, prox))
 	}
 }
