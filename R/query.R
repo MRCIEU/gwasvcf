@@ -383,12 +383,10 @@ query_pval_bcftools <- function(pval, vcffile, id=NULL)
 	}
 	id <- paste(id, collapse=",")
 	tmp <- tempfile()
-	write.table(unique(rsid), file=paste0(tmp, ".snplist"), row=F, col=F, qu=F)
 	cmd <- sprintf("%s view -s %s -i 'FORMAT/LP > %s' %s > %s.vcf", bcftools, id, -log10(pval), vcffile, tmp)
 	system(cmd)
 	o <- readVcf(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".vcf"))
-	unlink(paste0(tmp, ".snplist"))
 	return(o)
 }
 

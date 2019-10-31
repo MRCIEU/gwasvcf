@@ -9,6 +9,8 @@
 #' @param threads Number of threads to use (=1)
 #' @param out temporary output file
 #'
+#' @importFrom magrittr %>%
+#'
 #' @export
 #' @return data frame
 get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, out=tempfile())
@@ -101,7 +103,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 					searchspace <- NULL
 				}				
 			} else {
-				searchspace <- names(rowRanges(vcf))
+				searchspace <- names(SummarizedExperiment::rowRanges(vcf))
 			}
 			ld <- get_ld_proxies(missing, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
 			if(nrow(ld) == 0)
@@ -124,7 +126,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 					searchspace <- NULL
 				}				
 			} else {
-				searchspace <- names(rowRanges(vcf))
+				searchspace <- names(SummarizedExperiment::rowRanges(vcf))
 			}
 		ld <- get_ld_proxies(rsid, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
 		if(nrow(ld) == 0)
@@ -152,35 +154,41 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	index <- match(names(e), ld$SNP_B)
 	ld <- ld[index,]
 	stopifnot(all(ld$SNP_B == names(e)))
-	sign_index <- rowRanges(e)$REF == ld$B1
+	sign_index <- SummarizedExperiment::rowRanges(e)$REF == ld$B1
 
-	gr <- GRanges(ld$CHR_A, IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A))
-	fixeddat <- DataFrame(paramRangeID=as.factor(rep(NA, nrow(ld))),  REF=DNAStringSet(ld$A1), ALT=DNAStringSetList(as.list(ld$A2)), QUAL=as.numeric(NA), FILTER="PASS")
-	prox <- VCF(
+	gr <- GenomicRanges::GRanges(ld$CHR_A, IRanges::IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A))
+	fixeddat <- S4Vectors::DataFrame(
+		paramRangeID=as.factor(rep(NA, nrow(ld))),  
+		REF=Biostrings::DNAStringSet(ld$A1), 
+		ALT=Biostrings::DNAStringSetList(as.list(ld$A2)), 
+		QUAL=as.numeric(NA), 
+		FILTER="PASS"
+	)
+	prox <- VariantAnnotation::VCF(
 		rowRanges = gr,
-		colData = colData(e),
-		info = info(e),
+		colData = SummarizedExperiment::colData(e),
+		info = VariantAnnotation::info(e),
 		exptData = list(
-			header = header(e), 
+			header = VariantAnnotation::header(e), 
 			fixed = fixeddat
 		),
-		geno = SimpleList(
-			lapply(geno(e), `dimnames<-`, NULL)
+		geno = S4Vectors::SimpleList(
+			lapply(VariantAnnotation::geno(e), `dimnames<-`, NULL)
 		)
 	)
 
-	geno(header(prox)) <- rbind(geno(header(prox)), 
+	VariantAnnotation::geno(VariantAnnotation::header(prox)) <- rbind(VariantAnnotation::geno(VariantAnnotation::header(prox)), 
 		DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid")
 	)
-	geno(prox)$ES[!sign_index] <- {unlist(geno(prox)$ES[!sign_index]) * -1} %>% as.list
-	geno(prox)$PR <- matrix(ld$SNP_B, length(ld$SNP_B), 1)
+	VariantAnnotation::geno(prox)$ES[!sign_index] <- {unlist(VariantAnnotation::geno(prox)$ES[!sign_index]) * -1} %>% as.list
+	VariantAnnotation::geno(prox)$PR <- matrix(ld$SNP_B, length(ld$SNP_B), 1)
 
 	if(proxies == "only")
 	{
 		return(prox)
 	} else {
-		geno(header(o)) <- rbind(geno(header(o)), DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid"))
-		geno(o)$PR <- matrix(rep(NA, length(o)), length(o), 1)
+		VariantAnnotation::geno(VariantAnnotation::header(o)) <- rbind(VariantAnnotation::geno(VariantAnnotation::header(o)), S4Vectors::DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid"))
+		VariantAnnotation::geno(o)$PR <- matrix(rep(NA, length(o)), length(o), 1)
 		return(BiocGenerics::rbind(o, prox))
 	}
 }

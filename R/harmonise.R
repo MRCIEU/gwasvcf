@@ -95,21 +95,21 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 		z_col=names(dat)[z],
 	)
 	print(head(o))
-	o$beta.outcome[!is.finite(o$beta.outcome)] <- NA
-	o$se.outcome[!is.finite(o$se.outcome)] <- NA
-	o$pval.outcome[!is.finite(o$pval.outcome)] <- NA
-	o$eaf.outcome[!is.finite(o$eaf.outcome)] <- NA
-	o$info.outcome[!is.finite(o$info.outcome)] <- NA
-	o$z.outcome[!is.finite(o$z.outcome)] <- NA
-	if(all(is.na(o$info.outcome)))
+	o[["beta.outcome"]][!is.finite(o[["beta.outcome"]])] <- NA
+	o[["se.outcome"]][!is.finite(o[["se.outcome"]])] <- NA
+	o[["pval.outcome"]][!is.finite(o[["pval.outcome"]])] <- NA
+	o[["eaf.outcome"]][!is.finite(o[["eaf.outcome"]])] <- NA
+	o[["info.outcome"]][!is.finite(o[["info.outcome"]])] <- NA
+	o[["z.outcome"]][!is.finite(o[["z.outcome"]])] <- NA
+	if(all(is.na(o[["info.outcome"]])))
 	{
 		o <- subset(o, select=-c(info.outcome))
 	}
-	if(all(is.na(o$z.outcome)))
+	if(all(is.na(o[["z.outcome"]])))
 	{
 		o <- subset(o, select=-c(z.outcome))
 	}
-	ind <- is.finite(o$beta.outcome) & is.finite(o$pval.outcome)
+	ind <- is.finite(o[["beta.outcome"]]) & is.finite(o[["pval.outcome"]])
 	o <- o[ind,]
 	o <- subset(o, !is.na(pval.outcome))
 	return(o)
@@ -153,13 +153,13 @@ read_reference <- function(reference_file, rsid=NULL, chrompos=NULL, remove_dup_
 harmonise_against_ref <- function(gwas, reference)
 {
 	# Check strand
-	action <- is_forward_strand(gwas$SNP, gwas$effect_allele.outcome, gwas$other_allele.outcome, reference$SNP, reference$other_allele.exposure, reference$effect_allele.exposure, threshold=0.9)
+	action <- is_forward_strand(gwas[["SNP"]], gwas[["effect_allele.outcome"]], gwas[["other_allele.outcome"]], reference[["SNP"]], reference[["other_allele.exposure"]], reference[["effect_allele.exposure"]], threshold=0.9)
 
 	# Harmonise
 	dat <- suppressMessages(TwoSampleMR::harmonise_data(reference, gwas, action))
 	cols <- c("SNP"="ID", "effect_allele.exposure"="ALT", "other_allele.exposure"="REF", "beta.outcome"="BETA", "se.outcome"="SE", "pval.outcome"="PVALUE", "eaf.outcome"="AF", "samplesize.outcome"="N", "z.outcome"="ZVALUE", "info.outcome"="INFO")
-	if(! "z.outcome" %in% names(dat)) dat$z.outcome <- NA
-	if(! "info.outcome" %in% names(dat)) dat$info.outcome <- NA
+	if(! "z.outcome" %in% names(dat)) dat[["z.outcome"]] <- NA
+	if(! "info.outcome" %in% names(dat)) dat[["info.outcome"]] <- NA
 
 	dat <- subset(dat, select=names(cols))
 	names(dat) <- cols
@@ -168,7 +168,7 @@ harmonise_against_ref <- function(gwas, reference)
 	names(ref)[names(ref) == "pos.exposure"] <- "POS"
 
 	dat <- dat %>%
-		dplyr::inner_join(subset(ref, select=c(SNP,other_allele.exposure,effect_allele.exposure,CHROM,POS)), by=c("ID"="SNP", "REF"="other_allele.exposure", "ALT"="effect_allele.exposure"))
+		dplyr::inner_join(subset(ref, select=c("SNP","other_allele.exposure","effect_allele.exposure","CHROM","POS")), by=c("ID"="SNP", "REF"="other_allele.exposure", "ALT"="effect_allele.exposure"))
 	return(dat)
 }
 
@@ -183,16 +183,16 @@ harmonise_against_ref <- function(gwas, reference)
 vcf_to_TwoSampleMR <- function(vcf, type="exposure")
 {
 	a <- vcf %>% vcf_to_granges
-	a$SNP <- names(a)
+	a[["SNP"]] <- names(a)
 	a <- as_tibble(a)
-	if(!"ES" %in% names(a)) a$ES <- NA
-	if(!"SE" %in% names(a)) a$SE <- NA
-	if(!"LP" %in% names(a)) a$LP <- NA
-	if(!"SS" %in% names(a)) a$SS <- NA
-	if(!"NC" %in% names(a)) a$NC <- NA
-	if(!"id" %in% names(a)) a$id <- NA
-	a$LP <- 10^-a$LP
-	a$NCONT <- a$SS - a$NC
+	if(!"ES" %in% names(a)) a[["ES"]] <- NA
+	if(!"SE" %in% names(a)) a[["SE"]] <- NA
+	if(!"LP" %in% names(a)) a[["LP"]] <- NA
+	if(!"SS" %in% names(a)) a[["SS"]] <- NA
+	if(!"NC" %in% names(a)) a[["NC"]] <- NA
+	if(!"id" %in% names(a)) a[["id"]] <- NA
+	a[["LP"]] <- 10^-a[["LP"]]
+	a[["NCONT"]] <- a[["SS"]] - a[["NC"]]
 	TwoSampleMR::format_data(
 		a, type=type,
 		snp_col="SNP",
@@ -239,9 +239,9 @@ write_out <- function(harmonised, path)
 		header = TRUE,
 		build = "GRCh37"
 	)
-	if(!all(is.na(harmonised$ZVALUE))) j$imp_z_col <- 8
-	if(!all(is.na(harmonised$INFO))) j$imp_z_col <- 9
-	if(!all(is.na(harmonised$NCASE))) j$ncase_col <- which(names(harmonised) == "NCASE")
+	if(!all(is.na(harmonised[["ZVALUE"]]))) j[["imp_z_col"]] <- 8
+	if(!all(is.na(harmonised[["INFO"]]))) j[["imp_z_col"]] <- 9
+	if(!all(is.na(harmonised[["NCASE"]]))) j[["ncase_col"]] <- which(names(harmonised) == "NCASE")
 
 	write_json(j, paste0(path, ".json"), auto_unbox=TRUE)
 	if(grepl(".gz$", path))
@@ -303,20 +303,20 @@ is_forward_strand <- function(gwas_snp, gwas_a1, gwas_a2, ref_snp, ref_a1, ref_a
 	r <- dplyr::data_frame(SNP=ref_snp, A1=toupper(ref_a1), A2=toupper(ref_a2))
 
 	gr <- dplyr::inner_join(g,r,by="SNP")
-	index <- (gr$A1.x == gr$A1.y & gr$A2.x == gr$A2.y) | (gr$A1.x == gr$A2.y & gr$A2.x == gr$A1.y)
+	index <- (gr[["A1.x"]] == gr[["A1.y"]] & gr[["A2.x"]] == gr[["A2.y"]]) | (gr[["A1.x"]] == gr[["A2.y"]] & gr[["A2.x"]] == gr[["A1.y"]])
 	diff <- gr[!index,]
-	diff$A1.x[diff$A1.x == "C"] <- "g"
-	diff$A1.x[diff$A1.x == "G"] <- "c"
-	diff$A1.x[diff$A1.x == "T"] <- "a"
-	diff$A1.x[diff$A1.x == "A"] <- "t"
-	diff$A2.x[diff$A2.x == "C"] <- "g"
-	diff$A2.x[diff$A2.x == "G"] <- "c"
-	diff$A2.x[diff$A2.x == "T"] <- "a"
-	diff$A2.x[diff$A2.x == "A"] <- "t"
-	diff$A1.x <- toupper(diff$A1.x)
-	diff$A2.x <- toupper(diff$A2.x)
+	diff[["A1.x"]][diff[["A1.x"]] == "C"] <- "g"
+	diff[["A1.x"]][diff[["A1.x"]] == "G"] <- "c"
+	diff[["A1.x"]][diff[["A1.x"]] == "T"] <- "a"
+	diff[["A1.x"]][diff[["A1.x"]] == "A"] <- "t"
+	diff[["A2.x"]][diff[["A2.x"]] == "C"] <- "g"
+	diff[["A2.x"]][diff[["A2.x"]] == "G"] <- "c"
+	diff[["A2.x"]][diff[["A2.x"]] == "T"] <- "a"
+	diff[["A2.x"]][diff[["A2.x"]] == "A"] <- "t"
+	diff[["A1.x"]] <- toupper(diff[["A1.x"]])
+	diff[["A2.x"]] <- toupper(diff[["A2.x"]])
 
-	index2 <- (diff$A1.x == diff$A1.y & diff$A2.x == diff$A2.y) | (diff$A1.x == diff$A2.y & diff$A2.x == diff$A1.y)
+	index2 <- (diff[["A1.x"]] == diff[["A1.y"]] & diff[["A2.x"]] == diff[["A2.y"]]) | (diff[["A1.x"]] == diff[["A2.y"]] & diff[["A2.x"]] == diff[["A1.y"]])
 
 	# Number that match initially
 	message("SNPs that match: ", sum(index, na.rm=TRUE))
@@ -367,24 +367,24 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 	}
 	nsnp <- length(chrom)
 	gen <- list()
-	if(!is.null(ea_af)) gen$AF <- matrix(ea_af, nsnp)
-	if(!is.null(effect)) gen$ES <- matrix(effect, nsnp)
-	if(!is.null(se)) gen$SE <- matrix(se, nsnp)
-	if(!is.null(pval)) gen$LP <- matrix(-log10(pval), nsnp)
-	if(!is.null(n)) gen$SS <- matrix(n, nsnp)
-	if(!is.null(ncase)) gen$NC <- matrix(ncase, nsnp)
-	gen <- SimpleList(gen)
+	if(!is.null(ea_af)) gen[["AF"]] <- matrix(ea_af, nsnp)
+	if(!is.null(effect)) gen[["ES"]] <- matrix(effect, nsnp)
+	if(!is.null(se)) gen[["SE"]] <- matrix(se, nsnp)
+	if(!is.null(pval)) gen[["LP"]] <- matrix(-log10(pval), nsnp)
+	if(!is.null(n)) gen[["SS"]] <- matrix(n, nsnp)
+	if(!is.null(ncase)) gen[["NC"]] <- matrix(ncase, nsnp)
+	gen <- S4Vectors::SimpleList(gen)
 
-	gr <- GRanges(chrom, IRanges(start=pos, end=pos + pmax(nchar(nea), nchar(ea)) - 1, names=snp))
+	gr <- GenomicRanges::GRanges(chrom, IRanges::IRanges(start=pos, end=pos + pmax(nchar(nea), nchar(ea)) - 1, names=snp))
 	coldata <- S4Vectors::DataFrame(Samples = length(name), row.names=name)
 
-	header <- VCFHeader(
-		header = DataFrameList(
-			fileformat = DataFrame(Value="VCFv4.2", row.names="fileformat")
+	hdr <- VariantAnnotation::VCFHeader(
+		header = IRanges::DataFrameList(
+			fileformat = S4Vectors::DataFrame(Value="VCFv4.2", row.names="fileformat")
 		),
 		sample = name
 	)
-	geno(header) <- DataFrame(
+	VariantAnnotation::geno(hdr) <- S4Vectors::DataFrame(
 		Number = c("A", "A", "A", "A", "A", "A"),
 		Type = c("Float", "Float", "Float", "Float", "Float", "Float"),
 		Description = c(
@@ -396,14 +396,15 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 			"Number of cases used to estimate genetic effect"
 		),
 		row.names=c("ES", "SE", "LP", "AF", "SS", "NC")
-	) %>% subset(., rownames(.) %in% names(gen))
+	)
+	VariantAnnotation::geno(hdr) <- subset(VariantAnnotation::geno(hdr), rownames(VariantAnnotation::geno(hdr)) %in% names(gen))
 
-	vcf <- VCF(
+	vcf <- VariantAnnotation::VCF(
 		rowRanges = gr,
 		colData = coldata,
 		exptData = list(
-			header = header,
-			fixed = DataFrame(REF=DNAStringSet(nea), ALT=DNAStringSetList(as.list(ea)), QUAL=as.numeric(NA), FILTER="PASS")
+			header = hdr,
+			fixed = S4Vectors::DataFrame(REF=Biostrings::DNAStringSet(nea), ALT=Biostrings::DNAStringSetList(as.list(ea)), QUAL=as.numeric(NA), FILTER="PASS")
 		),
 		geno = gen
 	)

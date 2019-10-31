@@ -8,13 +8,35 @@ Depends:
   dplyr,
   magrittr,
   VariantAnnotation,
-  data.table,
   tidyr,
   methods,
   utils
-License: What license is it under?
+Imports:
+  BiocGenerics,
+  Biostrings,
+  GenomicRanges,
+  IRanges,
+  S4Vectors,
+  SummarizedExperiment,
+  stringr,
+  magrittr,
+  dplyr,
+  data.table
+Suggests:
+  TwoSampleMR,
+  testthat,
+  jsonlite
+Remotes:
+  explodecomputer/genetics.binaRies,
+  mrcieu/TwoSampleMR,
+  bioc::release/BiocGenerics,
+  bioc::release/GenomicRanges,
+  bioc::release/IRanges,
+  bioc::release/S4Vectors,
+  bioc::release/SummarizedExperiment,
+  bioc::release/VariantAnnotation
+
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 6.1.1
-Suggests: 
-    testthat
