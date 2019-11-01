@@ -19,11 +19,11 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	searchspacename <- paste0(out, ".searchspace")
 	targetsname <- paste0(out, ".targets")
 	outname <- paste0(out, ".targets.ld.gz")
-	write.table(rsid, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
+	utils::write.table(rsid, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
 	if(!is.null(searchspace))
 	{
 		stopifnot(is.character(searchspace))
-		write.table(c(rsid, searchspace), file=searchspacename, row=F, col=F, qu=F)
+		utils::write.table(c(rsid, searchspace), file=searchspacename, row=F, col=F, qu=F)
 		extract_param <- paste0(" --extract ", searchspacename)
 	} else {
 		extract_param <- " "

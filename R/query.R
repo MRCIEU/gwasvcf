@@ -355,7 +355,7 @@ query_rsid_bcftools <- function(rsid, vcffile, id=NULL)
 	}
 	id <- paste(id, collapse=",")
 	tmp <- tempfile()
-	write.table(unique(rsid), file=paste0(tmp, ".snplist"), row=F, col=F, qu=F)
+	utils::write.table(unique(rsid), file=paste0(tmp, ".snplist"), row=F, col=F, qu=F)
 	cmd <- sprintf("%s view -s %s -i'ID=@%s.snplist' %s > %s.vcf", bcftools, id, tmp, vcffile, tmp)
 	system(cmd)
 	o <- VariantAnnotation::readVcf(paste0(tmp, ".vcf"))
@@ -409,7 +409,7 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 	chrompos <- parse_chrompos(chrompos)
 	chrompos %>% as.data.frame
 	tmp <- tempfile()
-	write.table(as.data.frame(chrompos)[,1:3], file=paste0(tmp, ".snplist"), sep="\t", row=F, col=F, qu=F)
+	utils::write.table(as.data.frame(chrompos)[,1:3], file=paste0(tmp, ".snplist"), sep="\t", row=F, col=F, qu=F)
 
 	cmd <- sprintf("%s view -s %s -R %s.snplist %s > %s.vcf", bcftools, id, tmp, vcffile, tmp)
 	system(cmd)

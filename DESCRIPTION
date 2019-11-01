@@ -6,24 +6,23 @@ Description: Tools for dealing with GWAS summary data in VCF format. Includes re
 Depends: 
   R (>= 3.5.0),
 Imports:
-  tidyr,
   BiocGenerics,
   Biostrings,
   GenomicRanges,
   IRanges,
   S4Vectors,
   SummarizedExperiment,
+  Rsamtools,
+  VariantAnnotation,
+  tidyr,
   stringr,
   magrittr,
   dplyr,
   data.table,
-  Rsamtools,
-  VariantAnnotation,
   methods,
   utils,
   jsonlite
 Suggests:
-  TwoSampleMR,
   genetics.binaRies,
   testthat
 License: MIT + file LICENSE

@@ -94,7 +94,6 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 		info_col=names(dat)[info],
 		z_col=names(dat)[z],
 	)
-	print(head(o))
 	o[["beta.outcome"]][!is.finite(o[["beta.outcome"]])] <- NA
 	o[["se.outcome"]][!is.finite(o[["se.outcome"]])] <- NA
 	o[["pval.outcome"]][!is.finite(o[["pval.outcome"]])] <- NA
@@ -184,7 +183,7 @@ vcf_to_TwoSampleMR <- function(vcf, type="exposure")
 {
 	a <- vcf %>% vcf_to_granges
 	a[["SNP"]] <- names(a)
-	a <- as_tibble(a)
+	a <- dplyr::as_tibble(a)
 	if(!"ES" %in% names(a)) a[["ES"]] <- NA
 	if(!"SE" %in% names(a)) a[["SE"]] <- NA
 	if(!"LP" %in% names(a)) a[["LP"]] <- NA
