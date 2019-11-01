@@ -4,6 +4,19 @@ r:
   - devel
 cache: packages
 
+bioc_packages: 
+  - BiocGenerics
+  - Biostrings
+  - GenomicRanges
+  - IRanges
+  - S4Vectors
+  - SummarizedExperiment
+  - Rsamtools
+  - VariantAnnotation
+
+r_github_packages:
+  - explodecomputer/genetics.binaRies
+
 warnings_are_errors: false
 
 r_packages:
