@@ -13,7 +13,7 @@ query_pval_file(pval, vcffile, id = NULL, build = "GRCh37")
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
-\item{build="GRCh37"}{}
+\item{build}{Default="GRCh37"}
 }
 \value{
 VCF object

@@ -2,16 +2,11 @@ Package: gwasvcf
 Title: Tools for dealing with GWAS summary data in VCF format
 Version: 0.1.0
 Authors@R: person("Gibran", "Hemani", email = "explodecomputer@gmail.com", role = c("aut", "cre"))
-Description: Tools for dealing with GWAS summary data in VCF format
+Description: Tools for dealing with GWAS summary data in VCF format. Includes reading, querying, writing, as well as helper functions such as LD proxy searches.
 Depends: 
   R (>= 3.5.0),
-  dplyr,
-  magrittr,
-  VariantAnnotation,
-  tidyr,
-  methods,
-  utils
 Imports:
+  tidyr,
   BiocGenerics,
   Biostrings,
   GenomicRanges,
@@ -21,21 +16,16 @@ Imports:
   stringr,
   magrittr,
   dplyr,
-  data.table
+  data.table,
+  Rsamtools,
+  VariantAnnotation,
+  methods,
+  utils,
+  jsonlite
 Suggests:
   TwoSampleMR,
-  testthat,
-  jsonlite
-Remotes:
-  explodecomputer/genetics.binaRies,
-  mrcieu/TwoSampleMR,
-  bioc::release/BiocGenerics,
-  bioc::release/GenomicRanges,
-  bioc::release/IRanges,
-  bioc::release/S4Vectors,
-  bioc::release/SummarizedExperiment,
-  bioc::release/VariantAnnotation
-
+  genetics.binaRies,
+  testthat
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false

@@ -9,7 +9,7 @@ vcf_to_TwoSampleMR(vcf, type = "exposure")
 \arguments{
 \item{vcf}{VCF object}
 
-\item{type="exposure"}{or "outcome"}
+\item{type}{="exposure" or "outcome"}
 }
 \value{
 data frame

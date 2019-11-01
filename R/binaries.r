@@ -7,11 +7,11 @@
 #' @return TRUE or FALSE
 check_bcftools <- function()
 {
-	if(is.null(options()$tools_bcftools))
+	if(is.null(options()[["tools_bcftools"]]))
 	{
 		message("'tools_bcftools' option is not set, using native read which may be substantially slower. See 'set_bcftools' for information.")
 		return(FALSE)
-	} else if(!file.exists(options()$tools_bcftools)) {
+	} else if(!file.exists(options()[["tools_bcftools"]])) {
 		message("'tools_bcftools' option does not point to an existing file, using native read which may be substantially slower. See 'set_bcftools' for information.")
 		return(FALSE)
 	} else {
@@ -29,11 +29,11 @@ check_bcftools <- function()
 #' @return TRUE or FALSE
 check_plink <- function()
 {
-	if(is.null(options()$tools_plink))
+	if(is.null(options()[["tools_plink"]]))
 	{
 		message("'tools_plink' option is not set. See 'set_plink' for information.")
 		return(FALSE)
-	} else if(!file.exists(options()$tools_plink)) {
+	} else if(!file.exists(options()[["tools_plink"]])) {
 		message("'tools_plink' option does not point to an existing file. See 'set_plink' for information.")
 		return(FALSE)
 	} else {
@@ -55,7 +55,7 @@ set_bcftools <- function(path="")
 		options(tools_bcftools = NULL)
 	} else if(path == "")
 	{
-		a <- require(genetics.binaRies)
+		a <- requireNamespace("genetics.binaRies")
 		if(a)
 		{
 			message("Path not provided, using binaries in the explodecomputer/genetics.binaRies package")
@@ -82,7 +82,7 @@ set_plink <- function(path="")
 		options(tools_plink = NULL)
 	} else if(path == "")
 	{
-		a <- require(genetics.binaRies)
+		a <- requireNamespace("genetics.binaRies")
 		if(a)
 		{
 			message("Path not provided, using binaries in the explodecomputer/genetics.binaRies package")

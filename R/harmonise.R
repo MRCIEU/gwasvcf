@@ -119,10 +119,10 @@ read_gwas <- function(filename, skip, delimiter, gzipped, snp, nea, ea, ea_af, e
 
 #' Read in reference dataset
 #'
-#' @param reference_file <what param does>
-#' @param snplist <what param does>
-#' @param outfile <what param does>
-#' @param remove_dup_rsids=TRUE <what param does>
+#' @param reference_file Reference vcf
+#' @param rsid List of variants to read
+#' @param chrompos List of chrompos to read
+#' @param remove_dup_rsids =TRUE Remove duplicates from output
 #'
 #' @export
 #' @return data frame
@@ -140,7 +140,7 @@ read_reference <- function(reference_file, rsid=NULL, chrompos=NULL, remove_dup_
 	{
 		a <- a[!duplicated(names(a)), ]
 	}
-	return(format_from_vcf(a))
+	return(vcf_to_TwoSampleMR(a))
 }
 
 #' Harmonise gwas alleles to be same as reference
@@ -176,7 +176,7 @@ harmonise_against_ref <- function(gwas, reference)
 #' Create exposure or outcome data format for TwoSampleMR from vcf
 #'
 #' @param vcf VCF object
-#' @param type="exposure" or "outcome"
+#' @param type ="exposure" or "outcome"
 #'
 #' @export
 #' @return data frame
@@ -243,14 +243,14 @@ write_out <- function(harmonised, path)
 	if(!all(is.na(harmonised[["INFO"]]))) j[["imp_z_col"]] <- 9
 	if(!all(is.na(harmonised[["NCASE"]]))) j[["ncase_col"]] <- which(names(harmonised) == "NCASE")
 
-	write_json(j, paste0(path, ".json"), auto_unbox=TRUE)
+	jsonlite::write_json(j, paste0(path, ".json"), auto_unbox=TRUE)
 	if(grepl(".gz$", path))
 	{
 		gz1 <- gzfile(path, "w")
-		write.table(harmonised, gz1, row=FALSE, col=TRUE, qu=FALSE)
+		utils::write.table(harmonised, gz1, row=FALSE, col=TRUE, qu=FALSE)
 		close(gz1)
 	} else {
-		write.table(harmonised, path, row=FALSE, col=TRUE, qu=FALSE)
+		utils::write.table(harmonised, path, row=FALSE, col=TRUE, qu=FALSE)
 	}
 }
 
@@ -274,7 +274,7 @@ write_out <- function(harmonised, path)
 #' @param ref_snp Vector of SNP names for the reference dataset
 #' @param ref_a1 Vector of alleles
 #' @param ref_a2 Vector of alleles
-#' @param threshold=0.9 If the proportion of allele strands match is above this threshold, then declare the dataset to be on the forward strand
+#' @param threshold =0.9 If the proportion of allele strands match is above this threshold, then declare the dataset to be on the forward strand
 #'
 #' @export
 #' @return 1 = Forward strand; 2 = Not on forward strand
@@ -341,20 +341,18 @@ check_null <- function(x, n)
 
 #' Create GWAS vcf
 #'
-#' @param dat data frame
-#' @param snp_col snp_col
-#' @param chrom_col chrom_col
-#' @param pos_col pos_col
-#' @param nea_col nea_col
-#' @param ea_col ea_col
-#' @param ea_af_col ea_af_col
-#' @param effect_col effect_col
-#' @param se_col se_col
-#' @param pval_col pval_col
-#' @param n_col n_col
-#' @param ncase_col ncase_col
-#' @param info_col info_col
-#' @param z_col z_col
+#' @param chrom chrom vector
+#' @param pos pos vector
+#' @param nea nea vector
+#' @param ea ea vector
+#' @param snp Optional vector
+#' @param ea_af Optional vector
+#' @param effect Optional vector
+#' @param se Optional vector
+#' @param pval Optional vector
+#' @param n Optional vector
+#' @param ncase Optional vector
+#' @param name Optional vector
 #'
 #' @export
 #' @return vcf object

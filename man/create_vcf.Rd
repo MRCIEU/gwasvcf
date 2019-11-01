@@ -9,33 +9,29 @@ create_vcf(chrom, pos, nea, ea, snp = NULL, ea_af = NULL,
   name = NULL)
 }
 \arguments{
-\item{dat}{data frame}
+\item{chrom}{chrom vector}
 
-\item{snp_col}{snp_col}
+\item{pos}{pos vector}
 
-\item{chrom_col}{chrom_col}
+\item{nea}{nea vector}
 
-\item{pos_col}{pos_col}
+\item{ea}{ea vector}
 
-\item{nea_col}{nea_col}
+\item{snp}{Optional vector}
 
-\item{ea_col}{ea_col}
+\item{ea_af}{Optional vector}
 
-\item{ea_af_col}{ea_af_col}
+\item{effect}{Optional vector}
 
-\item{effect_col}{effect_col}
+\item{se}{Optional vector}
 
-\item{se_col}{se_col}
+\item{pval}{Optional vector}
 
-\item{pval_col}{pval_col}
+\item{n}{Optional vector}
 
-\item{n_col}{n_col}
+\item{ncase}{Optional vector}
 
-\item{ncase_col}{ncase_col}
-
-\item{info_col}{info_col}
-
-\item{z_col}{z_col}
+\item{name}{Optional vector}
 }
 \value{
 vcf object

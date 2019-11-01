@@ -14,15 +14,15 @@ proxy_match(vcf, rsid, bfile, proxies = "yes", tag_kb = 5000,
 
 \item{bfile}{ld reference panel}
 
-\item{proxies="yes"}{If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes}
+\item{proxies}{="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes}
 
-\item{tag_kb=5000}{Proxy parameter}
+\item{tag_kb}{=5000 Proxy parameter}
 
-\item{tag_nsnp=5000}{Proxy parameter}
+\item{tag_nsnp}{=5000 Proxy parameter}
 
-\item{tag_r2=0.6}{Proxy parameter}
+\item{tag_r2}{=0.6 Proxy parameter}
 
-\item{threads=1}{}
+\item{threads}{Number of threads to use (=1)}
 }
 \value{
 data frame

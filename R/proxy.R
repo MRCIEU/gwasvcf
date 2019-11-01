@@ -2,9 +2,9 @@
 #'
 #' @param rsid list of rs IDs
 #' @param bfile ld reference panel
-#' @param tag_kb=5000 Proxy parameter
-#' @param tag_nsnp=5000 Proxy parameter
-#' @param tag_r2=0.6 Proxy parameter
+#' @param tag_kb =5000 Proxy parameter
+#' @param tag_nsnp =5000 Proxy parameter
+#' @param tag_r2 =0.6 Proxy parameter
 #' @param searchspace Optional list of rs IDs to use as potential proxies 
 #' @param threads Number of threads to use (=1)
 #' @param out temporary output file
@@ -16,8 +16,6 @@
 get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, out=tempfile())
 {
 	stopifnot(check_plink())
-	require(dplyr)
-	require(data.table)
 	searchspacename <- paste0(out, ".searchspace")
 	targetsname <- paste0(out, ".targets")
 	outname <- paste0(out, ".targets.ld.gz")
@@ -30,7 +28,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	} else {
 		extract_param <- " "
 	}
-	cmd <- paste0(options()$tools_plink,
+	cmd <- paste0(options()[["tools_plink"]],
 		" --bfile ", bfile, 
 		extract_param,
 		" --keep-allele-order ",
@@ -44,20 +42,20 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	system(cmd)
 
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
-		dplyr::filter(R^2 > tag_r2) %>%
-		dplyr::filter(SNP_A != SNP_B) %>%
-		dplyr::mutate(PHASE=gsub("/", "", PHASE)) %>%
-		subset(., nchar(PHASE) == 4)
+		dplyr::filter(`R`^2 > `tag_r2`) %>%
+		dplyr::filter(`SNP_A` != `SNP_B`) %>%
+		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
+		subset(., nchar(`PHASE`) == 4)
 	if(nrow(ld) == 0)
 	{
 		return(ld)
 	}
-	temp <- do.call(rbind, strsplit(ld$PHASE, "")) %>% as_tibble(., .name_repair="minimal")
+	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% as_tibble(., .name_repair="minimal")
-	# ld <- arrange(ld, desc(abs(R))) %>%
+	ld <- cbind(ld, temp) %>% dplyr::as_tibble(., .name_repair="minimal")
+	# ld <- dplyr::arrange(ld, desc(abs(R))) %>%
 	# 	dplyr::filter(!duplicated(SNP_A))
-	ld <- arrange(ld, desc(abs(R)))
+	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
 	unlink(searchspacename)
 	unlink(targetsname)
 	unlink(paste0(targetsname, c(".log", ".nosex")))
@@ -73,11 +71,12 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 #' @param vcf vcf file name
 #' @param rsid list of rs IDs
 #' @param bfile ld reference panel
-#' @param proxies="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
-#' @param tag_kb=5000 Proxy parameter
-#' @param tag_nsnp=5000 Proxy parameter
-#' @param tag_r2=0.6 Proxy parameter
-#' @param threads=1
+#' @param proxies ="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
+#' @param tag_kb =5000 Proxy parameter
+#' @param tag_nsnp =5000 Proxy parameter
+#' @param tag_r2 =0.6 Proxy parameter
+#' @param threads Number of threads to use (=1)
+
 #'
 #' @export
 #' @return data frame
@@ -96,7 +95,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			{
 				if(check_bcftools())
 				{
-					cmd <- paste0(options()$tools_bcftools, " query -f'%ID\n' ", vcf, " > ", searchspacename)
+					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
 					searchspace <- scan(searchspacename, what="character")
 				} else {
@@ -119,7 +118,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			{
 				if(check_bcftools())
 				{
-					cmd <- paste0(options()$tools_bcftools, " query -f'%ID\n' ", vcf, " > ", searchspacename)
+					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
 					searchspace <- scan(searchspacename, what="character")
 				} else {
@@ -143,24 +142,24 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	{
 		ld <- ld %>% dplyr::filter(!duplicated(SNP_A))
 	}
-	e <- query_gwas(vcf, rsid=ld$SNP_B)
+	e <- query_gwas(vcf, rsid=ld[["SNP_B"]])
 
 	if(is.null(searchspace))
 	{
-		ld <- subset(ld, SNP_B %in% names(e)) %>%
-			dplyr::filter(!duplicated(SNP_A))		
+		ld <- subset(ld, `SNP_B` %in% names(e)) %>%
+			dplyr::filter(!duplicated(`SNP_A`))		
 	}
-	e <- e[names(e) %in% ld$SNP_B, ]
-	index <- match(names(e), ld$SNP_B)
+	e <- e[names(e) %in% ld[["SNP_B"]], ]
+	index <- match(names(e), ld[["SNP_B"]])
 	ld <- ld[index,]
-	stopifnot(all(ld$SNP_B == names(e)))
-	sign_index <- SummarizedExperiment::rowRanges(e)$REF == ld$B1
+	stopifnot(all(ld[["SNP_B"]] == names(e)))
+	sign_index <- SummarizedExperiment::rowRanges(e)$`REF` == ld[["B1"]]
 
-	gr <- GenomicRanges::GRanges(ld$CHR_A, IRanges::IRanges(start=ld$BP_A, end=ld$BP_A, names=ld$SNP_A))
+	gr <- GenomicRanges::GRanges(ld[["CHR_A"]], IRanges::IRanges(start=ld[["BP_A"]], end=ld[["BP_A"]], names=ld[["SNP_A"]]))
 	fixeddat <- S4Vectors::DataFrame(
 		paramRangeID=as.factor(rep(NA, nrow(ld))),  
-		REF=Biostrings::DNAStringSet(ld$A1), 
-		ALT=Biostrings::DNAStringSetList(as.list(ld$A2)), 
+		REF=Biostrings::DNAStringSet(ld[["A1"]]), 
+		ALT=Biostrings::DNAStringSetList(as.list(ld[["A2"]])), 
 		QUAL=as.numeric(NA), 
 		FILTER="PASS"
 	)
@@ -178,17 +177,17 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	)
 
 	VariantAnnotation::geno(VariantAnnotation::header(prox)) <- rbind(VariantAnnotation::geno(VariantAnnotation::header(prox)), 
-		DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid")
+		S4Vectors::DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid")
 	)
-	VariantAnnotation::geno(prox)$ES[!sign_index] <- {unlist(VariantAnnotation::geno(prox)$ES[!sign_index]) * -1} %>% as.list
-	VariantAnnotation::geno(prox)$PR <- matrix(ld$SNP_B, length(ld$SNP_B), 1)
+	VariantAnnotation::geno(prox)[["ES"]][!sign_index] <- {unlist(VariantAnnotation::geno(prox)[["ES"]][!sign_index]) * -1} %>% as.list
+	VariantAnnotation::geno(prox)[["PR"]] <- matrix(ld[["SNP_B"]], length(ld[["SNP_B"]]), 1)
 
 	if(proxies == "only")
 	{
 		return(prox)
 	} else {
 		VariantAnnotation::geno(VariantAnnotation::header(o)) <- rbind(VariantAnnotation::geno(VariantAnnotation::header(o)), S4Vectors::DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid"))
-		VariantAnnotation::geno(o)$PR <- matrix(rep(NA, length(o)), length(o), 1)
+		VariantAnnotation::geno(o)[["PR"]] <- matrix(rep(NA, length(o)), length(o), 1)
 		return(BiocGenerics::rbind(o, prox))
 	}
 }

@@ -2,9 +2,9 @@ context("Getting LD proxies")
 library(gwasvcf)
 library(genetics.binaRies)
 
-vcffile <- system.file("data","data.vcf.gz", package="gwasvcf")
-vcf <- readVcf(vcffile)
-bfile <- system.file("data","eur.bed", package="gwasvcf") %>% gsub(".bed", "", .)
+vcffile <- system.file("extdata","data.vcf.gz", package="gwasvcf")
+vcf <- VariantAnnotation::readVcf(vcffile)
+bfile <- system.file("extdata","eur.bed", package="gwasvcf") %>% gsub(".bed", "", .)
 
 set_plink()
 
@@ -69,7 +69,7 @@ test_that("query bcftools", {
 
 test_that("alignment native", {
 	set_bcftools(NULL)
-	rsid <- names(rowRanges(vcf))
+	rsid <- names(SummarizedExperiment::rowRanges(vcf))
 	a <- proxy_match(vcf, rsid, bfile, proxies="only")
 	b <- query_gwas(vcf, rsid=rsid)
 	index <- match(names(b), names(a))
@@ -79,7 +79,7 @@ test_that("alignment native", {
 
 test_that("alignment bcftools", {
 	set_bcftools()
-	rsid <- names(rowRanges(vcf))
+	rsid <- names(SummarizedExperiment::rowRanges(vcf))
 	a <- proxy_match(vcf, rsid, bfile, proxies="only")
 	b <- query_gwas(vcf, rsid=rsid)
 	index <- match(names(b), names(a))

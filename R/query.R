@@ -3,7 +3,6 @@
 #' Read in GWAS summary data with filters on datasets (if multiple datasets per file) and/or chromosome/position, rsids or pvalues. Chooses most optimal choice for the detected operating system. Typically chrompos searches are the fastest. On Windows, rsid or pvalue filters from a file will be slow. 
 #'
 #' @param vcf VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf
-#' @param vcffile Path to .vcf.gz GWAS summary data file
 #' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
 #' @param rsid Vector of rsids
 #' @param pval  P-value threshold (NOT -log10)
@@ -98,7 +97,7 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 
 df_to_granges <- function(df)
 {
-	GRanges(seqnames=df$chrom, ranges=IRanges(start=df$start, end=df$end))
+	GenomicRanges::GRanges(seqnames=df[["chrom"]], ranges=IRanges::IRanges(start=df[["start"]], end=df[["end"]]))
 }
 
 
@@ -150,23 +149,23 @@ vcf_to_granges <- function(vcf, id=NULL)
 {
 	if(is.null(id))
 	{
-		id <- samples(header(vcf))
+		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
 	}
 	stopifnot(length(id) == 1)
-	a <- rowRanges(vcf)
-	a$ALT <- unlist(a$ALT)
+	a <- SummarizedExperiment::rowRanges(vcf)
+	a$`ALT` <- unlist(a$`ALT`)
 
-	if(length(geno(vcf)) == 0)
+	if(length(VariantAnnotation::geno(vcf)) == 0)
 	{
 		return(a)
 	} else {
 		out <- VariantAnnotation::expand(vcf) %>% 
-			geno() %>%
+			VariantAnnotation::geno() %>%
 			as.list() %>%
 			lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
-			bind_cols()
-		values(a) <- cbind(values(a), out)
-		values(a)$id <- id
+			dplyr::bind_cols()
+		S4Vectors::values(a) <- cbind(S4Vectors::values(a), out)
+		S4Vectors::values(a)[["id"]] <- id
 		return(a)
 	}
 }
@@ -182,8 +181,8 @@ vcf_to_granges <- function(vcf, id=NULL)
 vcf_to_tibble <- function(vcf, id=NULL)
 {
 	a <- vcf_to_granges(vcf, id)
-	a$SNP <- names(a)
-	return(as_tibble(a))
+	a[["SNP"]] <- names(a)
+	return(dplyr::as_tibble(a))
 }
 
 
@@ -194,7 +193,7 @@ vcf_to_tibble <- function(vcf, id=NULL)
 #' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
 #' @param vcffile Path to .vcf.gz GWAS summary data file
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="GRCh37" Build of vcffile
+#' @param build Default="GRCh37" Build of vcffile
 #'
 #' @export
 #' @return VCF object
@@ -203,12 +202,12 @@ query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="GRCh37")
 	chrompos <- parse_chrompos(chrompos)
 	if(!is.null(id))
 	{
-		param <- ScanVcfParam(which=chrompos, samples=id)
+		param <- VariantAnnotation::ScanVcfParam(which=chrompos, samples=id)
 	} else {
-		param <- ScanVcfParam(which=chrompos)
+		param <- VariantAnnotation::ScanVcfParam(which=chrompos)
 	}
-	tab <- TabixFile(vcffile)
-	vcf <- readVcf(tab, build, param=chrompos)
+	tab <- Rsamtools::TabixFile(vcffile)
+	vcf <- VariantAnnotation::readVcf(tab, build, param=chrompos)
 	return(vcf)
 }
 
@@ -218,26 +217,26 @@ query_chrompos_file <- function(chrompos, vcffile, id=NULL, build="GRCh37")
 #' @param rsid Vector of rsids. Use DBSNP build (???)
 #' @param vcffile Path to .vcf.gz GWAS summary data file
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="GRCh37" Build of vcffile
+#' @param build Default="GRCh37" Build of vcffile
 #'
 #' @export
 #' @return VCF object
 query_rsid_file <- function(rsid, vcffile, id=NULL, build="GRCh37")
 {
 	message("Note, this is much slower than searching by chromosome/position (e.g. see query_chrompos_file)")
-	vcf <- TabixFile(vcffile)
+	vcf <- Rsamtools::TabixFile(vcffile)
 	fil <- function(x)
 	{
 		grepl(paste(rsid, collapse="|"), x)
 	}
 
 	tempfile <- tempfile()
-	filterVcf(vcf, build, tempfile, prefilters=FilterRules(list(fil=fil)), verbose=TRUE)
+	VariantAnnotation::filterVcf(vcf, build, tempfile, prefilters=S4Vectors::FilterRules(list(fil=fil)), verbose=TRUE)
 	if(!is.null(id))
 	{
-		o <- readVcf(tempfile, param=ScanVcfParam(samples=id))
+		o <- VariantAnnotation::readVcf(tempfile, param=VariantAnnotation::ScanVcfParam(samples=id))
 	} else {
-		o <- readVcf(tempfile)
+		o <- VariantAnnotation::readVcf(tempfile)
 	}
 	unlink(tempfile)
 
@@ -252,7 +251,7 @@ query_rsid_file <- function(rsid, vcffile, id=NULL, build="GRCh37")
 #' @param pval P-value threshold (NOT -log10)
 #' @param vcffile Path to tabix indexed vcf file
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
-#' @param build="GRCh37"
+#' @param build Default="GRCh37"
 #'
 #' @export
 #' @return VCF object
@@ -260,19 +259,19 @@ query_pval_file <- function(pval, vcffile, id=NULL, build="GRCh37")
 {
 	if(is.null(id))
 	{
-		id <- samples(scanVcfHeader(vcffile))
+		id <- VariantAnnotation::samples(VariantAnnotation::scanVcfHeader(vcffile))
 	}
 	stopifnot(length(id) == 1)
 	message("Filtering p-value based on id ", id)
 	message("Note, this is much slower than searching by chromosome/position (e.g. see query_chrompos_file)")
-	vcf <- TabixFile(vcffile)
+	vcf <- Rsamtools::TabixFile(vcffile)
 	fil <- function(x)
 	{
-		geno(x)$LP[,id,drop=TRUE] > -log10(pval)
+		VariantAnnotation::geno(x)[["LP"]][,id,drop=TRUE] > -log10(pval)
 	}
 	tempfile <- tempfile()
-	filterVcf(vcf, build, tempfile, filters=FilterRules(list(fil=fil)), verbose=TRUE)
-	o <- readVcf(tempfile)
+	VariantAnnotation::filterVcf(vcf, build, tempfile, filters=S4Vectors::FilterRules(list(fil=fil)), verbose=TRUE)
+	o <- VariantAnnotation::readVcf(tempfile)
 	unlink(tempfile)
 	return(o)
 }
@@ -290,9 +289,9 @@ query_chrompos_vcf <- function(chrompos, vcf, id=NULL)
 {
 	if(is.null(id))
 	{
-		id <- samples(header(vcf))
+		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
 	}
-	colid <- which(samples(header(vcf)) == id)
+	colid <- which(VariantAnnotation::samples(VariantAnnotation::header(vcf)) == id)
 	chrompos <- parse_chrompos(chrompos)
 	i <- IRanges::findOverlaps(SummarizedExperiment::rowRanges(vcf), chrompos) %>% S4Vectors::queryHits() %>% unique %>% sort
 	vcf[i,colid]
@@ -311,9 +310,9 @@ query_rsid_vcf <- function(rsid, vcf, id=NULL)
 {
 	if(is.null(id))
 	{
-		id <- samples(header(vcf))
+		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
 	}
-	colid <- which(samples(header(vcf)) == id)
+	colid <- which(VariantAnnotation::samples(VariantAnnotation::header(vcf)) == id)
 	vcf[rownames(vcf) %in% rsid,colid]
 }
 
@@ -330,11 +329,11 @@ query_pval_vcf <- function(pval, vcf, id=NULL)
 {
 	if(is.null(id))
 	{
-		id <- samples(header(vcf))
+		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
 	}
 	stopifnot(length(id) == 1)
-	colid <- which(samples(header(vcf)) == id)
-	vcf[geno(vcf)$LP[,colid,drop=TRUE] > -log10(pval),colid]
+	colid <- which(VariantAnnotation::samples(VariantAnnotation::header(vcf)) == id)
+	vcf[VariantAnnotation::geno(vcf)[["LP"]][,colid,drop=TRUE] > -log10(pval),colid]
 }
 
 
@@ -349,17 +348,17 @@ query_pval_vcf <- function(pval, vcf, id=NULL)
 query_rsid_bcftools <- function(rsid, vcffile, id=NULL)
 {
 	stopifnot(check_bcftools())
-	bcftools <- options()$tools_bcftools
+	bcftools <- options()[["tools_bcftools"]]
 	if(is.null(id))
 	{
-		id <- samples(scanVcfHeader(vcffile))
+		id <- VariantAnnotation::samples(VariantAnnotation::scanVcfHeader(vcffile))
 	}
 	id <- paste(id, collapse=",")
 	tmp <- tempfile()
 	write.table(unique(rsid), file=paste0(tmp, ".snplist"), row=F, col=F, qu=F)
 	cmd <- sprintf("%s view -s %s -i'ID=@%s.snplist' %s > %s.vcf", bcftools, id, tmp, vcffile, tmp)
 	system(cmd)
-	o <- readVcf(paste0(tmp, ".vcf"))
+	o <- VariantAnnotation::readVcf(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".snplist"))
 	return(o)
@@ -376,16 +375,16 @@ query_rsid_bcftools <- function(rsid, vcffile, id=NULL)
 query_pval_bcftools <- function(pval, vcffile, id=NULL)
 {
 	stopifnot(check_bcftools())
-	bcftools <- options()$tools_bcftools
+	bcftools <- options()[["tools_bcftools"]]
 	if(is.null(id))
 	{
-		id <- samples(scanVcfHeader(vcffile))
+		id <- VariantAnnotation::samples(VariantAnnotation::scanVcfHeader(vcffile))
 	}
 	id <- paste(id, collapse=",")
 	tmp <- tempfile()
 	cmd <- sprintf("%s view -s %s -i 'FORMAT/LP > %s' %s > %s.vcf", bcftools, id, -log10(pval), vcffile, tmp)
 	system(cmd)
-	o <- readVcf(paste0(tmp, ".vcf"))
+	o <- VariantAnnotation::readVcf(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".vcf"))
 	return(o)
 }
@@ -398,13 +397,13 @@ query_pval_bcftools <- function(pval, vcffile, id=NULL)
 #'
 #' @export
 #' @return vcf object
-query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL, build="GRCh37")
+query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 {
 	stopifnot(check_bcftools())
-	bcftools <- options()$tools_bcftools
+	bcftools <- options()[["tools_bcftools"]]
 	if(is.null(id))
 	{
-		id <- samples(scanVcfHeader(vcffile))
+		id <- VariantAnnotation::samples(VariantAnnotation::scanVcfHeader(vcffile))
 	}
 	id <- paste(id, collapse=",")
 	chrompos <- parse_chrompos(chrompos)
@@ -414,7 +413,7 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL, build="GRCh37")
 
 	cmd <- sprintf("%s view -s %s -R %s.snplist %s > %s.vcf", bcftools, id, tmp, vcffile, tmp)
 	system(cmd)
-	o <- readVcf(paste0(tmp, ".vcf"))
+	o <- VariantAnnotation::readVcf(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".snplist"))
 	return(o)

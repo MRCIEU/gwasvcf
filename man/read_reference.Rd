@@ -8,13 +8,13 @@ read_reference(reference_file, rsid = NULL, chrompos = NULL,
   remove_dup_rsids = TRUE)
 }
 \arguments{
-\item{reference_file}{<what param does>}
+\item{reference_file}{Reference vcf}
 
-\item{snplist}{<what param does>}
+\item{rsid}{List of variants to read}
 
-\item{outfile}{<what param does>}
+\item{chrompos}{List of chrompos to read}
 
-\item{remove_dup_rsids=TRUE}{<what param does>}
+\item{remove_dup_rsids}{=TRUE Remove duplicates from output}
 }
 \value{
 data frame

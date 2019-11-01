@@ -13,7 +13,7 @@ query_chrompos_file(chrompos, vcffile, id = NULL, build = "GRCh37")
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
-\item{build="GRCh37"}{Build of vcffile}
+\item{build}{Default="GRCh37" Build of vcffile}
 }
 \value{
 VCF object

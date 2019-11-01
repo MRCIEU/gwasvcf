@@ -20,7 +20,7 @@ is_forward_strand(gwas_snp, gwas_a1, gwas_a2, ref_snp, ref_a1, ref_a2,
 
 \item{ref_a2}{Vector of alleles}
 
-\item{threshold=0.9}{If the proportion of allele strands match is above this threshold, then declare the dataset to be on the forward strand}
+\item{threshold}{=0.9 If the proportion of allele strands match is above this threshold, then declare the dataset to be on the forward strand}
 }
 \value{
 1 = Forward strand; 2 = Not on forward strand

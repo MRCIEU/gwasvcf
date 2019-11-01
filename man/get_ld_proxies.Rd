@@ -14,15 +14,15 @@ get_ld_proxies(rsid, bfile, searchspace = NULL, tag_kb = 5000,
 
 \item{searchspace}{Optional list of rs IDs to use as potential proxies}
 
+\item{tag_kb}{=5000 Proxy parameter}
+
+\item{tag_nsnp}{=5000 Proxy parameter}
+
+\item{tag_r2}{=0.6 Proxy parameter}
+
 \item{threads}{Number of threads to use (=1)}
 
 \item{out}{temporary output file}
-
-\item{tag_kb=5000}{Proxy parameter}
-
-\item{tag_nsnp=5000}{Proxy parameter}
-
-\item{tag_r2=0.6}{Proxy parameter}
 }
 \value{
 data frame

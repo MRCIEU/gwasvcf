@@ -4,7 +4,7 @@
 \alias{query_chrompos_bcftools}
 \title{Query chromosome and position using bcftools}
 \usage{
-query_chrompos_bcftools(chrompos, vcffile, id = NULL, build = "GRCh37")
+query_chrompos_bcftools(chrompos, vcffile, id = NULL)
 }
 \arguments{
 \item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.}

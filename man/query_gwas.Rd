@@ -35,8 +35,6 @@ query_gwas(vcf, chrompos = NULL, rsid = NULL, pval = NULL,
 \item{tag_r2}{=0.6 Proxy parameter}
 
 \item{threads}{=1 NUmber of threads}
-
-\item{vcffile}{Path to .vcf.gz GWAS summary data file}
 }
 \value{
 vcf object
