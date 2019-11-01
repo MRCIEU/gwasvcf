@@ -1,5 +1,11 @@
 # Reading, querying and writing GWAS summary data in VCF format
 
+<!-- badges: start -->
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental) [![Travis-CI build status](https://travis-ci.org/mrcieu/gwasvcf.svg?branch=master)](https://travis-ci.org/mrcieu/gwasvcf) [![codecov](https://codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://codecov.io/github/mrcieu/gwasvcf)
+
+<!-- badges: end -->
+
 Some utilities to create and query GWAS VCF files. These files are used to store GWAS summary data, and are not used to store genotype data. They are used for the utility of being able to quickly extract metadata from the fixed fields.
 
 
@@ -18,6 +24,37 @@ Example GWAS VCF (GIANT 2010 BMI):
 
 - [http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz](http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz)
 - [http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz.tbi](http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz.tbi)
+
+
+## Linked tools
+
+For LD related functions the package uses [plink 1.90](https://www.cog-genomics.org/plink/1.9). You can specify the location of your plink installation by running
+
+```
+set_plink('/path/to/plink')
+```
+
+For some VCF querying functions it is faster to optionally use [bcftools](https://samtools.github.io/bcftools/bcftools.html), and when available the R package will use that strategy. To set a location for the bcftools package, use
+
+```
+set_bcftools('/path/to/bcftools')
+```
+
+
+Alternatively you can automatically use use the binaries bundled here: https://github.com/explodecomputer/genetics.binaRies 
+
+```
+devtools::install_github('explodecomputer/genetics.binaRies')
+set_plink()
+set_bcftools()
+```
+
+To unset a path:
+
+```
+set_plink(NULL)
+set_bcftools(NULL)
+```
 
 
 ## Getting started
@@ -47,6 +84,7 @@ devtools::install_github("mrcieu/gwasvcftools")
 ```r
 vcf <- readVcf("IEU-a-2.vcf.gz")
 ```
+
 
 ### Reading in with filters
 
