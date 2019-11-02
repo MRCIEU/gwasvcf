@@ -405,8 +405,7 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 	{
 		id <- VariantAnnotation::samples(VariantAnnotation::scanVcfHeader(vcffile))
 	}
-	id <- paste(id, collapse=",")
-	idclause <- ifelse(length(id) == 0, "", paste0("-s ", id))
+	idclause <- ifelse(length(id) == 0, "", paste0("-s ", paste(id, collapse=",")))
 
 	chrompos <- parse_chrompos(chrompos)
 	chrompos %>% as.data.frame
