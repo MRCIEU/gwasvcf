@@ -406,7 +406,7 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 		id <- VariantAnnotation::samples(VariantAnnotation::scanVcfHeader(vcffile))
 	}
 	id <- paste(id, collapse=",")
-		idclause <- ifelse(length(id) == 0, "", paste0("-s ", id))
+	idclause <- ifelse(length(id) == 0, "", paste0("-s ", id))
 
 	chrompos <- parse_chrompos(chrompos)
 	chrompos %>% as.data.frame
@@ -414,7 +414,7 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 	utils::write.table(as.data.frame(chrompos)[,1:3], file=paste0(tmp, ".snplist"), sep="\t", row=F, col=F, qu=F)
 
 	cmd <- sprintf(paste0("%s view %s -R %s.snplist %s > %s.vcf"), bcftools, idclause, tmp, vcffile, tmp)
-
+	print(cmd)
 	system(cmd)
 	o <- VariantAnnotation::readVcf(paste0(tmp, ".vcf"))
 	unlink(paste0(tmp, ".vcf"))
