@@ -1,14 +1,14 @@
 
-#' Harmonise two GWAS VCF objects
+#' Merge two GWAS VCF objects
 #'
-#' Returns harmonised intersection
+#' Returns merged intersection of two VCF objects
 #'
 #' @param a VCF object
 #' @param b VCF object
 #'
 #' @export
 #' @return SimpleList of VCF objects
-harmonise <- function(a, b, force)
+merge_vcf <- function(a, b, force)
 {
 	a <- expand(a)
 	b <- expand(b)
@@ -457,5 +457,72 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 		geno = gen
 	)
 	return(vcf)
+}
+
+
+harmonise <- function(chr1, pos1, ref1, alt1, chr2, pos2, ref2, alt2, indel_recode=FALSE, strand_flip=FALSE)
+{
+	chrpos1 <- paste(chr1, pos1)
+	chrpos2 <- paste(chr2, pos2)
+	target <- dplyr::tibble(chr=chr1, pos=pos1, ref=toupper(ref1), alt=toupper(alt1))
+	reference <- dplyr::tibble(chr=chr2, pos=pos2, ref=toupper(ref2), alt=toupper(alt2)) %>%
+		subset(., !duplicated(paste(chr, pos, ref, alt)))
+
+	target$keep <- chrpos1 %in% chrpos2
+	target$i <- 1:nrow(target)
+	dat <- dplyr::left_join(target, reference, by=c("chr", "pos"))
+	dat$decision <- 6
+	dat$decision[dat$decision == 6 & is.na(dat$ref.y)] <- 7
+
+
+	a0 <- dat$ref.x == dat$ref.y & dat$alt.x == dat$alt.y
+	a1 <- dat$ref.x == dat$alt.y & dat$alt.x == dat$ref.y
+	dat$decision[a0] <- 0
+	dat$decision[a1] <- 1
+
+	if(indel_recode)
+	{
+		dat$nref.y <- nchar(dat$ref.y)
+		dat$nalt.y <- nchar(dat$alt.y)
+		dat$inref <- dat$nref.y > dat$nalt.y
+		a2 <- dat$ref.x == "I" & dat$alt.x == "D" & dat$inref | dat$ref.x == "D" & dat$alt.x == "I" & ! dat$inref
+		a3 <- dat$ref.x == "I" & dat$alt.x == "D" & ! dat$inref | dat$ref.x == "D" & dat$alt.x == "I" & dat$inref		
+		dat$decision[a2] <- 2
+		dat$decision[a3] <- 3
+	}
+
+	if(strand_flip)
+	{
+		ref.x.flip <- flip_strand(dat$ref.x)
+		alt.x.flip <- flip_strand(dat$alt.x)
+		a5 <- dat$decision > 5 & ref.x.flip == dat$ref.y & alt.x.flip == dat$alt.y
+		a6 <- dat$decision > 5 & ref.x.flip == dat$alt.y & alt.x.flip == dat$ref.y
+		dat$decision[a5] <- 5
+		dat$decision[a6] <- 6
+	}
+
+	dat <- dat %>% arrange(i, decision) %>%
+		subset(!duplicated(i))
+
+	message("0: stick = ", sum(dat$decision == 0))
+	message("1: swap = ", sum(dat$decision == 1))
+	message("2: rename indel = ", sum(dat$decision == 2))
+	message("3: rename indel and swap = ", sum(dat$decision == 3))
+	message("4: flip = ", sum(dat$decision == 4))
+	message("5: flip and swap = ", sum(dat$decision == 5))
+	message("6: drop (no match) = ", sum(dat$decision == 6))
+	message("7: drop (no reference) = ", sum(dat$decision == 7))
+	return(dat)
+}
+
+
+
+flip_strand <- function(x)
+{
+	x %>% gsub("A", "t", .) %>%
+		gsub("G", "c", .) %>%
+		gsub("T", "a", .) %>%
+		gsub("C", "g", .) %>%
+		toupper()
 }
 
