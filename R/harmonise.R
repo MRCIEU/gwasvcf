@@ -8,7 +8,7 @@
 #'
 #' @export
 #' @return SimpleList of VCF objects
-merge_vcf <- function(a, b, force)
+merge_vcf <- function(a, b)
 {
 	a <- expand(a)
 	b <- expand(b)
@@ -460,6 +460,33 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 }
 
 
+#' Generic harmonisation function
+#'
+#' Assumes ref and alt alleles available for target and reference datasets, and uses chr:pos for alignment
+#'
+#' 0: stick
+#' 1: swap
+#' 2: rename indel
+#' 3: rename indel and swap
+#' 4: flip
+#' 5: flip and swap
+#' 6: drop (no match)
+#' 7: drop (no reference)
+#' 
+#'
+#' @param chr1 Vector
+#' @param pos1 Vector
+#' @param ref1 Vector
+#' @param alt1 Vector
+#' @param chr2 Vector
+#' @param pos2 Vector
+#' @param ref2 Vector
+#' @param alt2 Vector
+#' @param indel_recode =FALSE. If TRUE then attempts to recode D/I
+#' @param strand_flip =FALSE. If TRUE then attempts to flip strand when alignment is not otherwise possible
+#'
+#' @export
+#' @return Dataframe of outcomes
 harmonise <- function(chr1, pos1, ref1, alt1, chr2, pos2, ref2, alt2, indel_recode=FALSE, strand_flip=FALSE)
 {
 	chrpos1 <- paste(chr1, pos1)
