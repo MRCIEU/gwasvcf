@@ -1,3 +1,54 @@
+
+#' Harmonise two GWAS VCF objects
+#'
+#' Returns harmonised intersection
+#'
+#' @param a VCF object
+#' @param b VCF object
+#'
+#' @export
+#' @return SimpleList of VCF objects
+harmonise <- function(a, b, force)
+{
+	a <- expand(a)
+	b <- expand(b)
+	# o <- SummarizedExperiment::findOverlaps(a, b)
+	o <- dplyr::tibble(
+		from = which(names(a) %in% names(b)),
+		to = match(names(a)[from], names(b))
+	)
+	a <- a[o[["from"]],]
+	b <- b[o[["to"]],]
+	allele_match <- ref(a) == ref(b) & alt(a) == alt(b)
+	switch <- ref(a) == alt(b) & ref(b) == alt(a)
+	if(any(switch))
+	{
+		for(i in 1:ncol(geno(b)[["ES"]]))
+		{
+			geno(b)[["ES"]][,i][switch] <- lapply(geno(b)[["ES"]][,i][switch], function(x) x * -1)
+		}
+	}
+	a <- a[allele_match | switch, ]
+	b <- b[allele_match | switch, ]
+
+	ab <- a
+	temp <- lapply(names(geno(ab)), function(x) rbind(geno(ab)[x], geno(b)[x])) %>% SimpleList
+	names(temp) <- names(geno(ab))
+	geno(ab) <- temp
+
+	h <- header(a)
+	VCFHeader(
+		reference = reference(h),
+		samples = c(samples(h), samples(header(b))),
+		meta = meta(h)
+	)
+	samples(h) <- c(samples(h), samples(header(b)))
+
+	return(S4Vectors::SimpleList())
+}
+
+
+
 #' Read in GWAS dataset
 #'
 #'

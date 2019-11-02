@@ -11,12 +11,19 @@ check_bcftools <- function()
 	{
 		message("'tools_bcftools' option is not set, using native read which may be substantially slower. See 'set_bcftools' for information.")
 		return(FALSE)
-	} else if(!file.exists(options()[["tools_bcftools"]])) {
-		message("'tools_bcftools' option does not point to an existing file, using native read which may be substantially slower. See 'set_bcftools' for information.")
-		return(FALSE)
-	} else {
+	}
+	filecheck <- file.exists(options()[["tools_bcftools"]])
+	if(filecheck)
+	{
 		return(TRUE)
 	}
+	pathcheck <- any(sapply(strsplit(Sys.getenv("PATH"), split=":"), function(x) file.exists(file.path(x, options()[["tools_bcftools"]]))))
+	if(pathcheck)
+	{
+		return(TRUE)
+	}
+	message("'tools_bcftools' option does not point to an existing file, using native read which may be substantially slower. See 'set_bcftools' for information.")
+	return(FALSE)
 }
 
 
@@ -33,12 +40,19 @@ check_plink <- function()
 	{
 		message("'tools_plink' option is not set. See 'set_plink' for information.")
 		return(FALSE)
-	} else if(!file.exists(options()[["tools_plink"]])) {
-		message("'tools_plink' option does not point to an existing file. See 'set_plink' for information.")
-		return(FALSE)
-	} else {
+	}
+	filecheck <- file.exists(options()[["tools_plink"]])
+	if(filecheck)
+	{
 		return(TRUE)
 	}
+	pathcheck <- any(sapply(strsplit(Sys.getenv("PATH"), split=":"), function(x) file.exists(file.path(x, options()[["tools_plink"]]))))
+	if(pathcheck)
+	{
+		return(TRUE)
+	}
+	message("'tools_plink' option is not set. See 'set_plink' for information.")
+	return(FALSE)
 }
 
 #' Set bcftools binary location

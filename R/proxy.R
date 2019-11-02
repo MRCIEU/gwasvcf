@@ -37,7 +37,8 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		" --ld-window-kb ", tag_kb,
 		" --ld-window ", tag_nsnp,
 		" --out ", targetsname,
-		" --threads ", threads
+		" --threads ", threads,
+		" 2>&1 > /dev/null"
 	)
 	system(cmd)
 
