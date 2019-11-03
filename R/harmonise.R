@@ -482,18 +482,23 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 #' @param pos2 Vector
 #' @param ref2 Vector
 #' @param alt2 Vector
+#' @param rsid2 Optional vector
 #' @param indel_recode =FALSE. If TRUE then attempts to recode D/I
 #' @param strand_flip =FALSE. If TRUE then attempts to flip strand when alignment is not otherwise possible
 #'
 #' @export
 #' @return Dataframe of outcomes
-harmonise <- function(chr1, pos1, ref1, alt1, chr2, pos2, ref2, alt2, indel_recode=FALSE, strand_flip=FALSE)
+harmonise <- function(chr1, pos1, ref1, alt1, chr2, pos2, ref2, alt2, rsid2 = NULL, indel_recode=FALSE, strand_flip=FALSE)
 {
 	chrpos1 <- paste(chr1, pos1)
 	chrpos2 <- paste(chr2, pos2)
 	target <- dplyr::tibble(chr=chr1, pos=pos1, ref=toupper(ref1), alt=toupper(alt1))
-	reference <- dplyr::tibble(chr=chr2, pos=pos2, ref=toupper(ref2), alt=toupper(alt2)) %>%
-		subset(., !duplicated(paste(chr, pos, ref, alt)))
+	reference <- dplyr::tibble(chr=chr2, pos=pos2, ref=toupper(ref2), alt=toupper(alt2))
+	if(!is.null(rsid2))
+	{
+		reference$rsid <- rsid2
+	}
+	reference <- subset(reference, !duplicated(paste(chr, pos, ref, alt)))
 
 	target$keep <- chrpos1 %in% chrpos2
 	target$i <- 1:nrow(target)

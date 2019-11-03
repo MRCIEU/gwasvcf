@@ -101,19 +101,35 @@ df_to_granges <- function(df)
 }
 
 
+
+
+
+
 #' Parse chromosome:position
 #'
 #' Takes data frame or vector of chromosome position ranges and parses to granges object
 #'
 #' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
+#' @param radius Add radius to the specified positions. Default = NULL 
 #'
 #' @export
 #' @return GRanges object
-parse_chrompos <- function(chrompos)
+parse_chrompos <- function(chrompos, radius=NULL)
 {
 
 	if("GRanges" %in% class(chrompos))
 	{
+		if(!is.null(radius))
+		{
+			chrompos <- GRanges(
+				seqnames = seqnames(chrompos),
+				ranges = IRanges(
+					start = pmax(chrompos@start - radius, 0),
+					end = chrompos@end + radius
+				),
+				strand = chrompos@strand
+			)
+		}
 		return(chrompos)
 	} else if(is.data.frame(chrompos)) {
 		stopifnot(is.data.frame(chrompos))
@@ -134,6 +150,11 @@ parse_chrompos <- function(chrompos)
 	pos2[i] <- sapply(temp, function(x) {x[2]})
 	pos1 <- as.numeric(pos1)
 	pos2 <- as.numeric(pos2)
+	if(!is.null(radius))
+	{
+		pos1 <- pmax(0, pos1 - radius)
+		pos2 <- pos2 + radius
+	}
 	return(df_to_granges(data.frame(chrom, start=pos1, end=pos2, stringsAsFactors=FALSE)))
 }
 
