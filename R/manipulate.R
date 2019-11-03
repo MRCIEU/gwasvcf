@@ -186,6 +186,14 @@ vcf_to_granges <- function(vcf, id=NULL)
 			dplyr::bind_cols()
 		S4Vectors::values(a) <- cbind(S4Vectors::values(a), out)
 		S4Vectors::values(a)[["id"]] <- id
+
+		if("TotalCases" %in% names(meta(header(vcf))$SAMPLE))
+		{
+			a[["NC"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases)
+			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases) + as.numeric(meta(header(vcf))$SAMPLE$TotalControls)
+		} else if("TotalControls" %in% names(meta(header(vcf))$SAMPLE)) {
+			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalControls)
+		}
 		return(a)
 	}
 }
@@ -201,7 +209,7 @@ vcf_to_granges <- function(vcf, id=NULL)
 vcf_to_tibble <- function(vcf, id=NULL)
 {
 	a <- vcf_to_granges(vcf, id)
-	a[["SNP"]] <- names(a)
+	a[["SNP"]] <- names(vcf)
 	return(dplyr::as_tibble(a))
 }
 
