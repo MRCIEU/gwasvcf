@@ -189,10 +189,10 @@ vcf_to_granges <- function(vcf, id=NULL)
 
 		if("TotalCases" %in% names(meta(header(vcf))$SAMPLE))
 		{
-			a[["NC"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases)
-			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases) + as.numeric(meta(header(vcf))$SAMPLE$TotalControls)
+			a[["NC"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases) %>% rep(., nrow(a))
+			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases) + as.numeric(meta(header(vcf))$SAMPLE$TotalControls) %>% rep(., nrow(a))
 		} else if("TotalControls" %in% names(meta(header(vcf))$SAMPLE)) {
-			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalControls)
+			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalControls) %>% rep(., nrow(a))
 		}
 		return(a)
 	}
