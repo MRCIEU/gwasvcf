@@ -24,6 +24,8 @@ harmonise(chr1, pos1, ref1, alt1, chr2, pos2, ref2, alt2, rsid2 = NULL,
 
 \item{alt2}{Vector}
 
+\item{rsid2}{Optional vector}
+
 \item{indel_recode}{=FALSE. If TRUE then attempts to recode D/I}
 
 \item{strand_flip}{=FALSE. If TRUE then attempts to flip strand when alignment is not otherwise possible}

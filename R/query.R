@@ -159,53 +159,6 @@ parse_chrompos <- function(chrompos, radius=NULL)
 }
 
 
-#' Convert vcf format to granges format
-#'
-#' @param vcf Output from readVcf
-#' @param id Only accepts one ID, so specify here if there are multiple GWAS datasets in the vcf
-#'
-#' @export
-#' @return GRanges object
-vcf_to_granges <- function(vcf, id=NULL)
-{
-	if(is.null(id))
-	{
-		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
-	}
-	stopifnot(length(id) == 1)
-	a <- SummarizedExperiment::rowRanges(vcf)
-	a$`ALT` <- unlist(a$`ALT`)
-
-	if(length(VariantAnnotation::geno(vcf)) == 0)
-	{
-		return(a)
-	} else {
-		out <- VariantAnnotation::expand(vcf) %>% 
-			VariantAnnotation::geno() %>%
-			as.list() %>%
-			lapply(., function(x) unlist(x[,id,drop=TRUE])) %>%
-			dplyr::bind_cols()
-		S4Vectors::values(a) <- cbind(S4Vectors::values(a), out)
-		S4Vectors::values(a)[["id"]] <- id
-		return(a)
-	}
-}
-
-
-#' Convert vcf format to tibble (data frame)
-#'
-#' @param vcf Output from readVcf
-#' @param id Only accepts one ID, so specify here if there are multiple GWAS datasets in the vcf
-#'
-#' @export
-#' @return GRanges object
-vcf_to_tibble <- function(vcf, id=NULL)
-{
-	a <- vcf_to_granges(vcf, id)
-	a[["SNP"]] <- names(a)
-	return(dplyr::as_tibble(a))
-}
-
 
 
 #' Query vcf file, extracting by chromosome and position
