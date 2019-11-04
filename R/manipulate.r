@@ -256,6 +256,14 @@ vcflist_overlaps <- function(vcflist, chrompos)
 			stop("Item ", i, " in vcflist is neither VCF object nor path to VCF file")
 		})
 	}
+
+	# collapse indels for sorting purposes
+	vcflist <- lapply(vcflist, function(x)
+	{
+		end(x) <- start(x)
+		return(x)
+	})
+
 	o <- Reduce(IRanges::subsetByOverlaps, lapply(vcflist, SummarizedExperiment::rowRanges))
 	vcflist <- lapply(vcflist, function(x) IRanges::subsetByOverlaps(x, o))
 	return(vcflist)
