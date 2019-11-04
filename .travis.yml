@@ -13,6 +13,7 @@ bioc_packages:
   - SummarizedExperiment
   - Rsamtools
   - VariantAnnotation
+  - snpStats
 
 r_github_packages:
   - explodecomputer/genetics.binaRies

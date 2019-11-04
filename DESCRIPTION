@@ -21,7 +21,8 @@ Imports:
   data.table,
   methods,
   utils,
-  jsonlite
+  jsonlite,
+  coloc
 Suggests:
   genetics.binaRies,
   testthat
