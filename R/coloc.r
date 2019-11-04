@@ -22,9 +22,11 @@ perform_coloc <- function(vcf1, vcf2, p1=1e-4, p2=1e-4, p12=1e-5)
 			as.character(tab1$ALT) == as.character(tab2$ALT) &
 			as.character(tab1$seqnames) == as.character(tab2$seqnames) &
 			tab1$start == tab2$start
+	stopifnot(sum(index) > 0)
 
 	tab1 <- tab1[index,] %>% {list(pvalues = 10^-.$LP, N = .$SS, MAF = .$AF, beta = .$ES, varbeta = .$SE^2, type = "quant", snp = names(vcf2)[index])}
 	tab2 <- tab2[index,] %>% {list(pvalues = 10^-.$LP, N = .$SS, MAF = .$AF, beta = .$ES, varbeta = .$SE^2, type = "quant", snp = names(vcf2)[index])}
+
 
 	return(coloc::coloc.abf(tab1, tab2, p1=p1, p2=p2, p12=p12))
 }
