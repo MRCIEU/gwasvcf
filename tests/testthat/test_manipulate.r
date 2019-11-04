@@ -15,7 +15,6 @@ test_that("vcflist_overlaps", {
 	o <- vcflist_overlaps(vcflist=list(vcf1, vcf2), chrompos=NULL)
 	expect_true(all(sapply(o, length) == 31) & length(o) == 2)
 
-
 	o <- vcflist_overlaps(vcflist=list(vcf1, vcf2, vcf3, fn), chrompos="1:1-10000000")
 	expect_true(all(sapply(o, length) == 11) & length(o) == 4)
 
