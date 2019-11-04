@@ -67,7 +67,7 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 	VariantAnnotation::alt(vcf) <- Biostrings::DNAStringSetList(as.list(ea))
 	VariantAnnotation::ref(vcf) <- Biostrings::DNAStringSet(nea)
 	VariantAnnotation::fixed(vcf)$FILTER <- "PASS"
-	return(vcf)
+	return(sort(vcf))
 }
 
 #' Merge two GWAS VCF objects
