@@ -261,8 +261,13 @@ vcflist_overlaps <- function(vcflist, chrompos)
 	vcflist <- lapply(vcflist, function(x)
 	{
 		SummarizedExperiment::end(x) <- SummarizedExperiment::start(x)
+	
+		# Simple approach to avoid duplicate positions due to snps and indels
+		x <- x[!duplicated(SummarizedExperiment::start(x))]
 		return(x)
 	})
+
+
 
 	o <- Reduce(IRanges::subsetByOverlaps, lapply(vcflist, SummarizedExperiment::rowRanges))
 	vcflist <- lapply(vcflist, function(x) IRanges::subsetByOverlaps(x, o))
