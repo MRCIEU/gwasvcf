@@ -213,3 +213,50 @@ vcf_to_tibble <- function(vcf, id=NULL)
 	return(dplyr::as_tibble(a))
 }
 
+
+#' Reduce list of VCFs to intersecting regions
+#'
+#' @param vcflist List of VCF objects, or list of VCF filenames, or mix of VCF objects and filenames
+#' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`. 
+#'
+#' @export
+#' @return List of VCFs
+vcflist_overlaps <- function(vcflist, chrompos)
+{
+	stopifnot(is.list(vcflist))
+	if(!is.null(chrompos))
+	{
+		chrompos <- parse_chrompos(chrompos)
+		vcflist <- lapply(vcflist, function(x)
+		{
+			query_gwas(x, chrompos)
+		})
+	} else {
+		vcflist <- lapply(1:length(vcflist), function(i)
+		{
+			x <- vcflist[[i]]
+			if(class(x) %in% c("CollapsedVCF", "ExpandedVCF"))
+			{
+				if(is.null(chrompos))
+				{
+					return(x)
+				} else {
+					return(query_gwas(x, chrompos))
+				}
+			}
+			if(class(x) == "character")
+			{
+				if(is.null(chrompos))
+				{
+					return(VariantAnnotation::readVcf(x))
+				} else {
+					return(query_gwas(x, chrompos))
+				}
+			}
+			stop("Item ", i, " in vcflist is neither VCF object nor path to VCF file")
+		})
+	}
+	o <- Reduce(IRanges::subsetByOverlaps, lapply(vcflist, SummarizedExperiment::rowRanges))
+	vcflist <- lapply(vcflist, function(x) IRanges::subsetByOverlaps(x, o))
+	return(vcflist)
+}
