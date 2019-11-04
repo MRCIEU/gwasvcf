@@ -4,7 +4,7 @@
 \alias{perform_coloc}
 \title{Perform coloc}
 \usage{
-perform_coloc(vcf1, vcf2, chrompos)
+perform_coloc(vcf1, vcf2, p1 = 1e-04, p2 = 1e-04, p12 = 1e-05)
 }
 \arguments{
 \item{vcf1}{VCF object}
