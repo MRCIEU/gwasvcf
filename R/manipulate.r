@@ -260,7 +260,7 @@ vcflist_overlaps <- function(vcflist, chrompos)
 	# collapse indels for sorting purposes
 	vcflist <- lapply(vcflist, function(x)
 	{
-		end(x) <- start(x)
+		SummarizedExperiment::end(x) <- SummarizedExperiment::start(x)
 		return(x)
 	})
 
