@@ -81,8 +81,8 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 #' @return SimpleList of VCF objects
 merge_vcf <- function(a, b)
 {
-	a <- expand(a)
-	b <- expand(b)
+	a <- VariantAnnotation::expand(a)
+	b <- VariantAnnotation::expand(b)
 	# o <- SummarizedExperiment::findOverlaps(a, b)
 	o <- dplyr::tibble(
 		from = which(names(a) %in% names(b)),
@@ -90,30 +90,30 @@ merge_vcf <- function(a, b)
 	)
 	a <- a[o[["from"]],]
 	b <- b[o[["to"]],]
-	allele_match <- ref(a) == ref(b) & alt(a) == alt(b)
-	switch <- ref(a) == alt(b) & ref(b) == alt(a)
+	allele_match <- VariantAnnotation::ref(a) == VariantAnnotation::ref(b) & VariantAnnotation::alt(a) == VariantAnnotation::alt(b)
+	switch <- VariantAnnotation::ref(a) == VariantAnnotation::alt(b) & VariantAnnotation::ref(b) == VariantAnnotation::alt(a)
 	if(any(switch))
 	{
-		for(i in 1:ncol(geno(b)[["ES"]]))
+		for(i in 1:ncol(VariantAnnotation::geno(b)[["ES"]]))
 		{
-			geno(b)[["ES"]][,i][switch] <- lapply(geno(b)[["ES"]][,i][switch], function(x) x * -1)
+			VariantAnnotation::geno(b)[["ES"]][,i][switch] <- lapply(VariantAnnotation::geno(b)[["ES"]][,i][switch], function(x) x * -1)
 		}
 	}
 	a <- a[allele_match | switch, ]
 	b <- b[allele_match | switch, ]
 
 	ab <- a
-	temp <- lapply(names(geno(ab)), function(x) rbind(geno(ab)[x], geno(b)[x])) %>% SimpleList
-	names(temp) <- names(geno(ab))
-	geno(ab) <- temp
+	temp <- lapply(names(VariantAnnotation::geno(ab)), function(x) rbind(VariantAnnotation::geno(ab)[x], VariantAnnotation::geno(b)[x])) %>% S4Vectors::SimpleList
+	names(temp) <- names(VariantAnnotation::geno(ab))
+	VariantAnnotation::geno(ab) <- temp
 
-	h <- header(a)
+	h <- VariantAnnotation::header(a)
 	VCFHeader(
-		reference = reference(h),
-		samples = c(samples(h), samples(header(b))),
-		meta = meta(h)
+		reference = VariantAnnotation::reference(h),
+		samples = c(VariantAnnotation::samples(h), VariantAnnotation::samples(VariantAnnotation::header(b))),
+		meta = VariantAnnotation::meta(h)
 	)
-	samples(h) <- c(samples(h), samples(header(b)))
+	VariantAnnotation::samples(h) <- c(VariantAnnotation::samples(h), VariantAnnotation::samples(VariantAnnotation::header(b)))
 
 	return(S4Vectors::SimpleList())
 }
@@ -187,12 +187,12 @@ vcf_to_granges <- function(vcf, id=NULL)
 		S4Vectors::values(a) <- cbind(S4Vectors::values(a), out)
 		S4Vectors::values(a)[["id"]] <- id
 
-		if("TotalCases" %in% names(meta(header(vcf))$SAMPLE))
+		if("TotalCases" %in% names(VariantAnnotation::meta(VariantAnnotation::header(vcf))$SAMPLE))
 		{
-			a[["NC"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases) %>% rep(., nrow(a))
-			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalCases) + as.numeric(meta(header(vcf))$SAMPLE$TotalControls) %>% rep(., nrow(a))
-		} else if("TotalControls" %in% names(meta(header(vcf))$SAMPLE)) {
-			a[["SS"]] <- as.numeric(meta(header(vcf))$SAMPLE$TotalControls) %>% rep(., nrow(a))
+			S4Vectors::values(a)[["NC"]] <- as.numeric(VariantAnnotation::meta(VariantAnnotation::header(vcf))$SAMPLE$TotalCases) %>% rep(., length(a))
+			S4Vectors::values(a)[["SS"]] <- as.numeric(VariantAnnotation::meta(VariantAnnotation::header(vcf))$SAMPLE$TotalCases) + as.numeric(VariantAnnotation::meta(VariantAnnotation::header(vcf))$SAMPLE$TotalControls) %>% rep(., length(a))
+		} else if("TotalControls" %in% names(VariantAnnotation::meta(VariantAnnotation::header(vcf))$SAMPLE)) {
+			S4Vectors::values(a)[["SS"]] <- as.numeric(VariantAnnotation::meta(VariantAnnotation::header(vcf))$SAMPLE$TotalControls) %>% rep(., length(a))
 		}
 		return(a)
 	}
