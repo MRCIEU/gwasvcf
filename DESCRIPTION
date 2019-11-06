@@ -11,15 +11,15 @@ Description: Tools for dealing with GWAS summary data in VCF format. Includes re
 URL: https://github.com/mrcieu/gwasvcf
 BugReports: https://github.com/mrcieu/gwasvcf/issues
 Depends: 
-  R (>= 3.6.0),
-  VariantAnnotation
+  R (>= 3.6.0)
 Imports:
   BiocGenerics,
   Biostrings,
-  GenomicRanges,
-  IRanges,
   S4Vectors,
+  IRanges,
+  GenomicRanges,
   SummarizedExperiment,
+  VariantAnnotation,
   Rsamtools,
   tidyr,
   stringr,
@@ -36,9 +36,9 @@ Remotes:
   github::explodecomputer/genetics.binaRies,
   bioc::release/BiocGenerics,
   bioc::release/Biostrings,
-  bioc::release/GenomicRanges,
-  bioc::release/IRanges,
   bioc::release/S4Vectors,
+  bioc::release/IRanges,
+  bioc::release/GenomicRanges,
   bioc::release/SummarizedExperiment,
   bioc::release/Rsamtools,
   bioc::release/VariantAnnotation
