@@ -120,44 +120,6 @@ merge_vcf <- function(a, b)
 
 
 
-#' Create exposure or outcome data format for TwoSampleMR from vcf
-#'
-#' @param vcf VCF object
-#' @param type ="exposure" or "outcome"
-#'
-#' @export
-#' @return data frame
-vcf_to_TwoSampleMR <- function(vcf, type="exposure")
-{
-	a <- vcf %>% vcf_to_granges
-	a[["SNP"]] <- names(a)
-	a <- dplyr::as_tibble(a)
-	if(!"ES" %in% names(a)) a[["ES"]] <- NA
-	if(!"SE" %in% names(a)) a[["SE"]] <- NA
-	if(!"LP" %in% names(a)) a[["LP"]] <- NA
-	if(!"SS" %in% names(a)) a[["SS"]] <- NA
-	if(!"NC" %in% names(a)) a[["NC"]] <- NA
-	if(!"id" %in% names(a)) a[["id"]] <- NA
-	a[["LP"]] <- 10^-a[["LP"]]
-	a[["NCONT"]] <- a[["SS"]] - a[["NC"]]
-	TwoSampleMR::format_data(
-		a, type=type,
-		snp_col="SNP",
-		effect_allele_col="ALT",
-		other_allele_col="REF",
-		eaf_col="AF",
-		chr_col="CHROM",
-		pos_col="POS",
-		beta_col="ES",
-		se_col="SE",
-		pval_col="LP",
-		samplesize_col="SS",
-		ncase_col="NC",
-		ncontrol_col="NCONT",
-		phenotype_col="id"
-	)
-}
-
 #' Convert vcf format to granges format
 #'
 #' @param vcf Output from readVcf
