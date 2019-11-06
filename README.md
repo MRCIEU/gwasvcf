@@ -22,9 +22,6 @@ See also the [gwasglue](https://github.com/MRCIEU/gwasglue) R package for method
 ## Installation
 
 ```r
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("VariantAnnotation")
 devtools::install_github("mrcieu/gwasvcftools")
 ```
 
