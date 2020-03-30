@@ -129,6 +129,12 @@ merge_vcf <- function(a, b)
 #' @return GRanges object
 vcf_to_granges <- function(vcf, id=NULL)
 {
+	stopifnot(class(vcf) == "VariantAnnotation")
+	if(length(vcf) == 0)
+	{
+		message("VCF has length 0")
+		return(NULL)
+	}
 	if(is.null(id))
 	{
 		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
