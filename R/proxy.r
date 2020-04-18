@@ -158,9 +158,9 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 		ld <- subset(ld, `SNP_B` %in% names(e)) %>%
 			dplyr::filter(!duplicated(`SNP_A`))		
 	}
-	message("Identified proxies for ", nrow(ld), " of ", length(missing), " rsids")
-	message("Aligning...")
 	e <- e[names(e) %in% ld[["SNP_B"]], ]
+	message("Identified proxies for ", nrow(e), " of ", length(missing), " rsids")
+	message("Aligning...")
 	index <- match(names(e), ld[["SNP_B"]])
 	ld <- ld[index,]
 	stopifnot(all(ld[["SNP_B"]] == names(e)))
