@@ -178,7 +178,7 @@ vcf_to_granges <- function(vcf, id=NULL)
 vcf_to_tibble <- function(vcf, id=NULL)
 {
 	a <- vcf_to_granges(vcf, id)
-	S4Vectors::values(a)[["SNP"]] <- names(a)
+	S4Vectors::values(a)[["rsid"]] <- names(a)
 	return(dplyr::as_tibble(a))
 }
 
