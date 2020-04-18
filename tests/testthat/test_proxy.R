@@ -56,8 +56,14 @@ test_that("query bcftools", {
 	a <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", bfile=bfile, tag_r2=0.05)
 	expect_equal(nrow(a), 1)
 
+	a <- query_gwas(vcffile, rsid=c("rs12565286","rs4442317"), proxies="yes", bfile=bfile, tag_r2=0.05)
+	expect_equal(nrow(a), 2)
+
 	a <- query_gwas(vcf, rsid="rs4442317", proxies="yes", bfile=bfile, tag_r2=0.05)
 	expect_equal(nrow(a), 1)
+
+	a <- query_gwas(vcf, rsid=c("rs12565286","rs4442317"), proxies="yes", bfile=bfile, tag_r2=0.05)
+	expect_equal(nrow(a), 2)
 
 	a <- query_gwas(vcffile, rsid="rs9729550", proxies="only", bfile=bfile, tag_r2=0.05)
 	expect_equal(nrow(a), 1)

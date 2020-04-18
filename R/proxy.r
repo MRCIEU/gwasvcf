@@ -40,6 +40,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		" --threads ", threads,
 		" 2>&1 > /dev/null"
 	)
+	message("Finding proxies...")
 	system(cmd)
 
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
@@ -49,6 +50,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		subset(., nchar(`PHASE`) == 4)
 	if(nrow(ld) == 0)
 	{
+		message("No proxies found")
 		return(ld)
 	}
 	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
@@ -61,6 +63,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	unlink(targetsname)
 	unlink(paste0(targetsname, c(".log", ".nosex")))
 	unlink(outname)
+	message("Found ", nrow(ld), " proxies")
 	return(ld)
 }
 
@@ -87,10 +90,14 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	os <- Sys.info()[['sysname']]
 	if(proxies=="yes")
 	{
+		message("Initial search...")
 		o <- query_gwas(vcf, rsid=rsid)
 		missing <- rsid[!rsid %in% names(o)]
 		if(length(missing) != 0)
 		{
+			message("Extracted ", length(rsid) - length(missing), " out of ", length(rsid), " rsids")
+			message("Searching for proxies for ", length(missing), " rsids")
+			message("Determining searchspace...")
 			searchspacename <- tempfile()
 			if(is.character(vcf))
 			{
@@ -98,7 +105,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 				{
 					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
-					searchspace <- scan(searchspacename, what="character")
+					searchspace <- scan(searchspacename, what="character", quiet=TRUE)
 				} else {
 					searchspace <- NULL
 				}				
@@ -143,6 +150,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 	{
 		ld <- ld %>% dplyr::filter(!duplicated(SNP_A))
 	}
+	message("Extrating proxies...")
 	e <- query_gwas(vcf, rsid=ld[["SNP_B"]])
 
 	if(is.null(searchspace))
@@ -150,6 +158,8 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 		ld <- subset(ld, `SNP_B` %in% names(e)) %>%
 			dplyr::filter(!duplicated(`SNP_A`))		
 	}
+	message("Identified proxies for ", nrow(ld), " of ", length(missing), " rsids")
+	message("Aligning...")
 	e <- e[names(e) %in% ld[["SNP_B"]], ]
 	index <- match(names(e), ld[["SNP_B"]])
 	ld <- ld[index,]
