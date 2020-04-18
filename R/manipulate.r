@@ -129,7 +129,7 @@ merge_vcf <- function(a, b)
 #' @return GRanges object
 vcf_to_granges <- function(vcf, id=NULL)
 {
-	stopifnot(class(vcf) == "VariantAnnotation")
+	stopifnot(class(vcf) %in% c("ExpandedVCF", "CollapsedVCF"))
 	if(length(vcf) == 0)
 	{
 		message("VCF has length 0")
@@ -140,6 +140,7 @@ vcf_to_granges <- function(vcf, id=NULL)
 		id <- VariantAnnotation::samples(VariantAnnotation::header(vcf))
 	}
 	stopifnot(length(id) == 1)
+	vcf <- VariantAnnotation::expand(vcf)
 	a <- SummarizedExperiment::rowRanges(vcf)
 	a$`ALT` <- unlist(a$`ALT`)
 
@@ -177,7 +178,7 @@ vcf_to_granges <- function(vcf, id=NULL)
 vcf_to_tibble <- function(vcf, id=NULL)
 {
 	a <- vcf_to_granges(vcf, id)
-	a[["SNP"]] <- names(vcf)
+	S4Vectors::values(a)[["SNP"]] <- names(a)
 	return(dplyr::as_tibble(a))
 }
 
