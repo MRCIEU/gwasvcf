@@ -19,7 +19,7 @@ create_rsidx_index <- function(vcf, indexname)
 		'.separator " "',
 		paste0('.import ', fn, '.txt rsid_to_coord')
 	)
-	write.table(cmd, file=paste0(fn, ".sql"))
+	write.table(cmd, file=paste0(fn, ".sql"), row=F, col=F, qu=F)
 	cmd <- paste0("sqlite3 ", indexname, " < ", fn, ".sql")
 	message("Generating index")
 	system(cmd)
