@@ -142,7 +142,8 @@ vcf_to_granges <- function(vcf, id=NULL)
 	stopifnot(length(id) == 1)
 	vcf <- VariantAnnotation::expand(vcf)
 	a <- SummarizedExperiment::rowRanges(vcf)
-	a$`ALT` <- unlist(a$`ALT`)
+	a$`REF` <- as.character(a$`REF`)
+	a$`ALT` <- as.character(a$`ALT`)
 
 	if(length(VariantAnnotation::geno(vcf)) == 0)
 	{
