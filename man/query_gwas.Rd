@@ -4,10 +4,21 @@
 \alias{query_gwas}
 \title{Query data from vcf file}
 \usage{
-query_gwas(vcf, chrompos = NULL, rsid = NULL, pval = NULL,
-  id = NULL, build = "GRCh37", os = Sys.info()[["sysname"]],
-  proxies = "no", bfile = NULL, tag_kb = 5000, tag_nsnp = 5000,
-  tag_r2 = 0.6, threads = 1)
+query_gwas(
+  vcf,
+  chrompos = NULL,
+  rsid = NULL,
+  pval = NULL,
+  id = NULL,
+  build = "GRCh37",
+  os = Sys.info()[["sysname"]],
+  proxies = "no",
+  bfile = NULL,
+  tag_kb = 5000,
+  tag_nsnp = 5000,
+  tag_r2 = 0.6,
+  threads = 1
+)
 }
 \arguments{
 \item{vcf}{VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf}

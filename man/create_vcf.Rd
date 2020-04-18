@@ -4,9 +4,20 @@
 \alias{create_vcf}
 \title{Create GWAS vcf}
 \usage{
-create_vcf(chrom, pos, nea, ea, snp = NULL, ea_af = NULL,
-  effect = NULL, se = NULL, pval = NULL, n = NULL, ncase = NULL,
-  name = NULL)
+create_vcf(
+  chrom,
+  pos,
+  nea,
+  ea,
+  snp = NULL,
+  ea_af = NULL,
+  effect = NULL,
+  se = NULL,
+  pval = NULL,
+  n = NULL,
+  ncase = NULL,
+  name = NULL
+)
 }
 \arguments{
 \item{chrom}{chrom vector}

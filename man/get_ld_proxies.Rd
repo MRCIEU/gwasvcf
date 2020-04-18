@@ -4,8 +4,16 @@
 \alias{get_ld_proxies}
 \title{Find LD proxies for a set of SNPs}
 \usage{
-get_ld_proxies(rsid, bfile, searchspace = NULL, tag_kb = 5000,
-  tag_nsnp = 5000, tag_r2 = 0.6, threads = 1, out = tempfile())
+get_ld_proxies(
+  rsid,
+  bfile,
+  searchspace = NULL,
+  tag_kb = 5000,
+  tag_nsnp = 5000,
+  tag_r2 = 0.6,
+  threads = 1,
+  out = tempfile()
+)
 }
 \arguments{
 \item{rsid}{list of rs IDs}

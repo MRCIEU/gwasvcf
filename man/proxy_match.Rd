@@ -4,8 +4,16 @@
 \alias{proxy_match}
 \title{Extract SNPs from vcf file}
 \usage{
-proxy_match(vcf, rsid, bfile, proxies = "yes", tag_kb = 5000,
-  tag_nsnp = 5000, tag_r2 = 0.6, threads = 1)
+proxy_match(
+  vcf,
+  rsid,
+  bfile,
+  proxies = "yes",
+  tag_kb = 5000,
+  tag_nsnp = 5000,
+  tag_r2 = 0.6,
+  threads = 1
+)
 }
 \arguments{
 \item{vcf}{vcf file name}
