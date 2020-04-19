@@ -7,7 +7,7 @@
 #'
 #' @export
 #' @return
-create_rsidx_index <- function(vcf, indexname)
+create_rsidx_index_from_vcf <- function(vcf, indexname)
 {
 	fn <- tempfile()
 	cmd <- paste0("zcat ", vcf, " | grep -v '#' | awk '{ print substr($3, 3), $1, $2 }' > ", fn, ".txt")
@@ -23,4 +23,19 @@ create_rsidx_index <- function(vcf, indexname)
 	cmd <- paste0("sqlite3 ", indexname, " < ", fn, ".sql")
 	message("Generating index")
 	system(cmd)
+}
+
+#' @export
+create_rsidx_sub_index <- function(rsid, rsidx, newindex)
+{
+	conn <- RSQLite::dbConnect(RSQLite::SQLite(), rsidx)
+	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
+	query <- paste0("SELECT DISTINCT * FROM rsid_to_coord WHERE rsid IN (", numid, ")")
+	out <- RSQLite::dbGetQuery(conn, query)
+	dbDisconnect(conn)
+	unlink(newindex)
+	conn <- dbConnect(RSQLite::SQLite(), newindex)
+	dbWriteTable(conn, "rsid_to_coord", out)
+	dbExecute(conn, "CREATE INDEX rsid on rsid_to_coord(rsid);")
+	dbDisconnect(conn)
 }

@@ -415,10 +415,11 @@ query_rsid_rsidx <- function(rsid, vcffile, id=NULL, rsidx)
 {
 	stopifnot(file.exists(vcffile))
 	stopifnot(file.exists(rsidx))
-	conn <- dbConnect(RSQLite::SQLite(), rsidx)
+	conn <- RSQLite::dbConnect(RSQLite::SQLite(), rsidx)
 	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
 	query <- paste0("SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid IN (", numid, ")")
 	out <- RSQLite::dbGetQuery(conn, query)
+	dbDisconnect(conn)
 	return(
 		query_gwas(vcffile, chrompos=data.frame(chrom=out$chrom, start=out$coord, end=out$coord), id=id)
 	)
