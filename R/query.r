@@ -126,9 +126,9 @@ parse_chrompos <- function(chrompos, radius=NULL)
 	{
 		if(!is.null(radius))
 		{
-			chrompos <- GRanges(
-				seqnames = seqnames(chrompos),
-				ranges = IRanges(
+			chrompos <- GenomicRanges::GRanges(
+				seqnames = GenomeInfoDb::seqnames(chrompos),
+				ranges = IRanges::IRanges(
 					start = pmax(chrompos@start - radius, 0),
 					end = chrompos@end + radius
 				),
@@ -413,16 +413,27 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 #' @return vcf object
 query_rsid_rsidx <- function(rsid, vcffile, id=NULL, rsidx)
 {
-	stopifnot(file.exists(vcffile))
-	stopifnot(file.exists(rsidx))
-	conn <- RSQLite::dbConnect(RSQLite::SQLite(), rsidx)
-	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
-	query <- paste0("SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid IN (", numid, ")")
-	out <- RSQLite::dbGetQuery(conn, query)
-	dbDisconnect(conn)
+	out <- query_rsidx(rsid, rsidx)
 	return(
 		query_gwas(vcffile, chrompos=data.frame(chrom=out$chrom, start=out$coord, end=out$coord), id=id)
 	)
+}
+
+#' Query rsidx
+#'
+#' @param rsid Vector of rsids
+#' @param rsidx Path to rsidx index file
+#'
+#' @export
+#' @return data frame
+query_rsidx <- function(rsid, rsidx)
+{
+	conn <- RSQLite::dbConnect(RSQLite::SQLite(), rsidx)
+	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
+	query <- paste0("SELECT DISTINCT * FROM rsid_to_coord WHERE rsid IN (", numid, ")")
+	out <- RSQLite::dbGetQuery(conn, query)
+	RSQLite::dbDisconnect(conn)
+	return(out)
 }
 
 

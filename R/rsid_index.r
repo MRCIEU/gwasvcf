@@ -2,15 +2,15 @@
 #'
 #' <full description>
 #'
-#' @param vcf <what param does>
-#' @param indexname <what param does>
+#' @param vcf VCF filename
+#' @param indexname index file name to create. Deletes existing file if exists.
 #'
 #' @export
-#' @return
+#' @return NULL
 create_rsidx_index_from_vcf <- function(vcf, indexname)
 {
 	fn <- tempfile()
-	cmd <- paste0("zcat ", vcf, " | grep -v '#' | awk '{ print substr($3, 3), $1, $2 }' > ", fn, ".txt")
+	cmd <- paste0("gunzip -c ", vcf, " | grep -v '#' | awk '{ print substr($3, 3), $1, $2 }' > ", fn, ".txt")
 	message("Extracting position info")
 	system(cmd)
 
@@ -20,22 +20,26 @@ create_rsidx_index_from_vcf <- function(vcf, indexname)
 		paste0('.import ', fn, '.txt rsid_to_coord')
 	)
 	write.table(cmd, file=paste0(fn, ".sql"), row=F, col=F, qu=F)
-	cmd <- paste0("sqlite3 ", indexname, " < ", fn, ".sql")
 	message("Generating index")
+	cmd <- paste0("sqlite3 ", indexname, " < ", fn, ".sql")
+	unlink(indexname)
 	system(cmd)
 }
 
+#' Create new index from existing index using a subset of rsids
+#'
+#' @param rsid Vector of rsids
+#' @param rsidx Existing index
+#' @param newindex New index (Note: will delete existing file if exists)
+#'
 #' @export
+#' @return NULL, creates new index file
 create_rsidx_sub_index <- function(rsid, rsidx, newindex)
 {
-	conn <- RSQLite::dbConnect(RSQLite::SQLite(), rsidx)
-	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
-	query <- paste0("SELECT DISTINCT * FROM rsid_to_coord WHERE rsid IN (", numid, ")")
-	out <- RSQLite::dbGetQuery(conn, query)
-	dbDisconnect(conn)
+	out <- query_rsidx(rsid, rsidx)
 	unlink(newindex)
-	conn <- dbConnect(RSQLite::SQLite(), newindex)
-	dbWriteTable(conn, "rsid_to_coord", out)
-	dbExecute(conn, "CREATE INDEX rsid on rsid_to_coord(rsid);")
-	dbDisconnect(conn)
+	conn <- RSQLite::dbConnect(RSQLite::SQLite(), newindex)
+	RSQLite::dbWriteTable(conn, "rsid_to_coord", out)
+	RSQLite::dbExecute(conn, "CREATE INDEX rsid on rsid_to_coord(rsid);")
+	RSQLite::dbDisconnect(conn)
 }

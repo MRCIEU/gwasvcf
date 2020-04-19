@@ -7,12 +7,9 @@
 create_rsidx_index_from_vcf(vcf, indexname)
 }
 \arguments{
-\item{vcf}{<what param does>}
+\item{vcf}{VCF filename}
 
-\item{indexname}{<what param does>}
-}
-\value{
-
+\item{indexname}{index file name to create. Deletes existing file if exists.}
 }
 \description{
 <full description>
