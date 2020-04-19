@@ -10,6 +10,7 @@ query_gwas(
   rsid = NULL,
   pval = NULL,
   id = NULL,
+  rsidx = NULL,
   build = "GRCh37",
   os = Sys.info()[["sysname"]],
   proxies = "no",
@@ -30,6 +31,8 @@ query_gwas(
 \item{pval}{P-value threshold (NOT -log10)}
 
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
+
+\item{rsidx}{Path to rsidx index file}
 
 \item{build}{="GRCh37" Build of vcffile}
 

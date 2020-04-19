@@ -80,18 +80,18 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 #' @param tag_nsnp =5000 Proxy parameter
 #' @param tag_r2 =0.6 Proxy parameter
 #' @param threads Number of threads to use (=1)
-
+#' @param rsidx Path to rsidx index 
 #'
 #' @export
 #' @return data frame
-proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, rsidx=NULL)
 {
 
 	os <- Sys.info()[['sysname']]
 	if(proxies=="yes")
 	{
 		message("Initial search...")
-		o <- query_gwas(vcf, rsid=rsid)
+		o <- query_gwas(vcf, rsid=rsid, rsidx=rsidx)
 		missing <- rsid[!rsid %in% names(o)]
 		if(length(missing) != 0)
 		{
@@ -141,7 +141,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			return(VCF())
 		}
 	} else if(proxies == "no") {
-		o <- query_gwas(vcf, rsid=rsid)
+		o <- query_gwas(vcf, rsid=rsid, rsidx=rsidx)
 		return(o)
 	} else {
 		stop('proxies must be "yes", "no" or "only"')
@@ -151,7 +151,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 		ld <- ld %>% dplyr::filter(!duplicated(SNP_A))
 	}
 	message("Extrating proxies...")
-	e <- query_gwas(vcf, rsid=ld[["SNP_B"]])
+	e <- query_gwas(vcf, rsid=ld[["SNP_B"]], rsidx=rsidx)
 
 	if(is.null(searchspace))
 	{

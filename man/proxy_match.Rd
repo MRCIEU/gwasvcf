@@ -12,7 +12,8 @@ proxy_match(
   tag_kb = 5000,
   tag_nsnp = 5000,
   tag_r2 = 0.6,
-  threads = 1
+  threads = 1,
+  rsidx = NULL
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ proxy_match(
 \item{tag_r2}{=0.6 Proxy parameter}
 
 \item{threads}{Number of threads to use (=1)}
+
+\item{rsidx}{Path to rsidx index}
 }
 \value{
 data frame

@@ -7,6 +7,7 @@
 #' @param rsid Vector of rsids
 #' @param pval  P-value threshold (NOT -log10)
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
+#' @param rsidx Path to rsidx index file
 #' @param build ="GRCh37" Build of vcffile
 #' @param os The operating system. Default is as detected. Determines the method used to perform query
 #' @param proxies ="no" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes. Currently only possible if querying rsid.
@@ -18,7 +19,7 @@
 #'
 #' @export
 #' @return vcf object
-query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.character(vcf))
 	{
@@ -67,6 +68,10 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, build=
 		{
 			return(query_rsid_vcf(rsid, vcf))
 		} else {
+			if(!is.null(rsidx))
+			{
+				return(query_rsid_rsidx(rsid, vcf, id, rsidx))
+			}
 			if(!check_bcftools())
 			{
 				return(query_rsid_file(rsid, vcf, id, build))
@@ -393,4 +398,30 @@ query_chrompos_bcftools <- function(chrompos, vcffile, id=NULL)
 	unlink(paste0(tmp, ".snplist"))
 	return(o)
 }
+
+
+#' Query rsid from file using rsidx index
+#'
+#' See create_rsidx_index
+#'
+#' @param rsid Vector of rsids
+#' @param vcffile Path to .vcf.gz GWAS summary data file
+#' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
+#' @param rsidx Path to rsidx index file
+#'
+#' @export
+#' @return vcf object
+query_rsid_rsidx <- function(rsid, vcffile, id=NULL, rsidx)
+{
+	stopifnot(file.exists(vcffile))
+	stopifnot(file.exists(rsidx))
+	conn <- dbConnect(RSQLite::SQLite(), rsidx)
+	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
+	query <- paste0("SELECT DISTINCT chrom,coord FROM rsid_to_coord WHERE rsid IN (", numid, ")")
+	out <- RSQLite::dbGetQuery(conn, query)
+	return(
+		query_gwas(vcffile, chrompos=data.frame(chrom=out$chrom, start=out$coord, end=out$coord), id=id)
+	)
+}
+
 
