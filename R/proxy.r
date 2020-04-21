@@ -48,6 +48,10 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		dplyr::filter(`SNP_A` != `SNP_B`) %>%
 		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
 		subset(., nchar(`PHASE`) == 4)
+	unlink(searchspacename)
+	unlink(targetsname)
+	unlink(paste0(targetsname, c(".log", ".nosex")))
+	unlink(outname)
 	if(nrow(ld) == 0)
 	{
 		message("No proxies found")
@@ -59,10 +63,6 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	# ld <- dplyr::arrange(ld, desc(abs(R))) %>%
 	# 	dplyr::filter(!duplicated(SNP_A))
 	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
-	unlink(searchspacename)
-	unlink(targetsname)
-	unlink(paste0(targetsname, c(".log", ".nosex")))
-	unlink(outname)
 	message("Found ", nrow(ld), " proxies")
 	return(ld)
 }
