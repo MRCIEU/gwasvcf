@@ -47,3 +47,28 @@ test_that("sqlite proxy", {
 	a <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.05)
 	expect_equal(nrow(a), 1)
 })
+
+test_that("sqlite proxy", {
+	vcffile <- system.file("extdata","data.vcf.gz", package="gwasvcf")
+	set_bcftools()
+	a <- query_gwas(vcffile, rsid=c("rs12565286","rs4442317"), proxies="yes", dbfile=dbfile, tag_r2=0.05)
+	expect_equal(nrow(a), 2)
+})
+
+test_that("sqlite proxy only", {
+	vcffile <- system.file("extdata","data.vcf.gz", package="gwasvcf")
+	set_bcftools()
+	a <- query_gwas(vcffile, rsid=c("rs12565286","rs4442317"), proxies="only", dbfile=dbfile, tag_r2=0.05)
+	expect_equal(nrow(a), 2)
+	b <- a %>% vcf_to_tibble
+	expect_true(all(! b$ID %in% c("rs12565286","rs4442317")))
+})
+
+test_that("sqlite proxy no result", {
+	vcffile <- system.file("extdata","data.vcf.gz", package="gwasvcf")
+	set_bcftools()
+	a <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.5)
+	expect_equal(nrow(a), 0)
+})
+
+unlink(dbfile)

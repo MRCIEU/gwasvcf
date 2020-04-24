@@ -137,12 +137,12 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 		{
 			message("Extracted ", length(rsid) - length(missing), " out of ", length(rsid), " rsids")
 			message("Searching for proxies for ", length(missing), " rsids")
-			message("Determining searchspace...")
 			searchspacename <- tempfile()
 			if(is.character(vcf))
 			{
 				if(check_bcftools() & is.null(dbfile))
 				{
+					message("Determining searchspace...")
 					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
 					searchspace <- scan(searchspacename, what="character", quiet=TRUE)
@@ -150,8 +150,10 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 					searchspace <- NULL
 				}				
 			} else {
+				message("Determining searchspace...")
 				searchspace <- names(SummarizedExperiment::rowRanges(vcf))
 			}
+			message("Proxy lookup...")
 			if(is.null(dbfile))
 			{
 				ld <- get_ld_proxies(missing, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
@@ -166,21 +168,29 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 			return(o)
 		}
 	} else if(proxies == "only") {
-			searchspacename <- tempfile()
-			if(is.character(vcf))
+		searchspacename <- tempfile()
+		if(is.character(vcf))
+		{
+			if(check_bcftools() & is.null(dbfile))
 			{
-				if(check_bcftools() & is.null(dbfile))
-				{
-					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
-					system(cmd)
-					searchspace <- scan(searchspacename, what="character")
-				} else {
-					searchspace <- NULL
-				}				
+				message("Determining searchspace...")
+				cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
+				system(cmd)
+				searchspace <- scan(searchspacename, what="character")
 			} else {
-				searchspace <- names(SummarizedExperiment::rowRanges(vcf))
-			}
-		ld <- get_ld_proxies(rsid, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
+				searchspace <- NULL
+			}				
+		} else {
+			message("Determining searchspace...")
+			searchspace <- names(SummarizedExperiment::rowRanges(vcf))
+		}
+		message("Proxy lookup...")
+		if(is.null(dbfile))
+		{
+			ld <- get_ld_proxies(rsid, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)			
+		} else {
+			ld <- sqlite_ld_proxies(rsids=rsid, dbfile=dbfile, tag_r2=tag_r2)
+		}
 		if(nrow(ld) == 0)
 		{
 			return(VCF())
@@ -208,6 +218,10 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 	message("Aligning...")
 	index <- match(names(e), ld[["SNP_B"]])
 	ld <- ld[index,]
+	if(nrow(ld) == 0)
+	{
+		return(o)
+	}
 	stopifnot(all(ld[["SNP_B"]] == names(e)))
 	sign_index <- SummarizedExperiment::rowRanges(e)$`REF` == ld[["B1"]]
 
