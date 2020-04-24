@@ -12,6 +12,7 @@
 #' @param os The operating system. Default is as detected. Determines the method used to perform query
 #' @param proxies ="no" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes. Currently only possible if querying rsid.
 #' @param bfile =path to plink bed/bim/fam ld reference panel
+#' @param dfile =path to sqlite tag snp database
 #' @param tag_kb =5000 Proxy parameter
 #' @param tag_nsnp =5000 Proxy parameter
 #' @param tag_r2 =0.6 Proxy parameter
@@ -19,7 +20,7 @@
 #'
 #' @export
 #' @return vcf object
-query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, dbfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.character(vcf))
 	{
@@ -62,7 +63,7 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=
 		stopifnot(proxies %in% c("yes", "no", "only"))
 		if(proxies != "no")
 		{
-			return(proxy_match(vcf, rsid, bfile=bfile, proxies=proxies, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads))
+			return(proxy_match(vcf, rsid, bfile=bfile, dbfile=dbfile, proxies=proxies, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads))
 		}
 		if(!fileflag)
 		{

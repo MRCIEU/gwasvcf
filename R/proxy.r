@@ -68,25 +68,65 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 }
 
 
+
+#' Lookup LD proxies from sqlite database
+#'
+#' @param rsids List of rsids
+#' @param dbfile path to dbfile
+#' @param tag_r2 minimum r2 value
+#'
+#' @export
+#' @return data frame
+sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
+{
+	conn <- RSQLite::dbConnect(RSQLite::SQLite(), dbfile)
+	numid <- gsub("rs", "", rsids) %>% paste(., collapse=",")
+	query <- paste0("SELECT DISTINCT * FROM tags WHERE SNP_A IN (", numid, ")")
+	ld <- RSQLite::dbGetQuery(conn, query) %>% 
+		dplyr::as_tibble() %>%
+		dplyr::filter(`R`^2 > `tag_r2`) %>%
+		dplyr::filter(`SNP_A` != `SNP_B`) %>%
+		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
+		subset(., nchar(`PHASE`) == 4) %>%
+		dplyr::mutate(`SNP_A` = paste0("rs", `SNP_A`), `SNP_B` = paste0("rs", `SNP_B`))
+
+	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
+	names(temp) <- c("A1", "B1", "A2", "B2")
+	ld <- cbind(ld, temp) %>% dplyr::as_tibble(., .name_repair="minimal")
+	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
+	message("Found ", nrow(ld), " proxies")
+	RSQLite::dbDisconnect(conn)
+	return(ld)
+}
+
+
 #' Extract SNPs from vcf file
 #'
 #' Finds proxies if necessary
 #'
 #' @param vcf vcf file name
 #' @param rsid list of rs IDs
-#' @param bfile ld reference panel
+#' @param bfile ld reference panel (plink)
 #' @param proxies ="yes" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes
 #' @param tag_kb =5000 Proxy parameter
 #' @param tag_nsnp =5000 Proxy parameter
 #' @param tag_r2 =0.6 Proxy parameter
 #' @param threads Number of threads to use (=1)
 #' @param rsidx Path to rsidx index 
+#' @param dbfile ld tag database (sqlite)
 #'
 #' @export
 #' @return data frame
-proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, rsidx=NULL)
+proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1, rsidx=NULL, dbfile=NULL)
 {
-
+	if(is.null(dbfile) & is.null(bfile))
+	{
+		stop('please provide either bfile or dbfile')
+	}
+	if(!is.null(dbfile) & !is.null(bfile))
+	{
+		warning("bfile and dbfile both provided. Using dbfile.")
+	}
 	os <- Sys.info()[['sysname']]
 	if(proxies=="yes")
 	{
@@ -101,7 +141,7 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			searchspacename <- tempfile()
 			if(is.character(vcf))
 			{
-				if(check_bcftools())
+				if(check_bcftools() & is.null(dbfile))
 				{
 					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
@@ -112,7 +152,12 @@ proxy_match <- function(vcf, rsid, bfile, proxies="yes", tag_kb=5000, tag_nsnp=5
 			} else {
 				searchspace <- names(SummarizedExperiment::rowRanges(vcf))
 			}
-			ld <- get_ld_proxies(missing, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
+			if(is.null(dbfile))
+			{
+				ld <- get_ld_proxies(missing, bfile, searchspace=searchspace, tag_kb=tag_kb, tag_nsnp=tag_nsnp, tag_r2=tag_r2, threads=threads)
+			} else {
+				ld <- sqlite_ld_proxies(rsids=missing, dbfile=dbfile, tag_r2=tag_r2)
+			}
 			if(nrow(ld) == 0)
 			{
 				return(o)

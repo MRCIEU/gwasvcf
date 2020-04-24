@@ -15,6 +15,7 @@ query_gwas(
   os = Sys.info()[["sysname"]],
   proxies = "no",
   bfile = NULL,
+  dbfile = NULL,
   tag_kb = 5000,
   tag_nsnp = 5000,
   tag_r2 = 0.6,
@@ -49,6 +50,8 @@ query_gwas(
 \item{tag_r2}{=0.6 Proxy parameter}
 
 \item{threads}{=1 NUmber of threads}
+
+\item{dfile}{=path to sqlite tag snp database}
 }
 \value{
 vcf object

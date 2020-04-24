@@ -17,5 +17,6 @@ create_rsidx_sub_index(rsid, rsidx, newindex)
 NULL, creates new index file
 }
 \description{
-Create new index from existing index using a subset of rsids
+Note this requires a modified version of plink that allows ld-window-r2 flag for --r option.
+Available here: https://github.com/explodecomputer/plink-ng
 }
