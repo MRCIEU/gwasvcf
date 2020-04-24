@@ -84,7 +84,7 @@ sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 	query <- paste0("SELECT DISTINCT * FROM tags WHERE SNP_A IN (", numid, ")")
 	ld <- RSQLite::dbGetQuery(conn, query) %>% 
 		dplyr::as_tibble() %>%
-		dplyr::filter(`RVAL`^2 > `tag_r2`) %>%
+		dplyr::filter(`R`^2 > `tag_r2`) %>%
 		dplyr::filter(`SNP_A` != `SNP_B`) %>%
 		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
 		subset(., nchar(`PHASE`) == 4) %>%
@@ -93,7 +93,7 @@ sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
 	ld <- cbind(ld, temp) %>% dplyr::as_tibble(., .name_repair="minimal")
-	ld <- dplyr::arrange(ld, dplyr::desc(abs(`RVAL`)))
+	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
 	message("Found ", nrow(ld), " proxies")
 	RSQLite::dbDisconnect(conn)
 	return(ld)
