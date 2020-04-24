@@ -84,7 +84,7 @@ sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 	query <- paste0("SELECT DISTINCT * FROM tags WHERE SNP_A IN (", numid, ")")
 	ld <- RSQLite::dbGetQuery(conn, query) %>% 
 		dplyr::as_tibble() %>%
-		dplyr::filter(`R`^2 > `tag_r2`) %>%
+		dplyr::filter(`RVAL`^2 > `tag_r2`) %>%
 		dplyr::filter(`SNP_A` != `SNP_B`) %>%
 		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
 		subset(., nchar(`PHASE`) == 4) %>%
@@ -93,7 +93,7 @@ sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
 	ld <- cbind(ld, temp) %>% dplyr::as_tibble(., .name_repair="minimal")
-	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
+	ld <- dplyr::arrange(ld, dplyr::desc(abs(`RVAL`)))
 	message("Found ", nrow(ld), " proxies")
 	RSQLite::dbDisconnect(conn)
 	return(ld)
@@ -169,7 +169,7 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 			searchspacename <- tempfile()
 			if(is.character(vcf))
 			{
-				if(check_bcftools())
+				if(check_bcftools() & is.null(dbfile))
 				{
 					cmd <- paste0(options()[["tools_bcftools"]], " query -f'%ID\n' ", vcf, " > ", searchspacename)
 					system(cmd)
