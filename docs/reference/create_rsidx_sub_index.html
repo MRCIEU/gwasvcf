@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Query chrompos from vcf object — query_chrompos_vcf • gwasvcf</title>
+<title>Create new index from existing index using a subset of rsids — create_rsidx_sub_index • gwasvcf</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Query chrompos from vcf object — query_chrompos_vcf" />
-<meta property="og:description" content="Query chrompos from vcf object" />
+<meta property="og:title" content="Create new index from existing index using a subset of rsids — create_rsidx_sub_index" />
+<meta property="og:description" content="Note this requires a modified version of plink that allows ld-window-r2 flag for --r option.
+Available here: https://github.com/explodecomputer/plink-ng" />
 
 
 
@@ -120,37 +121,38 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Query chrompos from vcf object</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mrcieu/gwasvcf/blob/master/R/query.r'><code>R/query.r</code></a></small>
-    <div class="hidden name"><code>query_chrompos_vcf.Rd</code></div>
+    <h1>Create new index from existing index using a subset of rsids</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mrcieu/gwasvcf/blob/master/R/rsid_index.r'><code>R/rsid_index.r</code></a></small>
+    <div class="hidden name"><code>create_rsidx_sub_index.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Query chrompos from vcf object</p>
+    <p>Note this requires a modified version of plink that allows ld-window-r2 flag for --r option.
+Available here: https://github.com/explodecomputer/plink-ng</p>
     </div>
 
-    <pre class="usage"><span class='fu'>query_chrompos_vcf</span>(<span class='no'>chrompos</span>, <span class='no'>vcf</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>create_rsidx_sub_index</span>(<span class='no'>rsid</span>, <span class='no'>rsidx</span>, <span class='no'>newindex</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>chrompos</th>
-      <td><p>Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.</p></td>
+      <th>rsid</th>
+      <td><p>Vector of rsids</p></td>
     </tr>
     <tr>
-      <th>vcf</th>
-      <td><p>VCF object (e.g. from readVcf)</p></td>
+      <th>rsidx</th>
+      <td><p>Existing index</p></td>
     </tr>
     <tr>
-      <th>id</th>
-      <td><p>If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter</p></td>
+      <th>newindex</th>
+      <td><p>New index (Note: will delete existing file if exists)</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>VCF object</p>
+    <p>NULL, creates new index file</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

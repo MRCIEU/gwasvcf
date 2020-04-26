@@ -34,7 +34,8 @@ Imports:
   coloc,
   genetics.binaRies,
   testthat,
-  RSQLite
+  RSQLite,
+  rlang
 Remotes:
   github::explodecomputer/genetics.binaRies,
   bioc::3.10/BiocGenerics,

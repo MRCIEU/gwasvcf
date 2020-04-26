@@ -43,6 +43,8 @@ query_gwas(
 
 \item{bfile}{=path to plink bed/bim/fam ld reference panel}
 
+\item{dbfile}{=path to sqlite tag snp database}
+
 \item{tag_kb}{=5000 Proxy parameter}
 
 \item{tag_nsnp}{=5000 Proxy parameter}
@@ -50,8 +52,6 @@ query_gwas(
 \item{tag_r2}{=0.6 Proxy parameter}
 
 \item{threads}{=1 NUmber of threads}
-
-\item{dfile}{=path to sqlite tag snp database}
 }
 \value{
 vcf object

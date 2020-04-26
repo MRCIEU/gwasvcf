@@ -10,6 +10,7 @@
 #' @param out temporary output file
 #'
 #' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #'
 #' @export
 #' @return data frame
@@ -44,10 +45,11 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	system(cmd)
 
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
-		dplyr::filter(`R`^2 > `tag_r2`) %>%
-		dplyr::filter(`SNP_A` != `SNP_B`) %>%
-		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
-		subset(., nchar(`PHASE`) == 4)
+		dplyr::as_tibble() %>%
+		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
+		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
+		dplyr::mutate(PHASE=gsub("/", "", .data[["PHASE"]])) %>%
+		dplyr::filter(nchar(.data[["PHASE"]]) == 4)
 	unlink(searchspacename)
 	unlink(targetsname)
 	unlink(paste0(targetsname, c(".log", ".nosex")))
@@ -57,12 +59,12 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		message("No proxies found")
 		return(ld)
 	}
-	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
+	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.data, .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% dplyr::as_tibble(., .name_repair="minimal")
+	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.data, .name_repair="minimal")
 	# ld <- dplyr::arrange(ld, desc(abs(R))) %>%
 	# 	dplyr::filter(!duplicated(SNP_A))
-	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
+	ld <- dplyr::arrange(ld, dplyr::desc(abs(.data[["R"]])))
 	message("Found ", nrow(ld), " proxies")
 	return(ld)
 }
@@ -75,25 +77,28 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 #' @param dbfile path to dbfile
 #' @param tag_r2 minimum r2 value
 #'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
 #' @export
 #' @return data frame
 sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 {
 	conn <- RSQLite::dbConnect(RSQLite::SQLite(), dbfile)
-	numid <- gsub("rs", "", rsids) %>% paste(., collapse=",")
+	numid <- gsub("rs", "", rsids) %>% paste(collapse=",")
 	query <- paste0("SELECT DISTINCT * FROM tags WHERE SNP_A IN (", numid, ")")
 	ld <- RSQLite::dbGetQuery(conn, query) %>% 
 		dplyr::as_tibble() %>%
-		dplyr::filter(`R`^2 > `tag_r2`) %>%
-		dplyr::filter(`SNP_A` != `SNP_B`) %>%
-		dplyr::mutate(PHASE=gsub("/", "", `PHASE`)) %>%
-		subset(., nchar(`PHASE`) == 4) %>%
-		dplyr::mutate(`SNP_A` = paste0("rs", `SNP_A`), `SNP_B` = paste0("rs", `SNP_B`))
+		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
+		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
+		dplyr::mutate(PHASE=gsub("/", "", .data[["PHASE"]])) %>%
+		dplyr::filter(nchar(.data[["PHASE"]]) == 4) %>%
+		dplyr::mutate(SNP_A = paste0("rs", .data[["SNP_A"]]), SNP_B = paste0("rs", .data[["SNP_B"]]))
 
-	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(., .name_repair="minimal")
+	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.data, .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% dplyr::as_tibble(., .name_repair="minimal")
-	ld <- dplyr::arrange(ld, dplyr::desc(abs(`R`)))
+	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.data, .name_repair="minimal")
+	ld <- dplyr::arrange(ld, dplyr::desc(abs(.data[["R"]])))
 	message("Found ", nrow(ld), " proxies")
 	RSQLite::dbDisconnect(conn)
 	return(ld)
@@ -203,15 +208,15 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 	}
 	if(!is.null(searchspace))
 	{
-		ld <- ld %>% dplyr::filter(!duplicated(SNP_A))
+		ld <- ld %>% dplyr::filter(!duplicated(.data[["SNP_A"]]))
 	}
 	message("Extrating proxies...")
 	e <- query_gwas(vcf, rsid=ld[["SNP_B"]], rsidx=rsidx)
 
 	if(is.null(searchspace))
 	{
-		ld <- subset(ld, `SNP_B` %in% names(e)) %>%
-			dplyr::filter(!duplicated(`SNP_A`))		
+		ld <- subset(ld, ld[["SNP_B"]] %in% names(e)) %>%
+			dplyr::filter(!duplicated(.data[["SNP_A"]]))		
 	}
 	e <- e[names(e) %in% ld[["SNP_B"]], ]
 	message("Identified proxies for ", nrow(e), " of ", length(missing), " rsids")
@@ -223,7 +228,7 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 		return(o)
 	}
 	stopifnot(all(ld[["SNP_B"]] == names(e)))
-	sign_index <- SummarizedExperiment::rowRanges(e)$`REF` == ld[["B1"]]
+	sign_index <- GenomicRanges::mcols(SummarizedExperiment::rowRanges(e))[,"REF"] == ld[["B1"]]
 
 	gr <- GenomicRanges::GRanges(ld[["CHR_A"]], IRanges::IRanges(start=ld[["BP_A"]], end=ld[["BP_A"]], names=ld[["SNP_A"]]))
 	fixeddat <- S4Vectors::DataFrame(

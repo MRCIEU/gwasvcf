@@ -29,6 +29,8 @@ test_that("query with rsidx", {
 	expect_true(all(names(a) == names(b)))
 })
 
+
+
 fn <- system.file("extdata", "eur.bed", package="gwasvcf") %>% gsub("eur.bed", "eur", .)
 dbfile <- tempfile()
 test_that("tag db", {

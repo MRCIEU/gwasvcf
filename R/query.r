@@ -12,7 +12,7 @@
 #' @param os The operating system. Default is as detected. Determines the method used to perform query
 #' @param proxies ="no" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes. Currently only possible if querying rsid.
 #' @param bfile =path to plink bed/bim/fam ld reference panel
-#' @param dfile =path to sqlite tag snp database
+#' @param dbfile =path to sqlite tag snp database
 #' @param tag_kb =5000 Proxy parameter
 #' @param tag_nsnp =5000 Proxy parameter
 #' @param tag_r2 =0.6 Proxy parameter
@@ -430,7 +430,7 @@ query_rsid_rsidx <- function(rsid, vcffile, id=NULL, rsidx)
 query_rsidx <- function(rsid, rsidx)
 {
 	conn <- RSQLite::dbConnect(RSQLite::SQLite(), rsidx)
-	numid <- gsub("rs", "", rsid) %>% paste(., collapse=",")
+	numid <- gsub("rs", "", rsid) %>% paste(.data, collapse=",")
 	query <- paste0("SELECT DISTINCT * FROM rsid_to_coord WHERE rsid IN (", numid, ")")
 	out <- RSQLite::dbGetQuery(conn, query)
 	RSQLite::dbDisconnect(conn)
