@@ -229,10 +229,8 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 	}
 	stopifnot(all(ld[["SNP_B"]] == names(e)))
 	sign_index <- GenomicRanges::mcols(SummarizedExperiment::rowRanges(e))[,"REF"] == ld[["B1"]]
-
 	gr <- GenomicRanges::GRanges(ld[["CHR_A"]], IRanges::IRanges(start=ld[["BP_A"]], end=ld[["BP_A"]], names=ld[["SNP_A"]]))
 	fixeddat <- S4Vectors::DataFrame(
-		paramRangeID=as.factor(rep(NA, nrow(ld))),  
 		REF=Biostrings::DNAStringSet(ld[["A1"]]), 
 		ALT=Biostrings::DNAStringSetList(as.list(ld[["A2"]])), 
 		QUAL=as.numeric(NA), 
@@ -241,16 +239,15 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 	prox <- VariantAnnotation::VCF(
 		rowRanges = gr,
 		colData = SummarizedExperiment::colData(e),
+		fixed = fixeddat,
 		info = VariantAnnotation::info(e),
 		exptData = list(
-			header = VariantAnnotation::header(e), 
-			fixed = fixeddat
+			header = VariantAnnotation::header(e)
 		),
 		geno = S4Vectors::SimpleList(
 			lapply(VariantAnnotation::geno(e), `dimnames<-`, NULL)
 		)
 	)
-
 	VariantAnnotation::geno(VariantAnnotation::header(prox)) <- rbind(VariantAnnotation::geno(VariantAnnotation::header(prox)), 
 		S4Vectors::DataFrame(row.names="PR", Number="1", Type="String", Description="Proxy rsid")
 	)

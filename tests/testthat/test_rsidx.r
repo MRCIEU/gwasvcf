@@ -33,6 +33,9 @@ test_that("query with rsidx", {
 
 fn <- system.file("extdata", "eur.bed", package="gwasvcf") %>% gsub("eur.bed", "eur", .)
 dbfile <- tempfile()
+
+set_plink()
+
 test_that("tag db", {
 	create_ldref_sqlite(fn, dbfile, 0.04)
 	expect_true(file.exists(dbfile))
