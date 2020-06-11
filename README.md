@@ -22,12 +22,19 @@ See also the [gwasglue](https://github.com/MRCIEU/gwasglue) R package for method
 ## Installation
 
 ```r
-devtools::install_github("mrcieu/gwasvcftools")
+remotes::install_github("mrcieu/gwasvcf")
 ```
 
 ## Usage
 
 See vignettes here: [https://mrcieu.github.io/gwasvcf](https://mrcieu.github.io/gwasvcf).
+
+## Citation
+
+If using GWAS-VCF files please reference the studies that you use and the following paper:
+
+**The variant call format provides efficient and robust storage of GWAS summary statistics.** Matthew Lyon, Shea J Andrews, Ben Elsworth, Tom R Gaunt, Gibran Hemani, Edoardo Marcora. bioRxiv 2020.05.29.115824; doi: https://doi.org/10.1101/2020.05.29.115824 
+
 
 ## Reference datasets
 
