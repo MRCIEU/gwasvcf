@@ -43,13 +43,14 @@ Example GWAS VCF (GIANT 2010 BMI):
 - [http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz](http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz)
 - [http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz.tbi](http://fileserve.mrcieu.ac.uk/vcf/IEU-a-2.vcf.gz.tbi)
 
-1000 genomes European reference panel for LD:
+1000 genomes reference panels for LD for each superpopulation - used by default in OpenGWAS:
+
+- [http://fileserve.mrcieu.ac.uk/ld/1kg.v3.tgz](http://fileserve.mrcieu.ac.uk/ld/1kg.v3.tgz)
+
+1000 genomes European reference panel for LD (legacy):
 
 - [http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz](http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz)
 
-1000 genomes reference panels for LD for each superpopulation:
-
-- [http://fileserve.mrcieu.ac.uk/ld/1kg.v3.tgz](http://fileserve.mrcieu.ac.uk/ld/1kg.v3.tgz)
 
 1000 genomes vcf harmonised against human genome reference:
 
