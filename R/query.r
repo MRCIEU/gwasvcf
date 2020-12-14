@@ -2,7 +2,7 @@
 #'
 #' Read in GWAS summary data with filters on datasets (if multiple datasets per file) and/or chromosome/position, rsids or pvalues. Chooses most optimal choice for the detected operating system. Typically chrompos searches are the fastest. On Windows, rsid or pvalue filters from a file will be slow. 
 #'
-#' @param vcf VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf
+#' @param vcf Path to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf
 #' @param chrompos Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.
 #' @param rsid Vector of rsids
 #' @param pval  P-value threshold (NOT -log10)

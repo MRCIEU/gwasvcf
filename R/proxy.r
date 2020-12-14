@@ -24,10 +24,11 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	if(!is.null(searchspace))
 	{
 		stopifnot(is.character(searchspace))
-		utils::write.table(c(rsid, searchspace), file=searchspacename, row=F, col=F, qu=F)
+
+		utils::write.table(unique(c(rsid, searchspace)), file=searchspacename, row=F, col=F, qu=F)
 		extract_param <- paste0(" --extract ", searchspacename)
 	} else {
-		extract_param <- " "
+		extract_param <- " " 
 	}
 	cmd <- paste0(options()[["tools_plink"]],
 		" --bfile ", bfile, 
@@ -36,6 +37,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		" --r in-phase with-freqs gz",
 		" --ld-snp-list ", targetsname,
 		" --ld-window-kb ", tag_kb,
+		" --ld-window-r2 ", tag_r2,
 		" --ld-window ", tag_nsnp,
 		" --out ", targetsname,
 		" --threads ", threads,
