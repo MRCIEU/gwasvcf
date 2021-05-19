@@ -38,17 +38,17 @@ Imports:
   rlang
 Remotes:
   github::explodecomputer/genetics.binaRies,
-  bioc::3.11/snpStats,
-  bioc::3.11/BiocGenerics,
-  bioc::3.11/Biostrings,
-  bioc::3.11/S4Vectors,
-  bioc::3.11/IRanges,
-  bioc::3.11/GenomicRanges,
-  bioc::3.11/GenomeInfoDb,
-  bioc::3.11/SummarizedExperiment,
-  bioc::3.11/Rhtslib,
-  bioc::3.11/Rsamtools,
-  bioc::3.11/VariantAnnotation
+  bioc::3.12/snpStats,
+  bioc::3.12/BiocGenerics,
+  bioc::3.12/Biostrings,
+  bioc::3.12/S4Vectors,
+  bioc::3.12/IRanges,
+  bioc::3.12/GenomicRanges,
+  bioc::3.12/GenomeInfoDb,
+  bioc::3.12/SummarizedExperiment,
+  bioc::3.12/Rhtslib,
+  bioc::3.12/Rsamtools,
+  bioc::3.12/VariantAnnotation
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
