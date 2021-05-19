@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -103,7 +103,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mrcieu/gwasvcf/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -129,30 +129,30 @@
     <p>Read in GWAS summary data with filters on datasets (if multiple datasets per file) and/or chromosome/position, rsids or pvalues. Chooses most optimal choice for the detected operating system. Typically chrompos searches are the fastest. On Windows, rsid or pvalue filters from a file will be slow.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>query_gwas</span>(
-  <span class='no'>vcf</span>,
-  <span class='kw'>chrompos</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rsid</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>pval</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rsidx</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>build</span> <span class='kw'>=</span> <span class='st'>"GRCh37"</span>,
-  <span class='kw'>os</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.info.html'>Sys.info</a></span>()<span class='kw'>[[</span><span class='st'>"sysname"</span>]],
-  <span class='kw'>proxies</span> <span class='kw'>=</span> <span class='st'>"no"</span>,
-  <span class='kw'>bfile</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>dbfile</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tag_kb</span> <span class='kw'>=</span> <span class='fl'>5000</span>,
-  <span class='kw'>tag_nsnp</span> <span class='kw'>=</span> <span class='fl'>5000</span>,
-  <span class='kw'>tag_r2</span> <span class='kw'>=</span> <span class='fl'>0.6</span>,
-  <span class='kw'>threads</span> <span class='kw'>=</span> <span class='fl'>1</span>
-)</pre>
+    <pre class="usage"><span class='fu'>query_gwas</span><span class='op'>(</span>
+  <span class='va'>vcf</span>,
+  chrompos <span class='op'>=</span> <span class='cn'>NULL</span>,
+  rsid <span class='op'>=</span> <span class='cn'>NULL</span>,
+  pval <span class='op'>=</span> <span class='cn'>NULL</span>,
+  id <span class='op'>=</span> <span class='cn'>NULL</span>,
+  rsidx <span class='op'>=</span> <span class='cn'>NULL</span>,
+  build <span class='op'>=</span> <span class='st'>"GRCh37"</span>,
+  os <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.info.html'>Sys.info</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>[[</span><span class='st'>"sysname"</span><span class='op'>]</span><span class='op'>]</span>,
+  proxies <span class='op'>=</span> <span class='st'>"no"</span>,
+  bfile <span class='op'>=</span> <span class='cn'>NULL</span>,
+  dbfile <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tag_kb <span class='op'>=</span> <span class='fl'>5000</span>,
+  tag_nsnp <span class='op'>=</span> <span class='fl'>5000</span>,
+  tag_r2 <span class='op'>=</span> <span class='fl'>0.6</span>,
+  threads <span class='op'>=</span> <span class='fl'>1</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>vcf</th>
-      <td><p>VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf</p></td>
+      <td><p>Path to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf</p></td>
     </tr>
     <tr>
       <th>chrompos</th>
@@ -231,7 +231,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
