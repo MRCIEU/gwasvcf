@@ -4,7 +4,6 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![codecov](https://codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://codecov.io/github/mrcieu/gwasvcf)
-
 [![R build status](https://github.com/MRCIEU/gwasvcf/workflows/R-CMD-check/badge.svg)](https://github.com/MRCIEU/gwasvcf/actions)
 <!-- badges: end -->
 
