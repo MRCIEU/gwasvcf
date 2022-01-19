@@ -44,7 +44,7 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 	)
 	VariantAnnotation::geno(hdr) <- S4Vectors::DataFrame(
 		Number = c("A", "A", "A", "A", "A", "A", "A"),
-		Type = c("Float", "Float", "Float", "Float", "Float", "Float"),
+		Type = c("Float", "Float", "Float", "Float", "Float", "Float", "String"),
 		Description = c(
 			"Effect size estimate relative to the alternative allele",
 			"Standard error of effect size estimate",
