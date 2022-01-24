@@ -1,3 +1,5 @@
+# All functions require v1.0 of the GWAS-VCF specification available from https://github.com/MRCIEU/gwas-vcf-specification/releases/tag/1.0.0
+
 #' Create GWAS vcf
 #'
 #' @param chrom chrom vector
