@@ -9,7 +9,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 Complete GWAS summary datasets are now abundant. A large repository of curated, harmonised and QC'd datasets is available in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/). They can be queried via the [API](http://gwasapi.mrcieu.ac.uk/docs/) directly, or through the [ieugwasr](https://github.com/mrcieu/ieugwasr) R package, or the [ieugwaspy](https://github.com/mrcieu/ieugwaspy) python package. However, for faster querying that can be used in a HPC environment, accessing the data directly and not through cloud systems is advantageous. 
 
-We developed a format for storing and harmonising GWAS summary data known as [GWAS VCF format](https://github.com/MRCIEU/gwas_vcf_spec). All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available for download in this format. This R package provides fast and convenient functions for querying and creating GWAS summary data in GWAS VCF format. 
+We developed a format for storing and harmonising GWAS summary data known as [GWAS VCF format](https://github.com/MRCIEU/gwas-vcf-specification) which can be created using [gwas2vcf](https://github.com/mrcieu/gwas2vcf). All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available for download in this format. This R package provides fast and convenient functions for querying and creating GWAS summary data in GWAS VCF format. See also [pygwasvcf](https://github.com/mrcieu/pygwasvcf) a Python3 parser for querying GWAS VCF files.
+
 This package includes:
 
 - a wrapper around the [bioconductor/VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html) package, providing functions tailored to GWAS VCF for reading, querying, creating and writing GWAS VCF format files
