@@ -32,6 +32,7 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 	if(!is.null(pval)) gen[["LP"]] <- matrix(-log10(pval), nsnp)
 	if(!is.null(n)) gen[["SS"]] <- matrix(n, nsnp)
 	if(!is.null(ncase)) gen[["NC"]] <- matrix(ncase, nsnp)
+	if(!is.null(snp)) gen[["ID"]] <- matrix(snp, nsnp)
 	gen <- S4Vectors::SimpleList(gen)
 
 	gr <- GenomicRanges::GRanges(chrom, IRanges::IRanges(start=pos, end=pos + pmax(nchar(nea), nchar(ea)) - 1, names=snp))
@@ -44,17 +45,18 @@ create_vcf <- function(chrom, pos, nea, ea, snp=NULL, ea_af=NULL, effect=NULL, s
 		sample = name
 	)
 	VariantAnnotation::geno(hdr) <- S4Vectors::DataFrame(
-		Number = c("A", "A", "A", "A", "A", "A"),
-		Type = c("Float", "Float", "Float", "Float", "Float", "Float"),
+		Number = c("A", "A", "A", "A", "A", "A", "A"),
+		Type = c("Float", "Float", "Float", "Float", "Float", "Float", "String"),
 		Description = c(
 			"Effect size estimate relative to the alternative allele",
 			"Standard error of effect size estimate",
 			"-log10 p-value for effect estimate",
 			"Alternate allele frequency in the association study",
 			"Sample size used to estimate genetic effect",
-			"Number of cases used to estimate genetic effect"
+			"Number of cases used to estimate genetic effect",
+			"Study variant identifier"
 		),
-		row.names=c("ES", "SE", "LP", "AF", "SS", "NC")
+		row.names=c("ES", "SE", "LP", "AF", "SS", "NC", "ID")
 	)
 	VariantAnnotation::geno(hdr) <- subset(VariantAnnotation::geno(hdr), rownames(VariantAnnotation::geno(hdr)) %in% names(gen))
 
