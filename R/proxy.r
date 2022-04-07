@@ -48,14 +48,14 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 
 	if (!file.exists(outcome))
 	{
-	  message("No proxies found")
+	  message("No proxies found for given SNPs")
 	  return(dplyr::tibble()) # So nrow is 0 for calling function
 	}
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
 		dplyr::as_tibble() 
 	if(nrow(ld) == 0)
 	{
-	  message("No proxies found")
+	  message("No proxies found for given SNPs")
 	  return(ld)
 	}
 	ld %>%
@@ -67,6 +67,11 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	unlink(targetsname)
 	unlink(paste0(targetsname, c(".log", ".nosex")))
 	unlink(outname)
+	if(nrow(ld) == 0)
+	{
+	  message("No proxies found for given parameters")
+	  return(ld)
+	}
 	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.data, .name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
 	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.data, .name_repair="minimal")
