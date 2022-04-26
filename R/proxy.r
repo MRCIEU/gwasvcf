@@ -46,7 +46,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	message("Finding proxies...")
 	system(cmd)
 
-	if (!file.exists(outcome))
+	if (!file.exists(outname))
 	{
 	  message("No proxies found for given SNPs")
 	  return(dplyr::tibble()) # So nrow is 0 for calling function
