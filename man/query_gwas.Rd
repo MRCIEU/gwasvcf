@@ -23,7 +23,7 @@ query_gwas(
 )
 }
 \arguments{
-\item{vcf}{Path to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf}
+\item{vcf}{Path or URL to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf}
 
 \item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.}
 
