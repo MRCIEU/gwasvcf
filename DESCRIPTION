@@ -35,7 +35,8 @@ Imports:
   genetics.binaRies,
   testthat,
   RSQLite,
-  rlang
+  rlang,
+  RCurl
 Remotes:
   github::explodecomputer/genetics.binaRies,
   bioc::3.12/snpStats,

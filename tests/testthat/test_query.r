@@ -137,3 +137,26 @@ test_that("query_chrompos_vcf", {
 	expect_equal(length(v), 3)
 })
 
+
+test_that("query_chrompos_vcf url", {
+	set_bcftools()
+	u <- "https://objectstorage.us-ashburn-1.oraclecloud.com/n/idrvm4tkz2a8/b/OpenGWAS/o/ieu-a/ieu-a-2/ieu-a-2.vcf.gz"
+	RCurl::url.exists(u)
+	v <- query_chrompos_bcftools("1:800000-1000000", u)
+	expect_equal(length(v), 3)
+})
+
+test_that("query_chrompos_vcf url2", {
+	set_bcftools()
+	u <- "https://objectstorage.us-ashburn-1.oraclecloud.com/n/idrvm4tkz2a8/b/OpenGWAS/o/ieu-a/ieu-a-2/ieu-a-2.vcf.gz"
+	# RCurl::url.exists(u)
+	v <- query_gwas(u, "1:800000-1000000")
+	expect_equal(length(v), 3)
+})
+
+test_that("query_chrompos_vcf url2", {
+	set_bcftools()
+	u <- "https://objectstorage.us-ashburn-1.oraclecloud.com/n/idrvm4tkz2a8/b/OpenGWAS/o/ieu-a/ieu-a-2/ieu-a-2.vcf.gz"
+	v <- query_gwas(u, pval=5e-8)
+	expect_equal(length(v), 2041)
+})
