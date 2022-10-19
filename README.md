@@ -47,12 +47,11 @@ Example GWAS VCF (GIANT 2010 BMI):
 
 - [http://fileserve.mrcieu.ac.uk/ld/1kg.v3.tgz](http://fileserve.mrcieu.ac.uk/ld/1kg.v3.tgz)
 
-1000 genomes European reference panel for LD (legacy):
+RSID index for faster querying:
 
-- [http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz](http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz)
+- [http://fileserve.mrcieu.ac.uk/vcf/annotations.vcf.gz.rsidx](http://fileserve.mrcieu.ac.uk/vcf/annotations.vcf.gz.rsidx)
 
-
-1000 genomes vcf harmonised against human genome reference:
+1000 genomes annotations in vcf format harmonised against human genome reference:
 
 - [http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz](http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz)
 - [http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz.tbi](http://fileserve.mrcieu.ac.uk/vcf/1kg_v3_nomult.vcf.gz.tbi)
