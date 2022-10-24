@@ -194,6 +194,21 @@ To query using the index:
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), rsidx="index.rsidx")
 ```
 
+## Indexing p-values
+
+Querying by p-value is slow. It could be worth generating an index file for p-values to speed this up. Similar to rsid queries, it uses an sqlite database linking -log10 pvalues to chromosome and position. 
+
+To create the index:
+
+```{r}
+create_pval_index_from_vcf(vcffile, maximum_pval=0.05, "index.pvali")
+```
+
+To query using the index:
+
+```{r}
+vcf <- query_gwas(vcffile, pval=0.05, pvali="index.pvali")
+```
 
 ## A note about chrompos
 
