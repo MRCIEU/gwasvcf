@@ -8,6 +8,7 @@
 #' @param pval  P-value threshold (NOT -log10)
 #' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
 #' @param rsidx Path to rsidx index file
+#' @param pvali Path to pval index file
 #' @param build ="GRCh37" Build of vcffile
 #' @param os The operating system. Default is as detected. Determines the method used to perform query
 #' @param proxies ="no" If SNPs are absent then look for proxies (yes) or not (no). Can also mask all target SNPs and only return proxies (only), for testing purposes. Currently only possible if querying rsid.
@@ -20,7 +21,7 @@
 #'
 #' @export
 #' @return vcf object
-query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, dbfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
+query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=NULL, pvali=NULL, build="GRCh37", os=Sys.info()[['sysname']], proxies="no", bfile=NULL, dbfile=NULL, tag_kb=5000, tag_nsnp=5000, tag_r2=0.6, threads=1)
 {
 	if(is.character(vcf))
 	{
@@ -94,6 +95,11 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=
 		{
 			return(query_pval_vcf(pval, vcf, id))
 		} else {
+			if(!is.null(pvali))
+			{
+				message("Using pval index")
+				return(query_pval_sqlite3(pval, vcf, id, pvali))
+			}
 			if(!check_bcftools())
 			{
 				return(query_pval_file(pval, vcf, id, build))
@@ -444,3 +450,37 @@ query_rsidx <- function(rsid, rsidx)
 }
 
 
+#' Query pval from file using pvali index
+#'
+#' See create_pvali_index
+#'
+#' @param pval pval threshold
+#' @param vcffile Path to .vcf.gz GWAS summary data file
+#' @param id If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter
+#' @param pvali Path to pval index file
+#'
+#' @export
+#' @return vcf object
+query_pval_sqlite3 <- function(pval, vcffile, id=NULL, pvali)
+{
+	out <- query_pvali(pval, pvali)
+	return(
+		query_gwas(vcffile, chrompos=data.frame(chrom=out$chrom, start=out$coord, end=out$coord), id=id)
+	)
+}
+
+#' Query pvali
+#'
+#' @param pval pval threshold
+#' @param pvali Path to pval index file
+#'
+#' @export
+#' @return data frame
+query_pvali <- function(pval, pvali)
+{
+	conn <- RSQLite::dbConnect(RSQLite::SQLite(), pvali)
+	query <- paste0("SELECT DISTINCT * FROM pval_to_coord WHERE lp >= ", -log10(pval))
+	out <- RSQLite::dbGetQuery(conn, query)
+	RSQLite::dbDisconnect(conn)
+	return(out)
+}
