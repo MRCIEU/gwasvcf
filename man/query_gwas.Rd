@@ -11,6 +11,7 @@ query_gwas(
   pval = NULL,
   id = NULL,
   rsidx = NULL,
+  pvali = NULL,
   build = "GRCh37",
   os = Sys.info()[["sysname"]],
   proxies = "no",
@@ -34,6 +35,8 @@ query_gwas(
 \item{id}{If multiple GWAS datasets in the vcf file, the name (sample ID) from which to perform the filter}
 
 \item{rsidx}{Path to rsidx index file}
+
+\item{pvali}{Path to pval index file}
 
 \item{build}{="GRCh37" Build of vcffile}
 

@@ -464,6 +464,7 @@ query_rsidx <- function(rsid, rsidx)
 query_pval_sqlite3 <- function(pval, vcffile, id=NULL, pvali)
 {
 	out <- query_pvali(pval, pvali)
+	message("Identified ", nrow(out), " variants passing threshold. Extracting...")
 	return(
 		query_gwas(vcffile, chrompos=data.frame(chrom=out$chrom, start=out$coord, end=out$coord), id=id)
 	)
