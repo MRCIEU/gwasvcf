@@ -2,49 +2,50 @@ Package: gwasvcf
 Title: Tools for dealing with GWAS summary data in VCF format
 Version: 0.1.1
 Authors@R: 
-    person(given = "Gibran",
-           family = "Hemani",
-           role = c("aut", "cre"),
-           email = "g.hemani@bristol.ac.uk",
+    person("Gibran", "Hemani", , "g.hemani@bristol.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0920-1055"))
-Description: Tools for dealing with GWAS summary data in VCF format. Includes reading, querying, writing, as well as helper functions such as LD proxy searches.
+Description: Tools for dealing with GWAS summary data in VCF format.
+    Includes reading, querying, writing, as well as helper functions such
+    as LD proxy searches.
+License: MIT + file LICENSE
 URL: https://github.com/mrcieu/gwasvcf
 BugReports: https://github.com/mrcieu/gwasvcf/issues
 Depends: 
   R (>= 4.0.0),
   VariantAnnotation
 Imports:
-  BiocGenerics,
-  Biostrings,
-  S4Vectors,
-  IRanges,
-  GenomicRanges,
-  SummarizedExperiment,
-  GenomeInfoDb,
-  Rhtslib,
-  Rsamtools,
-  tidyr,
-  stringr,
-  magrittr,
-  dplyr,
-  data.table,
-  methods,
-  utils,
-  jsonlite,
-  coloc,
-  genetics.binaRies,
-  testthat,
-  RSQLite,
-  rlang,
-  RCurl
+    BiocGenerics,
+    Biostrings,
+    coloc,
+    data.table,
+    dplyr,
+    genetics.binaRies,
+    GenomeInfoDb,
+    GenomicRanges,
+    IRanges,
+    jsonlite,
+    magrittr,
+    methods,
+    RCurl,
+    Rhtslib,
+    rlang,
+    Rsamtools,
+    RSQLite,
+    S4Vectors,
+    stringr,
+    SummarizedExperiment,
+    testthat,
+    tidyr,
+    utils
+Suggests: 
+    knitr,
+    markdown,
+    rmarkdown
+VignetteBuilder: 
+    knitr
 Remotes:
   github::mrcieu/genetics.binaRies
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.2.1
-Suggests: 
-    knitr,
-    rmarkdown,
-    markdown
-VignetteBuilder: knitr
