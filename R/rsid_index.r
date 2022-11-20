@@ -100,4 +100,3 @@ create_ldref_sqlite <- function(bfile, dbname, tag_r2=0.6)
 	unlink(paste0(bfile, ".ld.sqlite"))
 	# unlink(paste0(bfile, ".indels"))
 }
-

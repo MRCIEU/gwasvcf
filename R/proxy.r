@@ -265,4 +265,3 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 		return(BiocGenerics::rbind(o, prox))
 	}
 }
-
