@@ -36,7 +36,7 @@ For LD related functions the package uses [plink 1.90](https://www.cog-genomics.
 set_plink('/path/to/plink')
 ```
 
-Alternatively you can automatically use use the binaries bundled here: https://github.com/explodecomputer/genetics.binaRies 
+Alternatively you can automatically use use the binaries bundled here: https://github.com/mrcieu/genetics.binaRies 
 
 ```r
 remotes::install_github('mrcieu/genetics.binaRies')
