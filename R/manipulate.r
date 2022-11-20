@@ -226,7 +226,7 @@ vcflist_overlaps <- function(vcflist, chrompos)
 					return(query_gwas(x, chrompos))
 				}
 			}
-			if(class(x) == "character")
+			if(is.character(x))
 			{
 				if(is.null(chrompos))
 				{
