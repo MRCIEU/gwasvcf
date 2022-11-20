@@ -340,4 +340,3 @@ writeVcf(out, file="temp.vcf")
 ```
 
 You may want to first harmonise the data so that all the non-effect alleles are aligned to the human genome reference. See the [gwasglue](https://github.com/MRCIEU/gwasglue) package on some functions to do this. 
-
