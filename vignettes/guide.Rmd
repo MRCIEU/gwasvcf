@@ -38,8 +38,8 @@ set_plink('/path/to/plink')
 
 Alternatively you can automatically use use the binaries bundled here: https://github.com/explodecomputer/genetics.binaRies 
 
-devtools::install_github('explodecomputer/genetics.binaRies')
 ```r
+remotes::install_github('mrcieu/genetics.binaRies')
 set_plink()
 set_bcftools()
 ```
