@@ -24,6 +24,7 @@ All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available
 For some VCF querying functions it is faster to optionally use [bcftools](https://samtools.github.io/bcftools/bcftools.html), and when available the R package will use that strategy. To set a location for the bcftools package, use
 
 ```
+library(gwasvcf)
 set_bcftools('/path/to/bcftools')
 ```
 
