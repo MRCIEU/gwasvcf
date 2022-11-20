@@ -23,7 +23,7 @@ All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available
 
 For some VCF querying functions it is faster to optionally use [bcftools](https://samtools.github.io/bcftools/bcftools.html), and when available the R package will use that strategy. To set a location for the bcftools package, use
 
-```
+```r
 library(gwasvcf)
 set_bcftools('/path/to/bcftools')
 ```
@@ -32,21 +32,21 @@ Note that there is bcftools binary for Windows available, so some querying optio
 
 For LD related functions the package uses [plink 1.90](https://www.cog-genomics.org/plink/1.9). You can specify the location of your plink installation by running
 
-```
+```r
 set_plink('/path/to/plink')
 ```
 
 Alternatively you can automatically use use the binaries bundled here: https://github.com/explodecomputer/genetics.binaRies 
 
-```
 devtools::install_github('explodecomputer/genetics.binaRies')
+```r
 set_plink()
 set_bcftools()
 ```
 
 To unset a path:
 
-```
+```r
 set_plink(NULL)
 set_bcftools(NULL)
 ```
