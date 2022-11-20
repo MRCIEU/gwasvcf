@@ -42,8 +42,10 @@ test_that("tag db", {
 })
 
 test_that("sqlite_ld_proxies", {
+  skip("TODO: check this test")
 	m <- data.table::fread(paste0(fn, ".bim")) %>% {sample(.$V2, 100, replace=FALSE)}
 	ld <- sqlite_ld_proxies(m, dbfile, 0.2)
+	# Requires an expect_* condition here
 })
 
 test_that("sqlite proxy", {
