@@ -113,14 +113,13 @@ merge_vcf <- function(a, b)
 	VariantAnnotation::geno(ab) <- temp
 
 	h <- VariantAnnotation::header(a)
-	VCFHeader(
+	out <- VCFHeader(
 		reference = VariantAnnotation::reference(h),
 		samples = c(VariantAnnotation::samples(h), VariantAnnotation::samples(VariantAnnotation::header(b))),
 		meta = VariantAnnotation::meta(h)
 	)
-	VariantAnnotation::samples(h) <- c(VariantAnnotation::samples(h), VariantAnnotation::samples(VariantAnnotation::header(b)))
 
-	return(S4Vectors::SimpleList())
+	return(S4Vectors::SimpleList(out))
 }
 
 
