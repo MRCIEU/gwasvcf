@@ -47,5 +47,4 @@ Remotes:
   github::mrcieu/genetics.binaRies
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: false
 RoxygenNote: 7.2.1
