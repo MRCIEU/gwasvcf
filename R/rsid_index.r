@@ -1,6 +1,4 @@
-#' <brief desc>
-#'
-#' <full description>
+#' Create RSID index from VCF
 #'
 #' @param vcf VCF filename
 #' @param indexname index file name to create. Deletes existing file if exists.
