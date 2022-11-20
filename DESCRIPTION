@@ -1,5 +1,5 @@
 Package: gwasvcf
-Title: Tools for dealing with GWAS summary data in VCF format
+Title: Tools for Dealing with GWAS Summary Data in VCF Format
 Version: 0.1.1
 Authors@R: c(
     person("Gibran", "Hemani", , "g.hemani@bristol.ac.uk", role = c("aut", "cre"),
