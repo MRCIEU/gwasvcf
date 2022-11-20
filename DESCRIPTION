@@ -34,13 +34,13 @@ Imports:
     S4Vectors,
     stringr,
     SummarizedExperiment,
-    testthat,
     tidyr,
     utils
 Suggests: 
     knitr,
     markdown,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: 
     knitr
 Remotes:
