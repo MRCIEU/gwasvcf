@@ -16,3 +16,8 @@ inst/extdata/eur.indels
 inst/extdata/eur.log
 inst/extdata/eur.nosex
 tests/testthat/temp.vcf
+
+# Files created by vignettes
+vignettes/index.rsidx
+vignettes/temp.vcf
+vignettes/index.pvali
