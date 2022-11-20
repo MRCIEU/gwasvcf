@@ -10,3 +10,4 @@
 ^\.github$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^Dockerfile$
