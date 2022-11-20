@@ -34,7 +34,7 @@ query_gwas <- function(vcf, chrompos=NULL, rsid=NULL, pval=NULL, id=NULL, rsidx=
 		} 
 		fileflag <- TRUE
 	} else {
-		stopifnot(class(vcf) %in% c("CollapsedVCF", "ExpandedVCF"))
+		stopifnot(inherits(vcf, c("CollapsedVCF", "ExpandedVCF")))
 		fileflag <- FALSE
 	}
 	if(sum(c(!is.null(chrompos), !is.null(rsid), !is.null(pval))) != 1)
@@ -135,7 +135,7 @@ df_to_granges <- function(df)
 parse_chrompos <- function(chrompos, radius=NULL)
 {
 
-	if("GRanges" %in% class(chrompos))
+	if(inherits(chrompos, "GRanges"))
 	{
 		if(!is.null(radius))
 		{
