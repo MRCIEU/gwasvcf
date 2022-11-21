@@ -8,6 +8,9 @@
 create_rsidx_index_from_vcf <- function(vcf, indexname)
 {
 	fn <- tempfile()
+	if (Sys.info()["sysname"] == "Windows") {
+	  stop("Currently, this function only works on macOS and Linux")
+	}
 	cmd <- paste0("gunzip -c ", vcf, " | grep -v '#' | awk '{ print substr($3, 3), $1, $2 }' > ", fn, ".txt")
 	message("Extracting position info")
 	system(cmd)
@@ -69,6 +72,9 @@ create_ldref_sqlite <- function(bfile, dbname, tag_r2=0.6)
 	system(cmd)
 
 	message("formatting")
+	if (Sys.info()["sysname"] == "Windows") {
+	  stop("Currently, this function only works on macOS and Linux")
+	}
 	cmd <- paste0("gunzip -c ", bfile, ".ld.gz | awk 'BEGIN {OFS=\",\"}  { if(NR != 1) { print substr($3, 3), $1, $2, $4, substr($7, 3), $5, $6, $9, $8, $10 }}' > ", bfile, ".ld.tab")
 	system(cmd)
 

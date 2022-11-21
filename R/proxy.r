@@ -46,6 +46,9 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	message("Finding proxies...")
 	system(cmd)
 
+	if (Sys.info()["sysname"] == "Windows") {
+	  stop("Currently, this function only works on macOS and Linux")
+	}
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
 		dplyr::as_tibble() %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
