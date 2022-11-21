@@ -4,8 +4,6 @@ library(gwasvcf)
 fn <- system.file("extdata","data.vcf.gz", package="gwasvcf")
 vcf <- VariantAnnotation::readVcf(fn)
 set_bcftools()
-system("sudo apt update")
-system("sudo apt install sqlite3")
 
 indexname <- tempfile()
 
