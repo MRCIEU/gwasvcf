@@ -60,6 +60,8 @@ suppressWarnings(suppressPackageStartupMessages({
   library(dplyr)
   library(magrittr)
 }))
+```
+```{r eval=Sys.info()["sysname"] != "Windows"}
 set_bcftools()
 ```
 
@@ -185,13 +187,13 @@ Querying by rsid is slow. If a large number of queries by rsid are to be perform
 
 To create the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 create_rsidx_index_from_vcf(vcffile, "index.rsidx")
 ```
 
 To query using the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), rsidx="index.rsidx")
 ```
 
@@ -201,13 +203,13 @@ Querying by p-value is slow. It could be worth generating an index file for p-va
 
 To create the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 create_pval_index_from_vcf(vcffile, maximum_pval=0.05, "index.pvali")
 ```
 
 To query using the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, pval=0.05, pvali="index.pvali")
 ```
 
@@ -265,7 +267,7 @@ The rs4442317 variant is not present in the vcf file, i.e. if we query that vari
 query_gwas(vcffile, rsid="rs4442317") %>% nrow
 ```
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", bfile=ldfile, tag_r2=0.05)
 vcf %>% vcf_to_granges()
 ```
@@ -275,7 +277,7 @@ Here we see that the proxy variant is `r vcf_to_granges(vcf)$PR`.
 You may also extract only the best available proxies even if the requested rsids are present, by using `proxies="only"`. An example of this shows that the effect size estimates for the proxy variants are aligned to the effect alleles of the target variants:
 
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 # Read vcf
 a <- readVcf(vcffile)
 
@@ -306,19 +308,19 @@ set_plink()
 
 Now generate the tagging database
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 dbfile <- tempfile()
 create_ldref_sqlite(ldfile, dbfile, tag_r2 = 0.05)
 ```
 
 Perform the query
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.05)
 vcf %>% vcf_to_granges()
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=Sys.info()["sysname"] != "Windows"}
 unlink(dbfile)
 ```
 
