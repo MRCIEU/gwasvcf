@@ -9,7 +9,8 @@ bfile <- system.file("extdata","eur.bed", package="gwasvcf") %>% gsub(".bed", ""
 set_plink()
 
 test_that("query native", {
-
+  skip_on_os("windows")
+  
 	set_bcftools(NULL)
 	a <- query_gwas(vcffile, rsid="rs4970420")
 	expect_equal(nrow(a), 1)
@@ -39,7 +40,8 @@ test_that("query native", {
 
 
 test_that("query bcftools", {
-
+  skip_on_os("windows")
+  
 	set_bcftools()
 	a <- query_gwas(vcffile, rsid="rs4970420")
 	expect_equal(nrow(a), 1)
@@ -74,6 +76,8 @@ test_that("query bcftools", {
 })
 
 test_that("alignment native", {
+  skip_on_os("windows")
+  
 	set_bcftools(NULL)
 	rsid <- names(SummarizedExperiment::rowRanges(vcf))
 	a <- proxy_match(vcf, rsid, bfile, proxies="only")
@@ -84,6 +88,8 @@ test_that("alignment native", {
 })
 
 test_that("alignment bcftools", {
+  skip_on_os("windows")
+  
 	set_bcftools()
 	rsid <- names(SummarizedExperiment::rowRanges(vcf))
 	a <- proxy_match(vcf, rsid, bfile, proxies="only")
