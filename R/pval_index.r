@@ -29,7 +29,7 @@ create_pval_index_from_vcf <- function(vcffile, maximum_pval, indexname)
         'CREATE INDEX idx_LP ON pval_to_coord (LP)'
     )
     print(cmd)
-    utils::write.table(cmd, file=paste0(fn, ".sql"), row=F, col=F, qu=F)
+    utils::write.table(cmd, file=paste0(fn, ".sql"), row.names = FALSE, col.names = FALSE, quote = FALSE)
 	message("Generating index")
 	cmd <- paste0("sqlite3 ", indexname, " < ", fn, ".sql")
 	unlink(indexname)
