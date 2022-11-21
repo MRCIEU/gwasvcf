@@ -117,6 +117,7 @@ test_that("query_pval_vcf", {
 
 
 test_that("query_rsid_bcftools", {
+  skip_on_os("windows")
 	set_bcftools()
 	v <- query_rsid_bcftools(c("rs3128126", "rs3121561", "rs3813193"), fn)
 	expect_equal(length(v), 3)
@@ -124,6 +125,7 @@ test_that("query_rsid_bcftools", {
 
 
 test_that("query_pval_bcftools", {
+  skip_on_os("windows")
 	set_bcftools()
 	v <- query_pval_bcftools(0.2, fn)
 	expect_true(length(v) < 92)
@@ -132,6 +134,7 @@ test_that("query_pval_bcftools", {
 
 
 test_that("query_chrompos_vcf", {
+  skip_on_os("windows")
 	set_bcftools()
 	v <- query_chrompos_bcftools("1:800000-1000000", fn)
 	expect_equal(length(v), 3)
