@@ -40,6 +40,3 @@ test_that("create vcf", {
 	VariantAnnotation::writeVcf(out, file="temp.vcf")
 	expect_true(file.exists("temp.vcf"))
 })
-
-
-
