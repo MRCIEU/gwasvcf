@@ -1,6 +1,4 @@
-#' <brief desc>
-#'
-#' <full description>
+#' Create RSID index from VCF
 #'
 #' @param vcf VCF filename
 #' @param indexname index file name to create. Deletes existing file if exists.
@@ -10,6 +8,9 @@
 create_rsidx_index_from_vcf <- function(vcf, indexname)
 {
 	fn <- tempfile()
+	if (Sys.info()["sysname"] == "Windows") {
+	  stop("Currently, this function only works on macOS and Linux")
+	}
 	cmd <- paste0("gunzip -c ", vcf, " | grep -v '#' | awk '{ print substr($3, 3), $1, $2 }' > ", fn, ".txt")
 	message("Extracting position info")
 	system(cmd)
@@ -19,7 +20,7 @@ create_rsidx_index_from_vcf <- function(vcf, indexname)
 		'.separator " "',
 		paste0('.import ', fn, '.txt rsid_to_coord')
 	)
-	utils::write.table(cmd, file=paste0(fn, ".sql"), row=F, col=F, qu=F)
+	utils::write.table(cmd, file=paste0(fn, ".sql"), row.names = FALSE, col.names = FALSE, quote = FALSE)
 	message("Generating index")
 	cmd <- paste0("sqlite3 ", indexname, " < ", fn, ".sql")
 	unlink(indexname)
@@ -71,6 +72,9 @@ create_ldref_sqlite <- function(bfile, dbname, tag_r2=0.6)
 	system(cmd)
 
 	message("formatting")
+	if (Sys.info()["sysname"] == "Windows") {
+	  stop("Currently, this function only works on macOS and Linux")
+	}
 	cmd <- paste0("gunzip -c ", bfile, ".ld.gz | awk 'BEGIN {OFS=\",\"}  { if(NR != 1) { print substr($3, 3), $1, $2, $4, substr($7, 3), $5, $6, $9, $8, $10 }}' > ", bfile, ".ld.tab")
 	system(cmd)
 
@@ -93,7 +97,7 @@ create_ldref_sqlite <- function(bfile, dbname, tag_r2=0.6)
 		paste0(".import ", bfile, ".ld.tab tags")
 	)
 	unlink(paste0(bfile, ".ld.sqlite"))
-	utils::write.table(cmd, file=paste0(bfile, ".ld.sqlite"), row=F, col=F, qu=F)
+	utils::write.table(cmd, file=paste0(bfile, ".ld.sqlite"), row.names = FALSE, col.names = FALSE, quote = FALSE)
 	unlink(dbname)
 	cmd <- paste0("sqlite3 ", dbname, " < ", bfile, ".ld.sqlite")
 	system(cmd)
@@ -102,4 +106,3 @@ create_ldref_sqlite <- function(bfile, dbname, tag_r2=0.6)
 	unlink(paste0(bfile, ".ld.sqlite"))
 	# unlink(paste0(bfile, ".indels"))
 }
-

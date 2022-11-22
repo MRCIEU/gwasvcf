@@ -2,7 +2,7 @@
 % Please edit documentation in R/rsid_index.r
 \name{create_rsidx_index_from_vcf}
 \alias{create_rsidx_index_from_vcf}
-\title{<brief desc>}
+\title{Create RSID index from VCF}
 \usage{
 create_rsidx_index_from_vcf(vcf, indexname)
 }
@@ -12,5 +12,5 @@ create_rsidx_index_from_vcf(vcf, indexname)
 \item{indexname}{index file name to create. Deletes existing file if exists.}
 }
 \description{
-<full description>
+Create RSID index from VCF
 }

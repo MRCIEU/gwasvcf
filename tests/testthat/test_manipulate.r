@@ -9,11 +9,13 @@ vcf2 <- VariantAnnotation::readVcf(fn)[40:90,]
 vcf3 <- VariantAnnotation::readVcf(fn)[60:92,]
 vcf4 <- VariantAnnotation::readVcf(fn)[65:92,]
 l <- list(vcf1, vcf2, vcf3, vcf4)
-set_bcftools()
+if (Sys.info()["sysname"] != "Windows") set_bcftools()
 
 # Need to check what happens with multiallelic variants
 
 test_that("vcflist_overlaps", {
+  skip_on_os("windows")
+  
 	o <- vcflist_overlaps(vcflist=list(vcf1, vcf2), chrompos=NULL)
 	expect_true(all(sapply(o, length) == 31) & length(o) == 2)
 
@@ -40,6 +42,3 @@ test_that("create vcf", {
 	VariantAnnotation::writeVcf(out, file="temp.vcf")
 	expect_true(file.exists("temp.vcf"))
 })
-
-
-

@@ -15,7 +15,7 @@ bioc_packages:
   - snpStats
 
 r_github_packages:
-  - explodecomputer/genetics.binaRies
+  - MRCIEU/genetics.binaRies
 
 warnings_are_errors: false
 

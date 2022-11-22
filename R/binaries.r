@@ -58,7 +58,7 @@ check_plink <- function()
 #' Set bcftools binary location
 #'
 #'
-#' @param path If "" (default), then will use the explodecomputer/genetics.binaRies to get binaries that are appropriate for the detected operating system. Otherwise, provide the path to the bcftools binary. If NULL then will set the option to NULL.
+#' @param path If "" (default), then will use the MRCIEU/genetics.binaRies to get binaries that are appropriate for the detected operating system. Otherwise, provide the path to the bcftools binary. If NULL then will set the option to NULL.
 #'
 #' @export
 #' @return NULL, sets option 'tools_bcftools'
@@ -72,10 +72,10 @@ set_bcftools <- function(path="")
 		a <- requireNamespace("genetics.binaRies")
 		if(a)
 		{
-			message("Path not provided, using binaries in the explodecomputer/genetics.binaRies package")
+			message("Path not provided, using binaries in the MRCIEU/genetics.binaRies package")
 			options(tools_bcftools = genetics.binaRies::get_bcftools_binary())
 		} else {
-			stop("Please provide a path to bcftools binary or run devtools::install_github('explodecomputer/genetics.binaRies')")
+			stop("Please provide a path to bcftools binary or run devtools::install_github('MRCIEU/genetics.binaRies')")
 		}
 	} else {
 		options(tools_bcftools = path)
@@ -85,7 +85,7 @@ set_bcftools <- function(path="")
 #' Set plink binary location
 #'
 #'
-#' @param path If "" (default), then will use the explodecomputer/genetics.binaRies to get binaries that are appropriate for the detected operating system. Otherwise, provide the path to the plink binary. If NULL then will set the option to NULL.
+#' @param path If "" (default), then will use the MRCIEU/genetics.binaRies to get binaries that are appropriate for the detected operating system. Otherwise, provide the path to the plink binary. If NULL then will set the option to NULL.
 #'
 #' @export
 #' @return NULL, sets option 'tools_plink'
@@ -99,10 +99,10 @@ set_plink <- function(path="")
 		a <- requireNamespace("genetics.binaRies")
 		if(a)
 		{
-			message("Path not provided, using binaries in the explodecomputer/genetics.binaRies package")
+			message("Path not provided, using binaries in the MRCIEU/genetics.binaRies package")
 			options(tools_plink = genetics.binaRies::get_plink_binary())
 		} else {
-			stop("Please provide a path to plink binary or run devtools::install_github('explodecomputer/genetics.binaRies')")
+			stop("Please provide a path to plink binary or run devtools::install_github('MRCIEU/genetics.binaRies')")
 		}
 	} else {
 		options(tools_plink = path)

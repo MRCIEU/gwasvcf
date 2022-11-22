@@ -23,7 +23,8 @@ All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available
 
 For some VCF querying functions it is faster to optionally use [bcftools](https://samtools.github.io/bcftools/bcftools.html), and when available the R package will use that strategy. To set a location for the bcftools package, use
 
-```
+```r
+library(gwasvcf)
 set_bcftools('/path/to/bcftools')
 ```
 
@@ -31,21 +32,21 @@ Note that there is bcftools binary for Windows available, so some querying optio
 
 For LD related functions the package uses [plink 1.90](https://www.cog-genomics.org/plink/1.9). You can specify the location of your plink installation by running
 
-```
+```r
 set_plink('/path/to/plink')
 ```
 
-Alternatively you can automatically use use the binaries bundled here: https://github.com/explodecomputer/genetics.binaRies 
+Alternatively you can automatically use use the binaries bundled here: https://github.com/mrcieu/genetics.binaRies 
 
-```
-devtools::install_github('explodecomputer/genetics.binaRies')
+```r
+remotes::install_github('mrcieu/genetics.binaRies')
 set_plink()
 set_bcftools()
 ```
 
 To unset a path:
 
-```
+```r
 set_plink(NULL)
 set_bcftools(NULL)
 ```
@@ -59,6 +60,8 @@ suppressWarnings(suppressPackageStartupMessages({
   library(dplyr)
   library(magrittr)
 }))
+```
+```{r eval=Sys.info()["sysname"] != "Windows"}
 set_bcftools()
 ```
 
@@ -184,13 +187,13 @@ Querying by rsid is slow. If a large number of queries by rsid are to be perform
 
 To create the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 create_rsidx_index_from_vcf(vcffile, "index.rsidx")
 ```
 
 To query using the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), rsidx="index.rsidx")
 ```
 
@@ -200,14 +203,14 @@ Querying by p-value is slow. It could be worth generating an index file for p-va
 
 To create the index:
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 create_pval_index_from_vcf(vcffile, maximum_pval=0.05, "index.pvali")
 ```
 
 To query using the index:
 
-```{r}
-vcf <- query_gwas(vcffile, pval=0.05, indexname="index.pvali")
+```{r eval=Sys.info()["sysname"] != "Windows"}
+vcf <- query_gwas(vcffile, pval=0.05, pvali="index.pvali")
 ```
 
 ## A note about chrompos
@@ -264,7 +267,7 @@ The rs4442317 variant is not present in the vcf file, i.e. if we query that vari
 query_gwas(vcffile, rsid="rs4442317") %>% nrow
 ```
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", bfile=ldfile, tag_r2=0.05)
 vcf %>% vcf_to_granges()
 ```
@@ -274,7 +277,7 @@ Here we see that the proxy variant is `r vcf_to_granges(vcf)$PR`.
 You may also extract only the best available proxies even if the requested rsids are present, by using `proxies="only"`. An example of this shows that the effect size estimates for the proxy variants are aligned to the effect alleles of the target variants:
 
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 # Read vcf
 a <- readVcf(vcffile)
 
@@ -305,19 +308,19 @@ set_plink()
 
 Now generate the tagging database
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 dbfile <- tempfile()
 create_ldref_sqlite(ldfile, dbfile, tag_r2 = 0.05)
 ```
 
 Perform the query
 
-```{r}
+```{r eval=Sys.info()["sysname"] != "Windows"}
 vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.05)
 vcf %>% vcf_to_granges()
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=Sys.info()["sysname"] != "Windows"}
 unlink(dbfile)
 ```
 
@@ -339,4 +342,3 @@ writeVcf(out, file="temp.vcf")
 ```
 
 You may want to first harmonise the data so that all the non-effect alleles are aligned to the human genome reference. See the [gwasglue](https://github.com/MRCIEU/gwasglue) package on some functions to do this. 
-

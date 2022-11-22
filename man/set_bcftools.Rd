@@ -7,7 +7,7 @@
 set_bcftools(path = "")
 }
 \arguments{
-\item{path}{If "" (default), then will use the explodecomputer/genetics.binaRies to get binaries that are appropriate for the detected operating system. Otherwise, provide the path to the bcftools binary. If NULL then will set the option to NULL.}
+\item{path}{If "" (default), then will use the MRCIEU/genetics.binaRies to get binaries that are appropriate for the detected operating system. Otherwise, provide the path to the bcftools binary. If NULL then will set the option to NULL.}
 }
 \value{
 NULL, sets option 'tools_bcftools'

@@ -20,12 +20,12 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	searchspacename <- paste0(out, ".searchspace")
 	targetsname <- paste0(out, ".targets")
 	outname <- paste0(out, ".targets.ld.gz")
-	utils::write.table(rsid, file=targetsname, row=FALSE, col=FALSE, qu=FALSE)
+	utils::write.table(rsid, file=targetsname, row.names = FALSE, col.names = FALSE, quote = FALSE)
 	if(!is.null(searchspace))
 	{
 		stopifnot(is.character(searchspace))
 
-		utils::write.table(unique(c(rsid, searchspace)), file=searchspacename, row=F, col=F, qu=F)
+		utils::write.table(unique(c(rsid, searchspace)), file=searchspacename, row.names = FALSE, col.names = FALSE, quote = FALSE)
 		extract_param <- paste0(" --extract ", searchspacename)
 	} else {
 		extract_param <- " " 
@@ -46,6 +46,9 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	message("Finding proxies...")
 	system(cmd)
 
+	if (Sys.info()["sysname"] == "Windows") {
+	  stop("Currently, this function only works on macOS and Linux")
+	}
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
 		dplyr::as_tibble() %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
@@ -265,4 +268,3 @@ proxy_match <- function(vcf, rsid, bfile=NULL, proxies="yes", tag_kb=5000, tag_n
 		return(BiocGenerics::rbind(o, prox))
 	}
 }
-

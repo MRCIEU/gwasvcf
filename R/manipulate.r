@@ -113,14 +113,13 @@ merge_vcf <- function(a, b)
 	VariantAnnotation::geno(ab) <- temp
 
 	h <- VariantAnnotation::header(a)
-	VCFHeader(
+	out <- VCFHeader(
 		reference = VariantAnnotation::reference(h),
 		samples = c(VariantAnnotation::samples(h), VariantAnnotation::samples(VariantAnnotation::header(b))),
 		meta = VariantAnnotation::meta(h)
 	)
-	VariantAnnotation::samples(h) <- c(VariantAnnotation::samples(h), VariantAnnotation::samples(VariantAnnotation::header(b)))
 
-	return(S4Vectors::SimpleList())
+	return(S4Vectors::SimpleList(out))
 }
 
 
@@ -137,7 +136,7 @@ merge_vcf <- function(a, b)
 #' @return GRanges object
 vcf_to_granges <- function(vcf, id=NULL)
 {
-	stopifnot(class(vcf) %in% c("ExpandedVCF", "CollapsedVCF"))
+	stopifnot(inherits(vcf, c("ExpandedVCF", "CollapsedVCF")))
 	if(length(vcf) == 0)
 	{
 		message("VCF has length 0")
@@ -217,7 +216,7 @@ vcflist_overlaps <- function(vcflist, chrompos)
 		vcflist <- lapply(1:length(vcflist), function(i)
 		{
 			x <- vcflist[[i]]
-			if(class(x) %in% c("CollapsedVCF", "ExpandedVCF"))
+			if(inherits(x, c("CollapsedVCF", "ExpandedVCF")))
 			{
 				if(is.null(chrompos))
 				{
@@ -226,7 +225,7 @@ vcflist_overlaps <- function(vcflist, chrompos)
 					return(query_gwas(x, chrompos))
 				}
 			}
-			if(class(x) == "character")
+			if(is.character(x))
 			{
 				if(is.null(chrompos))
 				{
