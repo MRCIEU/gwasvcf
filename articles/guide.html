@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gwasvcf</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -61,7 +57,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/mrcieu/gwasvcf/">
+  <a href="https://github.com/mrcieu/gwasvcf/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -76,519 +72,623 @@
 
       
 
-      </header><script src="guide_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Reading, querying and writing GWAS summary data in VCF format</h1>
+      <h1 data-toc-skip>Reading, querying and writing GWAS summary data
+in VCF format</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/mrcieu/gwasvcf/blob/master/vignettes/guide.Rmd"><code>vignettes/guide.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mrcieu/gwasvcf/blob/HEAD/vignettes/guide.Rmd" class="external-link"><code>vignettes/guide.Rmd</code></a></small>
       <div class="hidden name"><code>guide.Rmd</code></div>
 
     </div>
 
     
     
-<p>We developed a format for storing and harmonising GWAS summary data known as <a href="https://github.com/MRCIEU/gwas_vcf_spec">GWAS VCF format</a>. This format is effective for being very fast when querying chromosome and position ranges, handling multiallelic variants and indels.</p>
-<p>All the data in the <a href="https://gwas.mrcieu.ac.uk/">IEU GWAS database</a> is available for download in the GWAS VCF format. This R package provides fast and convenient functions for querying and creating GWAS summary data in GWAS VCF format. The package builds on the <a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html">VariantAnnotation</a> Bioconductor package, which itself is based on the widely used <a href="https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html">SummarizedExperiment</a> Bioconductor package.</p>
-<div id="external-tools" class="section level2">
-<h2 class="hasAnchor">
-<a href="#external-tools" class="anchor"></a>External tools</h2>
-<p>For some VCF querying functions it is faster to optionally use <a href="https://samtools.github.io/bcftools/bcftools.html">bcftools</a>, and when available the R package will use that strategy. To set a location for the bcftools package, use</p>
-<pre><code><a href="../reference/set_bcftools.html">set_bcftools('/path/to/bcftools')</a></code></pre>
-<p>Note that there is bcftools binary for Windows available, so some querying options will be slower on Windows.</p>
-<p>For LD related functions the package uses <a href="https://www.cog-genomics.org/plink/1.9">plink 1.90</a>. You can specify the location of your plink installation by running</p>
-<pre><code><a href="../reference/set_plink.html">set_plink('/path/to/plink')</a></code></pre>
-<p>Alternatively you can automatically use use the binaries bundled here: <a href="https://github.com/explodecomputer/genetics.binaRies" class="uri">https://github.com/explodecomputer/genetics.binaRies</a></p>
-<pre><code>devtools::install_github('explodecomputer/genetics.binaRies')
-set_plink()
-set_bcftools()</code></pre>
+<p>We developed a format for storing and harmonising GWAS summary data
+known as <a href="https://github.com/MRCIEU/gwas_vcf_spec" class="external-link">GWAS VCF
+format</a>. This format is effective for being very fast when querying
+chromosome and position ranges, handling multiallelic variants and
+indels.</p>
+<p>All the data in the <a href="https://gwas.mrcieu.ac.uk/" class="external-link">IEU GWAS
+database</a> is available for download in the GWAS VCF format. This R
+package provides fast and convenient functions for querying and creating
+GWAS summary data in GWAS VCF format. The package builds on the <a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html" class="external-link">VariantAnnotation</a>
+Bioconductor package, which itself is based on the widely used <a href="https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html" class="external-link">SummarizedExperiment</a>
+Bioconductor package.</p>
+<div class="section level2">
+<h2 id="external-tools">External tools<a class="anchor" aria-label="anchor" href="#external-tools"></a>
+</h2>
+<p>For some VCF querying functions it is faster to optionally use <a href="https://samtools.github.io/bcftools/bcftools.html" class="external-link">bcftools</a>,
+and when available the R package will use that strategy. To set a
+location for the bcftools package, use</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrcieu/gwasvcf" class="external-link">gwasvcf</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/set_bcftools.html">set_bcftools</a></span><span class="op">(</span><span class="st">'/path/to/bcftools'</span><span class="op">)</span></span></code></pre></div>
+<p>Note that there is bcftools binary for Windows available, so some
+querying options will be slower on Windows.</p>
+<p>For LD related functions the package uses <a href="https://www.cog-genomics.org/plink/1.9" class="external-link">plink 1.90</a>. You can
+specify the location of your plink installation by running</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="st">'/path/to/plink'</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively you can automatically use use the binaries bundled
+here: <a href="https://github.com/mrcieu/genetics.binaRies" class="external-link uri">https://github.com/mrcieu/genetics.binaRies</a></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'mrcieu/genetics.binaRies'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/set_bcftools.html">set_bcftools</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>To unset a path:</p>
-<pre><code><a href="../reference/set_plink.html">set_plink(NULL)
-set_bcftools(NULL)</a></code></pre>
-<p>For this vignette we will use the bundled binaries in <code>genetics.binaRies</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/set_bcftools.html">set_bcftools</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<p>For this vignette we will use the bundled binaries in
+<code>genetics.binaRies</code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrcieu/gwasvcf">gwasvcf</a></span><span class="op">)</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">VariantAnnotation</span><span class="op">)</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/set_bcftools.html">set_bcftools</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Loading required namespace: genetics.binaRies</span>
-<span class="co">#&gt; Path not provided, using binaries in the explodecomputer/genetics.binaRies package</span></code></pre></div>
-</div>
-<div id="reading-in-everything" class="section level2">
-<h2 class="hasAnchor">
-<a href="#reading-in-everything" class="anchor"></a>Reading in everything</h2>
-<p>To read an entire dataset use the <code>readVcf</code> function. As an example we’ll use the bundled data which is a small subset of the Speliotes et al 2010 BMI GWAS.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrcieu/gwasvcf" class="external-link">gwasvcf</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">VariantAnnotation</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcffile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"data.vcf.gz"</span>, package<span class="op">=</span><span class="st">"gwasvcf"</span><span class="op">)</span>
-<span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span>
-<span class="co">#&gt; [1] "CollapsedVCF"</span>
-<span class="co">#&gt; attr(,"package")</span>
-<span class="co">#&gt; [1] "VariantAnnotation"</span></code></pre></div>
-<p>Please refer to the <code>VariantAnnotation</code> package documentation for full details about the <code>CollapsedVCF</code> object. A brief summary follows.</p>
-<p>General info about the dataset can be obtained by calling it:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_bcftools.html">set_bcftools</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required namespace: genetics.binaRies</span></span>
+<span><span class="co">#&gt; Path not provided, using binaries in the MRCIEU/genetics.binaRies package</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="reading-in-everything">Reading in everything<a class="anchor" aria-label="anchor" href="#reading-in-everything"></a>
+</h2>
+<p>To read an entire dataset use the <code>readVcf</code> function. As
+an example we’ll use the bundled data which is a small subset of the
+Speliotes et al 2010 BMI GWAS.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span>
-<span class="co">#&gt; class: CollapsedVCF </span>
-<span class="co">#&gt; dim: 92 1 </span>
-<span class="co">#&gt; rowRanges(vcf):</span>
-<span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span>
-<span class="co">#&gt; info(vcf):</span>
-<span class="co">#&gt;   DataFrame with 1 column: AF</span>
-<span class="co">#&gt; info(header(vcf)):</span>
-<span class="co">#&gt;       Number Type  Description     </span>
-<span class="co">#&gt;    AF A      Float Allele Frequency</span>
-<span class="co">#&gt; geno(vcf):</span>
-<span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span>
-<span class="co">#&gt; geno(header(vcf)):</span>
-<span class="co">#&gt;       Number Type   Description                                                </span>
-<span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span>
-<span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span>
-<span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span>
-<span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span>
-<span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span>
-<span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span>
-<span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span>
-<span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span>
-<span class="co">#&gt;    ID 1      String Study variant identifier</span></code></pre></div>
-<p>There are 92 rows and 1 column which means 92 SNPs and one GWAS. See the header information:</p>
+<code class="sourceCode R"><span><span class="va">vcffile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"data.vcf.gz"</span>, package<span class="op">=</span><span class="st">"gwasvcf"</span><span class="op">)</span></span>
+<span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "CollapsedVCF"</span></span>
+<span><span class="co">#&gt; attr(,"package")</span></span>
+<span><span class="co">#&gt; [1] "VariantAnnotation"</span></span></code></pre></div>
+<p>Please refer to the <code>VariantAnnotation</code> package
+documentation for full details about the <code>CollapsedVCF</code>
+object. A brief summary follows.</p>
+<p>General info about the dataset can be obtained by calling it:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span>
-<span class="co">#&gt; class: VCFHeader </span>
-<span class="co">#&gt; samples(1): IEU-a-2</span>
-<span class="co">#&gt; meta(4): fileformat META SAMPLE contig</span>
-<span class="co">#&gt; fixed(1): FILTER</span>
-<span class="co">#&gt; info(1): AF</span>
-<span class="co">#&gt; geno(9): ES SE ... NC ID</span></code></pre></div>
-<p>See the names of the GWAS datasets (in this case just one, and it refers to the IEU GWAS database ID name):</p>
+<code class="sourceCode R"><span><span class="va">vcf</span></span>
+<span><span class="co">#&gt; class: CollapsedVCF </span></span>
+<span><span class="co">#&gt; dim: 92 1 </span></span>
+<span><span class="co">#&gt; rowRanges(vcf):</span></span>
+<span><span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span></span>
+<span><span class="co">#&gt; info(vcf):</span></span>
+<span><span class="co">#&gt;   DataFrame with 1 column: AF</span></span>
+<span><span class="co">#&gt; info(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type  Description     </span></span>
+<span><span class="co">#&gt;    AF A      Float Allele Frequency</span></span>
+<span><span class="co">#&gt; geno(vcf):</span></span>
+<span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
+<span><span class="co">#&gt; geno(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
+<p>There are 92 rows and 1 column which means 92 SNPs and one GWAS. See
+the header information:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html">samples</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] "IEU-a-2"</span></code></pre></div>
-<p>In this case you can obtain information about this study through the <code>ieugwasr</code> package e.g. <code>ieugwasr::gwasinfo("IEU-a-2")</code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html" class="external-link">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; class: VCFHeader </span></span>
+<span><span class="co">#&gt; samples(1): IEU-a-2</span></span>
+<span><span class="co">#&gt; meta(4): fileformat META SAMPLE contig</span></span>
+<span><span class="co">#&gt; fixed(1): FILTER</span></span>
+<span><span class="co">#&gt; info(1): AF</span></span>
+<span><span class="co">#&gt; geno(9): ES SE ... NC ID</span></span></code></pre></div>
+<p>See the names of the GWAS datasets (in this case just one, and it
+refers to the IEU GWAS database ID name):</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Biobase/man/class.MIAME.html" class="external-link">samples</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCFHeader-class.html" class="external-link">header</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "IEU-a-2"</span></span></code></pre></div>
+<p>In this case you can obtain information about this study through the
+<code>ieugwasr</code> package
+e.g. <code>ieugwasr::gwasinfo("IEU-a-2")</code>.</p>
 <p>There are a few components within the object:</p>
 <ul>
 <li>
-<code>header</code> which has the meta data describing the dataset, including the association result variables</li>
+<code>header</code> which has the meta data describing the dataset,
+including the association result variables</li>
 <li>
 <code>rowRanges</code> which is information about each variant</li>
 <li>
 <code>info</code> which is further metadata about each variant</li>
 <li>
-<code>geno</code> which is the actual association results for each GWAS</li>
+<code>geno</code> which is the actual association results for each
+GWAS</li>
 </ul>
-<p>the <code>rowRanges</code> object is a <code>GenomicRanges</code> class, which is useful for performing fast operations on chromosome position information.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">rowRanges</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span>
-<span class="co">#&gt; GRanges object with 92 ranges and 5 metadata columns:</span>
-<span class="co">#&gt;              seqnames    ranges strand | paramRangeID            REF</span>
-<span class="co">#&gt;                 &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;</span>
-<span class="co">#&gt;   rs12565286        1    721290      * |           NA              G</span>
-<span class="co">#&gt;   rs11804171        1    723819      * |           NA              T</span>
-<span class="co">#&gt;    rs2977670        1    723891      * |           NA              G</span>
-<span class="co">#&gt;    rs3094315        1    752566      * |           NA              G</span>
-<span class="co">#&gt;    rs2073813        1    753541      * |           NA              G</span>
-<span class="co">#&gt;          ...      ...       ...    ... .          ...            ...</span>
-<span class="co">#&gt;     rs715643        1   1172907      * |           NA              C</span>
-<span class="co">#&gt;    rs6675798        1   1176597      * |           NA              T</span>
-<span class="co">#&gt;    rs6603783        1   1181751      * |           NA              T</span>
-<span class="co">#&gt;    rs6603785        1   1186502      * |           NA              A</span>
-<span class="co">#&gt;    rs6603787        1   1188225      * |           NA              G</span>
-<span class="co">#&gt;                             ALT      QUAL      FILTER</span>
-<span class="co">#&gt;              &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;</span>
-<span class="co">#&gt;   rs12565286                  C        NA        PASS</span>
-<span class="co">#&gt;   rs11804171                  A        NA        PASS</span>
-<span class="co">#&gt;    rs2977670                  C        NA        PASS</span>
-<span class="co">#&gt;    rs3094315                  A        NA        PASS</span>
-<span class="co">#&gt;    rs2073813                  A        NA        PASS</span>
-<span class="co">#&gt;          ...                ...       ...         ...</span>
-<span class="co">#&gt;     rs715643                  T        NA        PASS</span>
-<span class="co">#&gt;    rs6675798                  C        NA        PASS</span>
-<span class="co">#&gt;    rs6603783                  C        NA        PASS</span>
-<span class="co">#&gt;    rs6603785                  T        NA        PASS</span>
-<span class="co">#&gt;    rs6603787                  T        NA        PASS</span>
-<span class="co">#&gt;   -------</span>
-<span class="co">#&gt;   seqinfo: 84 sequences from GRCh37 genome</span></code></pre></div>
-</div>
-<div id="converting-to-simple-dataframes" class="section level2">
-<h2 class="hasAnchor">
-<a href="#converting-to-simple-dataframes" class="anchor"></a>Converting to simple dataframes</h2>
-<p>The VCF object is somewhat complex and you can read more about it in the ’VariantAnnotation package documentation](<a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html" class="uri">https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html</a>). You can create various other formats that might be easier to use from it. For example, create a <code>GRanges</code> object which is great for fast chromosome-position operations</p>
+<p>the <code>rowRanges</code> object is a <code>GenomicRanges</code>
+class, which is useful for performing fast operations on chromosome
+position information.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span>
-<span class="co">#&gt; GRanges object with 92 ranges and 15 metadata columns:</span>
-<span class="co">#&gt;              seqnames    ranges strand | paramRangeID         REF         ALT</span>
-<span class="co">#&gt;                 &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;character&gt; &lt;character&gt;</span>
-<span class="co">#&gt;   rs12565286        1    721290      * |           NA           G           C</span>
-<span class="co">#&gt;   rs11804171        1    723819      * |           NA           T           A</span>
-<span class="co">#&gt;    rs2977670        1    723891      * |           NA           G           C</span>
-<span class="co">#&gt;    rs3094315        1    752566      * |           NA           G           A</span>
-<span class="co">#&gt;    rs2073813        1    753541      * |           NA           G           A</span>
-<span class="co">#&gt;          ...      ...       ...    ... .          ...         ...         ...</span>
-<span class="co">#&gt;     rs715643        1   1172907      * |           NA           C           T</span>
-<span class="co">#&gt;    rs6675798        1   1176597      * |           NA           T           C</span>
-<span class="co">#&gt;    rs6603783        1   1181751      * |           NA           T           C</span>
-<span class="co">#&gt;    rs6603785        1   1186502      * |           NA           A           T</span>
-<span class="co">#&gt;    rs6603787        1   1188225      * |           NA           G           T</span>
-<span class="co">#&gt;                   QUAL      FILTER        ES        SE        LP        AF</span>
-<span class="co">#&gt;              &lt;numeric&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span>
-<span class="co">#&gt;   rs12565286        NA        PASS   -0.0067    0.0145 0.1930060   0.93220</span>
-<span class="co">#&gt;   rs11804171        NA        PASS   -0.0146    0.0175 0.3935110   0.96296</span>
-<span class="co">#&gt;    rs2977670        NA        PASS    0.0044    0.0184 0.0909791   0.07143</span>
-<span class="co">#&gt;    rs3094315        NA        PASS    0.0060    0.0065 0.4485500   0.15520</span>
-<span class="co">#&gt;    rs2073813        NA        PASS    0.0035    0.0102 0.1357860        NA</span>
-<span class="co">#&gt;          ...       ...         ...       ...       ...       ...       ...</span>
-<span class="co">#&gt;     rs715643        NA        PASS    0.0019    0.0118 0.0594337   0.90833</span>
-<span class="co">#&gt;    rs6675798        NA        PASS   -0.0013    0.0067 0.0725270   0.89170</span>
-<span class="co">#&gt;    rs6603783        NA        PASS   -0.0002    0.0069 0.0101499   0.90000</span>
-<span class="co">#&gt;    rs6603785        NA        PASS    0.0075    0.0104 0.3271640   0.91667</span>
-<span class="co">#&gt;    rs6603787        NA        PASS    0.0025    0.0089 0.1085740        NA</span>
-<span class="co">#&gt;                     SS        EZ        SI        NC          ID          id</span>
-<span class="co">#&gt;              &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt;</span>
-<span class="co">#&gt;   rs12565286  109823.0        NA        NA        NA  rs12565286     IEU-a-2</span>
-<span class="co">#&gt;   rs11804171   84828.0        NA        NA        NA  rs11804171     IEU-a-2</span>
-<span class="co">#&gt;    rs2977670   68458.9        NA        NA        NA   rs2977670     IEU-a-2</span>
-<span class="co">#&gt;    rs3094315  131544.0        NA        NA        NA   rs3094315     IEU-a-2</span>
-<span class="co">#&gt;    rs2073813   64351.3        NA        NA        NA   rs2073813     IEU-a-2</span>
-<span class="co">#&gt;          ...       ...       ...       ...       ...         ...         ...</span>
-<span class="co">#&gt;     rs715643    121822        NA        NA        NA    rs715643     IEU-a-2</span>
-<span class="co">#&gt;    rs6675798    223475        NA        NA        NA   rs6675798     IEU-a-2</span>
-<span class="co">#&gt;    rs6603783    220022        NA        NA        NA   rs6603783     IEU-a-2</span>
-<span class="co">#&gt;    rs6603785    165964        NA        NA        NA   rs6603785     IEU-a-2</span>
-<span class="co">#&gt;    rs6603787    199099        NA        NA        NA   rs6603787     IEU-a-2</span>
-<span class="co">#&gt;   -------</span>
-<span class="co">#&gt;   seqinfo: 84 sequences from GRCh37 genome</span></code></pre></div>
-<p>Create a data frame:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/MatrixGenerics/man/rowRanges.html" class="external-link">rowRanges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; GRanges object with 92 ranges and 5 metadata columns:</span></span>
+<span><span class="co">#&gt;              seqnames    ranges strand | paramRangeID            REF</span></span>
+<span><span class="co">#&gt;                 &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286        1    721290      * |           NA              G</span></span>
+<span><span class="co">#&gt;   rs11804171        1    723819      * |           NA              T</span></span>
+<span><span class="co">#&gt;    rs2977670        1    723891      * |           NA              G</span></span>
+<span><span class="co">#&gt;    rs3094315        1    752566      * |           NA              G</span></span>
+<span><span class="co">#&gt;    rs2073813        1    753541      * |           NA              G</span></span>
+<span><span class="co">#&gt;          ...      ...       ...    ... .          ...            ...</span></span>
+<span><span class="co">#&gt;     rs715643        1   1172907      * |           NA              C</span></span>
+<span><span class="co">#&gt;    rs6675798        1   1176597      * |           NA              T</span></span>
+<span><span class="co">#&gt;    rs6603783        1   1181751      * |           NA              T</span></span>
+<span><span class="co">#&gt;    rs6603785        1   1186502      * |           NA              A</span></span>
+<span><span class="co">#&gt;    rs6603787        1   1188225      * |           NA              G</span></span>
+<span><span class="co">#&gt;                             ALT      QUAL      FILTER</span></span>
+<span><span class="co">#&gt;              &lt;DNAStringSetList&gt; &lt;numeric&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286                  C        NA        PASS</span></span>
+<span><span class="co">#&gt;   rs11804171                  A        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs2977670                  C        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs3094315                  A        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs2073813                  A        NA        PASS</span></span>
+<span><span class="co">#&gt;          ...                ...       ...         ...</span></span>
+<span><span class="co">#&gt;     rs715643                  T        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs6675798                  C        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs6603783                  C        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs6603785                  T        NA        PASS</span></span>
+<span><span class="co">#&gt;    rs6603787                  T        NA        PASS</span></span>
+<span><span class="co">#&gt;   -------</span></span>
+<span><span class="co">#&gt;   seqinfo: 84 sequences from GRCh37 genome</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="converting-to-simple-dataframes">Converting to simple dataframes<a class="anchor" aria-label="anchor" href="#converting-to-simple-dataframes"></a>
+</h2>
+<p>The VCF object is somewhat complex and you can read more about it in
+the ’VariantAnnotation package documentation](<a href="https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html" class="external-link uri">https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html</a>).
+You can create various other formats that might be easier to use from
+it. For example, create a <code>GRanges</code> object which is great for
+fast chromosome-position operations</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 92 x 20</span>
-<span class="co">#&gt;    seqnames  start    end width strand paramRangeID REF   ALT    QUAL FILTER</span>
-<span class="co">#&gt;    &lt;fct&gt;     &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;        &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; </span>
-<span class="co">#&gt;  1 1        721290 721290     1 *      &lt;NA&gt;         G     C        NA PASS  </span>
-<span class="co">#&gt;  2 1        723819 723819     1 *      &lt;NA&gt;         T     A        NA PASS  </span>
-<span class="co">#&gt;  3 1        723891 723891     1 *      &lt;NA&gt;         G     C        NA PASS  </span>
-<span class="co">#&gt;  4 1        752566 752566     1 *      &lt;NA&gt;         G     A        NA PASS  </span>
-<span class="co">#&gt;  5 1        753541 753541     1 *      &lt;NA&gt;         G     A        NA PASS  </span>
-<span class="co">#&gt;  6 1        754192 754192     1 *      &lt;NA&gt;         A     G        NA PASS  </span>
-<span class="co">#&gt;  7 1        768448 768448     1 *      &lt;NA&gt;         G     A        NA PASS  </span>
-<span class="co">#&gt;  8 1        775659 775659     1 *      &lt;NA&gt;         A     G        NA PASS  </span>
-<span class="co">#&gt;  9 1        777122 777122     1 *      &lt;NA&gt;         A     T        NA PASS  </span>
-<span class="co">#&gt; 10 1        779322 779322     1 *      &lt;NA&gt;         A     G        NA PASS  </span>
-<span class="co">#&gt; # … with 82 more rows, and 10 more variables: ES &lt;dbl&gt;, SE &lt;dbl&gt;, LP &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   AF &lt;dbl&gt;, SS &lt;dbl&gt;, EZ &lt;dbl&gt;, SI &lt;dbl&gt;, NC &lt;dbl&gt;, ID &lt;chr&gt;, id &lt;chr&gt;</span></code></pre></div>
-<p>The direct conversion to formats for tools such as TwoSampleMR, coloc, and many others can also be made using the <a href="https://github.com/mrcieu/gwasglue">https://github.com/mrcieu/gwasglue</a> R package.</p>
-</div>
-<div id="reading-in-with-filters" class="section level2">
-<h2 class="hasAnchor">
-<a href="#reading-in-with-filters" class="anchor"></a>Reading in with filters</h2>
-<p>The <code>query_gwas</code> function takes either a filename to a vcf file, or vcf object as the main argument. You can then query on <code>rsid</code>, <code>pval</code> or <code>chrompos</code>. For example</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<span><span class="co">#&gt; GRanges object with 92 ranges and 15 metadata columns:</span></span>
+<span><span class="co">#&gt;              seqnames    ranges strand | paramRangeID         REF         ALT</span></span>
+<span><span class="co">#&gt;                 &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286        1    721290      * |           NA           G           C</span></span>
+<span><span class="co">#&gt;   rs11804171        1    723819      * |           NA           T           A</span></span>
+<span><span class="co">#&gt;    rs2977670        1    723891      * |           NA           G           C</span></span>
+<span><span class="co">#&gt;    rs3094315        1    752566      * |           NA           G           A</span></span>
+<span><span class="co">#&gt;    rs2073813        1    753541      * |           NA           G           A</span></span>
+<span><span class="co">#&gt;          ...      ...       ...    ... .          ...         ...         ...</span></span>
+<span><span class="co">#&gt;     rs715643        1   1172907      * |           NA           C           T</span></span>
+<span><span class="co">#&gt;    rs6675798        1   1176597      * |           NA           T           C</span></span>
+<span><span class="co">#&gt;    rs6603783        1   1181751      * |           NA           T           C</span></span>
+<span><span class="co">#&gt;    rs6603785        1   1186502      * |           NA           A           T</span></span>
+<span><span class="co">#&gt;    rs6603787        1   1188225      * |           NA           G           T</span></span>
+<span><span class="co">#&gt;                   QUAL      FILTER        ES        SE        LP        AF</span></span>
+<span><span class="co">#&gt;              &lt;numeric&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286        NA        PASS   -0.0067    0.0145 0.1930060   0.93220</span></span>
+<span><span class="co">#&gt;   rs11804171        NA        PASS   -0.0146    0.0175 0.3935110   0.96296</span></span>
+<span><span class="co">#&gt;    rs2977670        NA        PASS    0.0044    0.0184 0.0909791   0.07143</span></span>
+<span><span class="co">#&gt;    rs3094315        NA        PASS    0.0060    0.0065 0.4485500   0.15520</span></span>
+<span><span class="co">#&gt;    rs2073813        NA        PASS    0.0035    0.0102 0.1357860        NA</span></span>
+<span><span class="co">#&gt;          ...       ...         ...       ...       ...       ...       ...</span></span>
+<span><span class="co">#&gt;     rs715643        NA        PASS    0.0019    0.0118 0.0594337   0.90833</span></span>
+<span><span class="co">#&gt;    rs6675798        NA        PASS   -0.0013    0.0067 0.0725270   0.89170</span></span>
+<span><span class="co">#&gt;    rs6603783        NA        PASS   -0.0002    0.0069 0.0101499   0.90000</span></span>
+<span><span class="co">#&gt;    rs6603785        NA        PASS    0.0075    0.0104 0.3271640   0.91667</span></span>
+<span><span class="co">#&gt;    rs6603787        NA        PASS    0.0025    0.0089 0.1085740        NA</span></span>
+<span><span class="co">#&gt;                     SS        EZ        SI        NC          ID          id</span></span>
+<span><span class="co">#&gt;              &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286  109823.0        NA        NA        NA  rs12565286     IEU-a-2</span></span>
+<span><span class="co">#&gt;   rs11804171   84828.0        NA        NA        NA  rs11804171     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs2977670   68458.9        NA        NA        NA   rs2977670     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs3094315  131544.0        NA        NA        NA   rs3094315     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs2073813   64351.3        NA        NA        NA   rs2073813     IEU-a-2</span></span>
+<span><span class="co">#&gt;          ...       ...       ...       ...       ...         ...         ...</span></span>
+<span><span class="co">#&gt;     rs715643    121822        NA        NA        NA    rs715643     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6675798    223475        NA        NA        NA   rs6675798     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6603783    220022        NA        NA        NA   rs6603783     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6603785    165964        NA        NA        NA   rs6603785     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6603787    199099        NA        NA        NA   rs6603787     IEU-a-2</span></span>
+<span><span class="co">#&gt;   -------</span></span>
+<span><span class="co">#&gt;   seqinfo: 84 sequences from GRCh37 genome</span></span></code></pre></div>
+<p>Create a data frame:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcfsubset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>and</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 92 × 20</span></span></span>
+<span><span class="co">#&gt;    seqnames  start    end width strand paramR…¹ REF   ALT    QUAL FILTER      ES</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1        <span style="text-decoration: underline;">721</span>290 <span style="text-decoration: underline;">721</span>290     1 *      <span style="color: #BB0000;">NA</span>       G     C        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1        <span style="text-decoration: underline;">723</span>819 <span style="text-decoration: underline;">723</span>819     1 *      <span style="color: #BB0000;">NA</span>       T     A        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1        <span style="text-decoration: underline;">723</span>891 <span style="text-decoration: underline;">723</span>891     1 *      <span style="color: #BB0000;">NA</span>       G     C        <span style="color: #BB0000;">NA</span> PASS    0.004<span style="text-decoration: underline;">4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1        <span style="text-decoration: underline;">752</span>566 <span style="text-decoration: underline;">752</span>566     1 *      <span style="color: #BB0000;">NA</span>       G     A        <span style="color: #BB0000;">NA</span> PASS    0.006 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1        <span style="text-decoration: underline;">753</span>541 <span style="text-decoration: underline;">753</span>541     1 *      <span style="color: #BB0000;">NA</span>       G     A        <span style="color: #BB0000;">NA</span> PASS    0.003<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1        <span style="text-decoration: underline;">754</span>192 <span style="text-decoration: underline;">754</span>192     1 *      <span style="color: #BB0000;">NA</span>       A     G        <span style="color: #BB0000;">NA</span> PASS    0.007<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1        <span style="text-decoration: underline;">768</span>448 <span style="text-decoration: underline;">768</span>448     1 *      <span style="color: #BB0000;">NA</span>       G     A        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1        <span style="text-decoration: underline;">775</span>659 <span style="text-decoration: underline;">775</span>659     1 *      <span style="color: #BB0000;">NA</span>       A     G        <span style="color: #BB0000;">NA</span> PASS    0.002<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1        <span style="text-decoration: underline;">777</span>122 <span style="text-decoration: underline;">777</span>122     1 *      <span style="color: #BB0000;">NA</span>       A     T        <span style="color: #BB0000;">NA</span> PASS    0.003<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1        <span style="text-decoration: underline;">779</span>322 <span style="text-decoration: underline;">779</span>322     1 *      <span style="color: #BB0000;">NA</span>       A     G        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 82 more rows, 9 more variables: SE &lt;dbl&gt;, LP &lt;dbl&gt;, AF &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   SS &lt;dbl&gt;, EZ &lt;dbl&gt;, SI &lt;dbl&gt;, NC &lt;dbl&gt;, ID &lt;chr&gt;, id &lt;chr&gt;, and abbreviated</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   variable name ¹​paramRangeID</span></span></span></code></pre></div>
+<p>The direct conversion to formats for tools such as TwoSampleMR,
+coloc, and many others can also be made using the <a href="https://github.com/mrcieu/gwasglue" class="external-link">https://github.com/mrcieu/gwasglue</a>
+R package.</p>
+</div>
+<div class="section level2">
+<h2 id="reading-in-with-filters">Reading in with filters<a class="anchor" aria-label="anchor" href="#reading-in-with-filters"></a>
+</h2>
+<p>The <code>query_gwas</code> function takes either a filename to a vcf
+file, or vcf object as the main argument. You can then query on
+<code>rsid</code>, <code>pval</code> or <code>chrompos</code>. For
+example</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span>
-<span class="va">vcfsubset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcf</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>are each identical, but the former saves time and memory because it is querying the file using an index and only reading in what is required.</p>
-<p>Examples of other filters are here:</p>
+<code class="sourceCode R"><span><span class="va">vcfsubset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>and</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">vcf</span>
-<span class="co">#&gt; class: CollapsedVCF </span>
-<span class="co">#&gt; dim: 3 1 </span>
-<span class="co">#&gt; rowRanges(vcf):</span>
-<span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span>
-<span class="co">#&gt; info(vcf):</span>
-<span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span>
-<span class="co">#&gt; info(header(vcf)):</span>
-<span class="co">#&gt;       Number Type    Description                                </span>
-<span class="co">#&gt;    AF A      Float   Allele Frequency                           </span>
-<span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span>
-<span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span>
-<span class="co">#&gt; geno(vcf):</span>
-<span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span>
-<span class="co">#&gt; geno(header(vcf)):</span>
-<span class="co">#&gt;       Number Type   Description                                                </span>
-<span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span>
-<span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span>
-<span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span>
-<span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span>
-<span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span>
-<span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span>
-<span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span>
-<span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span>
-<span class="co">#&gt;    ID 1      String Study variant identifier</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span></span>
+<span><span class="va">vcfsubset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcf</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>are each identical, but the former saves time and memory because it
+is querying the file using an index and only reading in what is
+required.</p>
+<p>Examples of other filters are here:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, pval<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span>
-<span class="va">vcf</span>
-<span class="co">#&gt; class: CollapsedVCF </span>
-<span class="co">#&gt; dim: 45 1 </span>
-<span class="co">#&gt; rowRanges(vcf):</span>
-<span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span>
-<span class="co">#&gt; info(vcf):</span>
-<span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span>
-<span class="co">#&gt; info(header(vcf)):</span>
-<span class="co">#&gt;       Number Type    Description                                </span>
-<span class="co">#&gt;    AF A      Float   Allele Frequency                           </span>
-<span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span>
-<span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span>
-<span class="co">#&gt; geno(vcf):</span>
-<span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span>
-<span class="co">#&gt; geno(header(vcf)):</span>
-<span class="co">#&gt;       Number Type   Description                                                </span>
-<span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span>
-<span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span>
-<span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span>
-<span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span>
-<span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span>
-<span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span>
-<span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span>
-<span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span>
-<span class="co">#&gt;    ID 1      String Study variant identifier</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">vcf</span></span>
+<span><span class="co">#&gt; class: CollapsedVCF </span></span>
+<span><span class="co">#&gt; dim: 3 1 </span></span>
+<span><span class="co">#&gt; rowRanges(vcf):</span></span>
+<span><span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span></span>
+<span><span class="co">#&gt; info(vcf):</span></span>
+<span><span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span></span>
+<span><span class="co">#&gt; info(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type    Description                                </span></span>
+<span><span class="co">#&gt;    AF A      Float   Allele Frequency                           </span></span>
+<span><span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span></span>
+<span><span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span></span>
+<span><span class="co">#&gt; geno(vcf):</span></span>
+<span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
+<span><span class="co">#&gt; geno(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">vcf</span>
-<span class="co">#&gt; class: CollapsedVCF </span>
-<span class="co">#&gt; dim: 2 1 </span>
-<span class="co">#&gt; rowRanges(vcf):</span>
-<span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span>
-<span class="co">#&gt; info(vcf):</span>
-<span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span>
-<span class="co">#&gt; info(header(vcf)):</span>
-<span class="co">#&gt;       Number Type    Description                                </span>
-<span class="co">#&gt;    AF A      Float   Allele Frequency                           </span>
-<span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span>
-<span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span>
-<span class="co">#&gt; geno(vcf):</span>
-<span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span>
-<span class="co">#&gt; geno(header(vcf)):</span>
-<span class="co">#&gt;       Number Type   Description                                                </span>
-<span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span>
-<span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span>
-<span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span>
-<span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span>
-<span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span>
-<span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span>
-<span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span>
-<span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span>
-<span class="co">#&gt;    ID 1      String Study variant identifier</span></code></pre></div>
-<p>It’s possible to chain filters together e.g.</p>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, pval<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="va">vcf</span></span>
+<span><span class="co">#&gt; class: CollapsedVCF </span></span>
+<span><span class="co">#&gt; dim: 45 1 </span></span>
+<span><span class="co">#&gt; rowRanges(vcf):</span></span>
+<span><span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span></span>
+<span><span class="co">#&gt; info(vcf):</span></span>
+<span><span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span></span>
+<span><span class="co">#&gt; info(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type    Description                                </span></span>
+<span><span class="co">#&gt;    AF A      Float   Allele Frequency                           </span></span>
+<span><span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span></span>
+<span><span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span></span>
+<span><span class="co">#&gt; geno(vcf):</span></span>
+<span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
+<span><span class="co">#&gt; geno(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span>pval<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span>
-<span class="va">vcf</span>
-<span class="co">#&gt; class: CollapsedVCF </span>
-<span class="co">#&gt; dim: 1 1 </span>
-<span class="co">#&gt; rowRanges(vcf):</span>
-<span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span>
-<span class="co">#&gt; info(vcf):</span>
-<span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span>
-<span class="co">#&gt; info(header(vcf)):</span>
-<span class="co">#&gt;       Number Type    Description                                </span>
-<span class="co">#&gt;    AF A      Float   Allele Frequency                           </span>
-<span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span>
-<span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span>
-<span class="co">#&gt; geno(vcf):</span>
-<span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span>
-<span class="co">#&gt; geno(header(vcf)):</span>
-<span class="co">#&gt;       Number Type   Description                                                </span>
-<span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span>
-<span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span>
-<span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span>
-<span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span>
-<span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span>
-<span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span>
-<span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span>
-<span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span>
-<span class="co">#&gt;    ID 1      String Study variant identifier</span></code></pre></div>
-<p>It’s possible to have multiple GWAS studies per vcf. You can specify specific GWAS studies to read in using e.g.</p>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">vcf</span></span>
+<span><span class="co">#&gt; class: CollapsedVCF </span></span>
+<span><span class="co">#&gt; dim: 2 1 </span></span>
+<span><span class="co">#&gt; rowRanges(vcf):</span></span>
+<span><span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span></span>
+<span><span class="co">#&gt; info(vcf):</span></span>
+<span><span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span></span>
+<span><span class="co">#&gt; info(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type    Description                                </span></span>
+<span><span class="co">#&gt;    AF A      Float   Allele Frequency                           </span></span>
+<span><span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span></span>
+<span><span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span></span>
+<span><span class="co">#&gt; geno(vcf):</span></span>
+<span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
+<span><span class="co">#&gt; geno(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
+<p>It’s possible to chain filters together e.g.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span>, id<span class="op">=</span><span class="st">"IEU-a-2"</span><span class="op">)</span></code></pre></div>
-<p>Note that querying by chrompos is the fastest way to deal with VCFs, use this over rsid where possible when speed is an issue.</p>
-</div>
-<div id="indexing-rsid-values" class="section level2">
-<h2 class="hasAnchor">
-<a href="#indexing-rsid-values" class="anchor"></a>Indexing rsid values</h2>
-<p>Querying by rsid is slow. If a large number of queries by rsid are to be performed then it could be worth generating an index which would speed up the querying. This approach uses <a href="https://www.sqlite.org/index.html">SQLite</a> to create a local database, linking rsid to chromosome and position. It strips out the ‘rs’ from the rs identifiers to make fast searchers by integer. The concept is based on that developed here: <a href="https://github.com/bioforensics/rsidx">bioforensics/rsidx</a>.</p>
-<p>To create the index:</p>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span>pval<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></span>
+<span><span class="va">vcf</span></span>
+<span><span class="co">#&gt; class: CollapsedVCF </span></span>
+<span><span class="co">#&gt; dim: 1 1 </span></span>
+<span><span class="co">#&gt; rowRanges(vcf):</span></span>
+<span><span class="co">#&gt;   GRanges with 5 metadata columns: paramRangeID, REF, ALT, QUAL, FILTER</span></span>
+<span><span class="co">#&gt; info(vcf):</span></span>
+<span><span class="co">#&gt;   DataFrame with 3 columns: AF, AC, AN</span></span>
+<span><span class="co">#&gt; info(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type    Description                                </span></span>
+<span><span class="co">#&gt;    AF A      Float   Allele Frequency                           </span></span>
+<span><span class="co">#&gt;    AC A      Integer Allele count in genotypes                  </span></span>
+<span><span class="co">#&gt;    AN 1      Integer Total number of alleles in called genotypes</span></span>
+<span><span class="co">#&gt; geno(vcf):</span></span>
+<span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
+<span><span class="co">#&gt; geno(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
+<p>It’s possible to have multiple GWAS studies per vcf. You can specify
+specific GWAS studies to read in using e.g.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/create_rsidx_index_from_vcf.html">create_rsidx_index_from_vcf</a></span><span class="op">(</span><span class="va">vcffile</span>, <span class="st">"index.rsidx"</span><span class="op">)</span>
-<span class="co">#&gt; Extracting position info</span>
-<span class="co">#&gt; Generating index</span></code></pre></div>
-<p>To query using the index:</p>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span>, id<span class="op">=</span><span class="st">"IEU-a-2"</span><span class="op">)</span></span></code></pre></div>
+<p>Note that querying by chrompos is the fastest way to deal with VCFs,
+use this over rsid where possible when speed is an issue.</p>
+</div>
+<div class="section level2">
+<h2 id="indexing-rsid-values">Indexing rsid values<a class="anchor" aria-label="anchor" href="#indexing-rsid-values"></a>
+</h2>
+<p>Querying by rsid is slow. If a large number of queries by rsid are to
+be performed then it could be worth generating an index which would
+speed up the querying. This approach uses <a href="https://www.sqlite.org/index.html" class="external-link">SQLite</a> to create a local
+database, linking rsid to chromosome and position. It strips out the
+‘rs’ from the rs identifiers to make fast searchers by integer. The
+concept is based on that developed here: <a href="https://github.com/bioforensics/rsidx" class="external-link">bioforensics/rsidx</a>.</p>
+<p>To create the index:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span>, rsidx<span class="op">=</span><span class="st">"index.rsidx"</span><span class="op">)</span></code></pre></div>
-</div>
-<div id="a-note-about-chrompos" class="section level2">
-<h2 class="hasAnchor">
-<a href="#a-note-about-chrompos" class="anchor"></a>A note about chrompos</h2>
-<p>The fastest way to query VCFs is by specifying chromosome and position. Can specify specific positions, or ranges. e.g.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_rsidx_index_from_vcf.html">create_rsidx_index_from_vcf</a></span><span class="op">(</span><span class="va">vcffile</span>, <span class="st">"index.rsidx"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Extracting position info</span></span>
+<span><span class="co">#&gt; Generating index</span></span></code></pre></div>
+<p>To query using the index:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"1:10000"</span>, <span class="st">"2:10000-20000"</span><span class="op">)</span></code></pre></div>
-<p>or as a data frame</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cp</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>chrom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10000</span>,<span class="fl">10000</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10000</span>, <span class="fl">20000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>You can check what will be parsed out with:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/parse_chrompos.html">parse_chrompos</a></span><span class="op">(</span><span class="va">cp</span><span class="op">)</span>
-<span class="co">#&gt; GRanges object with 2 ranges and 0 metadata columns:</span>
-<span class="co">#&gt;       seqnames      ranges strand</span>
-<span class="co">#&gt;          &lt;Rle&gt;   &lt;IRanges&gt;  &lt;Rle&gt;</span>
-<span class="co">#&gt;   [1]        1       10000      *</span>
-<span class="co">#&gt;   [2]        2 10000-20000      *</span>
-<span class="co">#&gt;   -------</span>
-<span class="co">#&gt;   seqinfo: 2 sequences from an unspecified genome; no seqlengths</span></code></pre></div>
-<p>Querying by p-value or rsid is also possible but is slower as only chrompos is indexed. On Mac and Linux, rsid and p-value queries are performed by calls to bcftools. On Windows it uses VariantAnnotation directly, because bcftools binaries are not available. This is unfortunately somewhat slower. If many operations are being performed it might be faster to read in the whole dataset and perform queries that way.</p>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rs3128126"</span>, <span class="st">"rs3121561"</span>, <span class="st">"rs3813193"</span><span class="op">)</span>, rsidx<span class="op">=</span><span class="st">"index.rsidx"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="ld-proxies" class="section level2">
-<h2 class="hasAnchor">
-<a href="#ld-proxies" class="anchor"></a>LD proxies</h2>
-<p>If a set of rsids are requested from a vcf but some are absent, a reference panel can be used to search for LD proxies, extract them, and align the effects and alleles against the original variants that were requested.</p>
+<div class="section level2">
+<h2 id="indexing-p-values">Indexing p-values<a class="anchor" aria-label="anchor" href="#indexing-p-values"></a>
+</h2>
+<p>Querying by p-value is slow. It could be worth generating an index
+file for p-values to speed this up. Similar to rsid queries, it uses an
+sqlite database linking -log10 pvalues to chromosome and position.</p>
+<p>To create the index:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/create_pval_index_from_vcf.html">create_pval_index_from_vcf</a></span><span class="op">(</span><span class="va">vcffile</span>, maximum_pval<span class="op">=</span><span class="fl">0.05</span>, <span class="st">"index.pvali"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Extracting pval info</span></span>
+<span><span class="co">#&gt; [1] "CREATE TABLE pval_to_coord (chrom TEXT NOT NULL DEFAULT NULL, coord INTEGER NOT NULL DEFAULT NULL, LP REAL NOT NULL DEFAULT 0);"</span></span>
+<span><span class="co">#&gt; [2] ".separator ,"                                                                                                                   </span></span>
+<span><span class="co">#&gt; [3] ".import /tmp/RtmpG0td6k/file4a8d56dbfa33 pval_to_coord"                                                                         </span></span>
+<span><span class="co">#&gt; [4] "CREATE INDEX idx_LP ON pval_to_coord (LP)"</span></span>
+<span><span class="co">#&gt; Generating index</span></span></code></pre></div>
+<p>To query using the index:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, pval<span class="op">=</span><span class="fl">0.05</span>, pvali<span class="op">=</span><span class="st">"index.pvali"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using pval index</span></span>
+<span><span class="co">#&gt; Identified 7 variants passing threshold. Extracting...</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="a-note-about-chrompos">A note about chrompos<a class="anchor" aria-label="anchor" href="#a-note-about-chrompos"></a>
+</h2>
+<p>The fastest way to query VCFs is by specifying chromosome and
+position. Can specify specific positions, or ranges. e.g.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1:10000"</span>, <span class="st">"2:10000-20000"</span><span class="op">)</span></span></code></pre></div>
+<p>or as a data frame</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cp</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>chrom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10000</span>,<span class="fl">10000</span><span class="op">)</span>, end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10000</span>, <span class="fl">20000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>You can check what will be parsed out with:</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/parse_chrompos.html">parse_chrompos</a></span><span class="op">(</span><span class="va">cp</span><span class="op">)</span></span>
+<span><span class="co">#&gt; GRanges object with 2 ranges and 0 metadata columns:</span></span>
+<span><span class="co">#&gt;       seqnames      ranges strand</span></span>
+<span><span class="co">#&gt;          &lt;Rle&gt;   &lt;IRanges&gt;  &lt;Rle&gt;</span></span>
+<span><span class="co">#&gt;   [1]        1       10000      *</span></span>
+<span><span class="co">#&gt;   [2]        2 10000-20000      *</span></span>
+<span><span class="co">#&gt;   -------</span></span>
+<span><span class="co">#&gt;   seqinfo: 2 sequences from an unspecified genome; no seqlengths</span></span></code></pre></div>
+<p>Querying by p-value or rsid is also possible but is slower as only
+chrompos is indexed. On Mac and Linux, rsid and p-value queries are
+performed by calls to bcftools. On Windows it uses VariantAnnotation
+directly, because bcftools binaries are not available. This is
+unfortunately somewhat slower. If many operations are being performed it
+might be faster to read in the whole dataset and perform queries that
+way.</p>
+</div>
+<div class="section level2">
+<h2 id="ld-proxies">LD proxies<a class="anchor" aria-label="anchor" href="#ld-proxies"></a>
+</h2>
+<p>If a set of rsids are requested from a vcf but some are absent, a
+reference panel can be used to search for LD proxies, extract them, and
+align the effects and alleles against the original variants that were
+requested.</p>
 <p>There are two ways to perform the LD proxy search:</p>
 <ul>
-<li>using a set of genotyped samples as an LD reference panel (e.g. 1000 genomes data) - this is slow but relatively convenient</li>
-<li>compiling an LD tag list from an LD reference panel - once generated this is very fast</li>
+<li>using a set of genotyped samples as an LD reference panel (e.g. 1000
+genomes data) - this is slow but relatively convenient</li>
+<li>compiling an LD tag list from an LD reference panel - once generated
+this is very fast</li>
 </ul>
-<div id="using-an-ld-reference-panel" class="section level3">
-<h3 class="hasAnchor">
-<a href="#using-an-ld-reference-panel" class="anchor"></a>Using an LD reference panel</h3>
-<p>An LD reference panel can be obtained from here: <a href="http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz">http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz</a>. This dataset comprises Europeans from the 1000 genomes project, in plink format, and including only SNPs with MAF &gt; 0.01, and with the reference alleles aligned to the human genome reference sequence. For this vignette we can use a small subset of that dataset:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ldfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"eur.bed"</span>, package<span class="op">=</span><span class="st">"gwasvcf"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">".bed"</span>, <span class="st">""</span>, <span class="va">.</span><span class="op">)</span></code></pre></div>
-<p>We also need to provide a path to the plink binary used to generate LD calculations. This can be done through the <code>genetics.binaRies</code> package as with bcftools</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Path not provided, using binaries in the explodecomputer/genetics.binaRies package</span></code></pre></div>
-<p>The rs4442317 variant is not present in the vcf file, i.e. if we query that variant:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="st">"rs4442317"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="va">nrow</span>
-<span class="co">#&gt; [1] 0</span></code></pre></div>
+<div class="section level3">
+<h3 id="using-an-ld-reference-panel">Using an LD reference panel<a class="anchor" aria-label="anchor" href="#using-an-ld-reference-panel"></a>
+</h3>
+<p>An LD reference panel can be obtained from here: <a href="http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz" class="external-link">http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz</a>.
+This dataset comprises Europeans from the 1000 genomes project, in plink
+format, and including only SNPs with MAF &gt; 0.01, and with the
+reference alleles aligned to the human genome reference sequence. For
+this vignette we can use a small subset of that dataset:</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="st">"rs4442317"</span>, proxies<span class="op">=</span><span class="st">"yes"</span>, bfile<span class="op">=</span><span class="va">ldfile</span>, tag_r2<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span>
-<span class="co">#&gt; Initial search...</span>
-<span class="co">#&gt; Extracted 0 out of 1 rsids</span>
-<span class="co">#&gt; Searching for proxies for 1 rsids</span>
-<span class="co">#&gt; Determining searchspace...</span>
-<span class="co">#&gt; Proxy lookup...</span>
-<span class="co">#&gt; Finding proxies...</span>
-<span class="co">#&gt; Taking input= as a system command ('gunzip -c /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpF7nMLp/file1841759a9c6f.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span>
-<span class="co">#&gt; Found 10 proxies</span>
-<span class="co">#&gt; Extrating proxies...</span>
-<span class="co">#&gt; Identified proxies for 1 of 1 rsids</span>
-<span class="co">#&gt; Aligning...</span>
-<span class="va">vcf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; GRanges object with 1 range and 15 metadata columns:</span>
-<span class="co">#&gt;             seqnames    ranges strand |         REF         ALT      QUAL</span>
-<span class="co">#&gt;                &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt; &lt;numeric&gt;</span>
-<span class="co">#&gt;   rs4442317        1   1106784      * |           T           C        NA</span>
-<span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS</span>
-<span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span>
-<span class="co">#&gt;   rs4442317        PASS    0.0059    0.0071  0.391474    0.8559    138001</span>
-<span class="co">#&gt;                    EZ        SI        NC          ID          PR          id</span>
-<span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span>
-<span class="co">#&gt;   rs4442317        NA        NA        NA   rs4970420   rs4970420     IEU-a-2</span>
-<span class="co">#&gt;   -------</span>
-<span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></code></pre></div>
-<p>Here we see that the proxy variant is rs4970420.</p>
-<p>You may also extract only the best available proxies even if the requested rsids are present, by using <code>proxies="only"</code>. An example of this shows that the effect size estimates for the proxy variants are aligned to the effect alleles of the target variants:</p>
+<code class="sourceCode R"><span><span class="va">ldfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"eur.bed"</span>, package<span class="op">=</span><span class="st">"gwasvcf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">".bed"</span>, <span class="st">""</span>, <span class="va">.</span><span class="op">)</span></span></code></pre></div>
+<p>We also need to provide a path to the plink binary used to generate
+LD calculations. This can be done through the
+<code>genetics.binaRies</code> package as with bcftools</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Read vcf</span>
-<span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span>
-
-<span class="co"># Obtain the best LD proxy for each of the rsids</span>
-<span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>, proxies<span class="op">=</span><span class="st">"only"</span>, bfile<span class="op">=</span><span class="va">ldfile</span>, tag_r2<span class="op">=</span><span class="fl">0.6</span><span class="op">)</span>
-<span class="co">#&gt; Determining searchspace...</span>
-<span class="co">#&gt; Proxy lookup...</span>
-<span class="co">#&gt; Finding proxies...</span>
-<span class="co">#&gt; Taking input= as a system command ('gunzip -c /var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T//RtmpF7nMLp/file18416a3d9a43.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span>
-<span class="co">#&gt; Found 270 proxies</span>
-<span class="co">#&gt; Extrating proxies...</span>
-<span class="co">#&gt; Identified proxies for 52 of 1 rsids</span>
-<span class="co">#&gt; Aligning...</span>
-
-<span class="co"># Match the target data to the proxy data</span>
-<span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.html">match</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># Plot the target data effects against the proxy data effects</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">$</span><span class="va">ES</span>, <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">$</span><span class="va">ES</span><span class="op">[</span><span class="va">index</span><span class="op">]</span><span class="op">)</span></code></pre></div>
-<p><img src="guide_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
-</div>
-<div id="compiling-a-list-of-tagging-variants" class="section level3">
-<h3 class="hasAnchor">
-<a href="#compiling-a-list-of-tagging-variants" class="anchor"></a>Compiling a list of tagging variants</h3>
-<p>Using the LD reference panel described above, it is possible to create a sqlite tag reference panel using the following commands. First get an example LD reference panel:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Path not provided, using binaries in the MRCIEU/genetics.binaRies package</span></span></code></pre></div>
+<p>The rs4442317 variant is not present in the vcf file, i.e. if we
+query that variant:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ldfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"eur.bed"</span>, package<span class="op">=</span><span class="st">"gwasvcf"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">".bed"</span>, <span class="st">""</span>, <span class="va">.</span><span class="op">)</span></code></pre></div>
-<p>We also need to provide a path to the plink binary used to generate LD calculations. This can be done through the <code>genetics.binaRies</code> package as with bcftools</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="st">"rs4442317"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="va">nrow</span></span>
+<span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Path not provided, using binaries in the explodecomputer/genetics.binaRies package</span></code></pre></div>
-<p>Now generate the tagging database</p>
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="st">"rs4442317"</span>, proxies<span class="op">=</span><span class="st">"yes"</span>, bfile<span class="op">=</span><span class="va">ldfile</span>, tag_r2<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Initial search...</span></span>
+<span><span class="co">#&gt; Extracted 0 out of 1 rsids</span></span>
+<span><span class="co">#&gt; Searching for proxies for 1 rsids</span></span>
+<span><span class="co">#&gt; Determining searchspace...</span></span>
+<span><span class="co">#&gt; Proxy lookup...</span></span>
+<span><span class="co">#&gt; Finding proxies...</span></span>
+<span><span class="co">#&gt; Taking input= as a system command ('gunzip -c /tmp/RtmpG0td6k/file4a8d8911681.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span></span>
+<span><span class="co">#&gt; Found 10 proxies</span></span>
+<span><span class="co">#&gt; Extrating proxies...</span></span>
+<span><span class="co">#&gt; Identified proxies for 1 of 1 rsids</span></span>
+<span><span class="co">#&gt; Aligning...</span></span>
+<span><span class="va">vcf</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; GRanges object with 1 range and 15 metadata columns:</span></span>
+<span><span class="co">#&gt;             seqnames    ranges strand |         REF         ALT      QUAL</span></span>
+<span><span class="co">#&gt;                &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        1   1106784      * |           T           C        NA</span></span>
+<span><span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS</span></span>
+<span><span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        PASS    0.0059    0.0071  0.391474    0.8559    138001</span></span>
+<span><span class="co">#&gt;                    EZ        SI        NC          ID          PR          id</span></span>
+<span><span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        NA        NA        NA   rs4970420   rs4970420     IEU-a-2</span></span>
+<span><span class="co">#&gt;   -------</span></span>
+<span><span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></span></code></pre></div>
+<p>Here we see that the proxy variant is rs4970420.</p>
+<p>You may also extract only the best available proxies even if the
+requested rsids are present, by using <code>proxies="only"</code>. An
+example of this shows that the effect size estimates for the proxy
+variants are aligned to the effect alleles of the target variants:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">dbfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempfile</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="../reference/create_ldref_sqlite.html">create_ldref_sqlite</a></span><span class="op">(</span><span class="va">ldfile</span>, <span class="va">dbfile</span>, tag_r2 <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>
-<span class="co">#&gt; identifying indels to remove</span>
-<span class="co">#&gt; calculating ld tags</span>
-<span class="co">#&gt; formatting</span>
-<span class="co">#&gt; creating sqlite db</span></code></pre></div>
-<p>Perform the query</p>
+<code class="sourceCode R"><span><span class="co"># Read vcf</span></span>
+<span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Obtain the best LD proxy for each of the rsids</span></span>
+<span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>, proxies<span class="op">=</span><span class="st">"only"</span>, bfile<span class="op">=</span><span class="va">ldfile</span>, tag_r2<span class="op">=</span><span class="fl">0.6</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Determining searchspace...</span></span>
+<span><span class="co">#&gt; Proxy lookup...</span></span>
+<span><span class="co">#&gt; Finding proxies...</span></span>
+<span><span class="co">#&gt; Taking input= as a system command ('gunzip -c /tmp/RtmpG0td6k/file4a8d4caeb280.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span></span>
+<span><span class="co">#&gt; Found 270 proxies</span></span>
+<span><span class="co">#&gt; Extrating proxies...</span></span>
+<span><span class="co">#&gt; Identified proxies for 52 of 1 rsids</span></span>
+<span><span class="co">#&gt; Aligning...</span></span>
+<span></span>
+<span><span class="co"># Match the target data to the proxy data</span></span>
+<span><span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">match</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot the target data effects against the proxy data effects</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">$</span><span class="va">ES</span>, <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">$</span><span class="va">ES</span><span class="op">[</span><span class="va">index</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<p><img src="guide_files/figure-html/unnamed-chunk-29-1.png" width="700"></p>
+</div>
+<div class="section level3">
+<h3 id="compiling-a-list-of-tagging-variants">Compiling a list of tagging variants<a class="anchor" aria-label="anchor" href="#compiling-a-list-of-tagging-variants"></a>
+</h3>
+<p>Using the LD reference panel described above, it is possible to
+create a sqlite tag reference panel using the following commands. First
+get an example LD reference panel:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="st">"rs4442317"</span>, proxies<span class="op">=</span><span class="st">"yes"</span>, dbfile<span class="op">=</span><span class="va">dbfile</span>, tag_r2<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span>
-<span class="co">#&gt; Initial search...</span>
-<span class="co">#&gt; Extracted 0 out of 1 rsids</span>
-<span class="co">#&gt; Searching for proxies for 1 rsids</span>
-<span class="co">#&gt; Proxy lookup...</span>
-<span class="co">#&gt; Found 168 proxies</span>
-<span class="co">#&gt; Extrating proxies...</span>
-<span class="co">#&gt; Identified proxies for 1 of 1 rsids</span>
-<span class="co">#&gt; Aligning...</span>
-<span class="va">vcf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; GRanges object with 1 range and 15 metadata columns:</span>
-<span class="co">#&gt;             seqnames    ranges strand |         REF         ALT      QUAL</span>
-<span class="co">#&gt;                &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt; &lt;numeric&gt;</span>
-<span class="co">#&gt;   rs4442317        1   1106784      * |           T           C        NA</span>
-<span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS</span>
-<span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span>
-<span class="co">#&gt;   rs4442317        PASS    -4e-04    0.0066 0.0214999       0.9    233073</span>
-<span class="co">#&gt;                    EZ        SI        NC          ID          PR          id</span>
-<span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span>
-<span class="co">#&gt;   rs4442317        NA        NA        NA  rs10907175  rs10907175     IEU-a-2</span>
-<span class="co">#&gt;   -------</span>
-<span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></code></pre></div>
-</div>
-</div>
-<div id="creating-the-vcf-object-from-a-data-frame" class="section level2">
-<h2 class="hasAnchor">
-<a href="#creating-the-vcf-object-from-a-data-frame" class="anchor"></a>Creating the VCF object from a data frame</h2>
-<p>If you have GWAS summary data in a text file or data frame, this can be converted to a VCF object.</p>
+<code class="sourceCode R"><span><span class="va">ldfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"eur.bed"</span>, package<span class="op">=</span><span class="st">"gwasvcf"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">".bed"</span>, <span class="st">""</span>, <span class="va">.</span><span class="op">)</span></span></code></pre></div>
+<p>We also need to provide a path to the plink binary used to generate
+LD calculations. This can be done through the
+<code>genetics.binaRies</code> package as with bcftools</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span>
-<span class="va">vv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">out</span> <span class="op">&lt;-</span> <span class="va">vv</span> <span class="op">%$%</span> <span class="fu"><a href="../reference/create_vcf.html">create_vcf</a></span><span class="op">(</span>chrom<span class="op">=</span><span class="va">seqnames</span>, pos<span class="op">=</span><span class="va">start</span>, nea<span class="op">=</span><span class="va">REF</span>, ea<span class="op">=</span><span class="va">ALT</span>, snp<span class="op">=</span><span class="va">ID</span>, ea_af<span class="op">=</span><span class="va">AF</span>, effect<span class="op">=</span><span class="va">ES</span>, se<span class="op">=</span><span class="va">SE</span>, pval<span class="op">=</span><span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="va">LP</span>, n<span class="op">=</span><span class="va">SS</span>, name<span class="op">=</span><span class="st">"a"</span><span class="op">)</span>
-<span class="va">out</span>
-<span class="co">#&gt; class: CollapsedVCF </span>
-<span class="co">#&gt; dim: 92 1 </span>
-<span class="co">#&gt; rowRanges(vcf):</span>
-<span class="co">#&gt;   GRanges with 4 metadata columns: REF, ALT, QUAL, FILTER</span>
-<span class="co">#&gt; info(vcf):</span>
-<span class="co">#&gt;   DataFrame with 0 columns: </span>
-<span class="co">#&gt; geno(vcf):</span>
-<span class="co">#&gt;   List of length 5: AF, ES, SE, LP, SS</span>
-<span class="co">#&gt; geno(header(vcf)):</span>
-<span class="co">#&gt;       Number Type  Description                                            </span>
-<span class="co">#&gt;    AF A      Float Alternate allele frequency in the association study    </span>
-<span class="co">#&gt;    ES A      Float Effect size estimate relative to the alternative allele</span>
-<span class="co">#&gt;    SE A      Float Standard error of effect size estimate                 </span>
-<span class="co">#&gt;    LP A      Float -log10 p-value for effect estimate                     </span>
-<span class="co">#&gt;    SS A      Float Sample size used to estimate genetic effect</span></code></pre></div>
-<p>It’s possible to write the vcf file:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_plink.html">set_plink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Path not provided, using binaries in the MRCIEU/genetics.binaRies package</span></span></code></pre></div>
+<p>Now generate the tagging database</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/writeVcf-methods.html">writeVcf</a></span><span class="op">(</span><span class="va">out</span>, file<span class="op">=</span><span class="st">"temp.vcf"</span><span class="op">)</span></code></pre></div>
-<p>You may want to first harmonise the data so that all the non-effect alleles are aligned to the human genome reference. See the <a href="https://github.com/MRCIEU/gwasglue">gwasglue</a> package on some functions to do this.</p>
+<code class="sourceCode R"><span><span class="va">dbfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/create_ldref_sqlite.html">create_ldref_sqlite</a></span><span class="op">(</span><span class="va">ldfile</span>, <span class="va">dbfile</span>, tag_r2 <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
+<span><span class="co">#&gt; identifying indels to remove</span></span>
+<span><span class="co">#&gt; calculating ld tags</span></span>
+<span><span class="co">#&gt; formatting</span></span>
+<span><span class="co">#&gt; creating sqlite db</span></span></code></pre></div>
+<p>Perform the query</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, rsid<span class="op">=</span><span class="st">"rs4442317"</span>, proxies<span class="op">=</span><span class="st">"yes"</span>, dbfile<span class="op">=</span><span class="va">dbfile</span>, tag_r2<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Initial search...</span></span>
+<span><span class="co">#&gt; Extracted 0 out of 1 rsids</span></span>
+<span><span class="co">#&gt; Searching for proxies for 1 rsids</span></span>
+<span><span class="co">#&gt; Proxy lookup...</span></span>
+<span><span class="co">#&gt; Found 168 proxies</span></span>
+<span><span class="co">#&gt; Extrating proxies...</span></span>
+<span><span class="co">#&gt; Identified proxies for 1 of 1 rsids</span></span>
+<span><span class="co">#&gt; Aligning...</span></span>
+<span><span class="va">vcf</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; GRanges object with 1 range and 15 metadata columns:</span></span>
+<span><span class="co">#&gt;             seqnames    ranges strand |         REF         ALT      QUAL</span></span>
+<span><span class="co">#&gt;                &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        1   1106784      * |           T           C        NA</span></span>
+<span><span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS</span></span>
+<span><span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        PASS    -4e-04    0.0066 0.0214999       0.9    233073</span></span>
+<span><span class="co">#&gt;                    EZ        SI        NC          ID          PR          id</span></span>
+<span><span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        NA        NA        NA  rs10907175  rs10907175     IEU-a-2</span></span>
+<span><span class="co">#&gt;   -------</span></span>
+<span><span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="creating-the-vcf-object-from-a-data-frame">Creating the VCF object from a data frame<a class="anchor" aria-label="anchor" href="#creating-the-vcf-object-from-a-data-frame"></a>
+</h2>
+<p>If you have GWAS summary data in a text file or data frame, this can
+be converted to a VCF object.</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span></span>
+<span><span class="va">vv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="va">vv</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/exposition.html" class="external-link">%$%</a></span> <span class="fu"><a href="../reference/create_vcf.html">create_vcf</a></span><span class="op">(</span>chrom<span class="op">=</span><span class="va">seqnames</span>, pos<span class="op">=</span><span class="va">start</span>, nea<span class="op">=</span><span class="va">REF</span>, ea<span class="op">=</span><span class="va">ALT</span>, snp<span class="op">=</span><span class="va">ID</span>, ea_af<span class="op">=</span><span class="va">AF</span>, effect<span class="op">=</span><span class="va">ES</span>, se<span class="op">=</span><span class="va">SE</span>, pval<span class="op">=</span><span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="va">LP</span>, n<span class="op">=</span><span class="va">SS</span>, name<span class="op">=</span><span class="st">"a"</span><span class="op">)</span></span>
+<span><span class="va">out</span></span>
+<span><span class="co">#&gt; class: CollapsedVCF </span></span>
+<span><span class="co">#&gt; dim: 92 1 </span></span>
+<span><span class="co">#&gt; rowRanges(vcf):</span></span>
+<span><span class="co">#&gt;   GRanges with 4 metadata columns: REF, ALT, QUAL, FILTER</span></span>
+<span><span class="co">#&gt; info(vcf):</span></span>
+<span><span class="co">#&gt;   DataFrame with 0 columns: </span></span>
+<span><span class="co">#&gt; geno(vcf):</span></span>
+<span><span class="co">#&gt;   List of length 6: AF, ES, SE, LP, SS, ID</span></span>
+<span><span class="co">#&gt; geno(header(vcf)):</span></span>
+<span><span class="co">#&gt;       Number Type   Description                                            </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study    </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele</span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                 </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                     </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;    ID A      String Study variant identifier</span></span></code></pre></div>
+<p>It’s possible to write the vcf file:</p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/writeVcf-methods.html" class="external-link">writeVcf</a></span><span class="op">(</span><span class="va">out</span>, file<span class="op">=</span><span class="st">"temp.vcf"</span><span class="op">)</span></span></code></pre></div>
+<p>You may want to first harmonise the data so that all the non-effect
+alleles are aligned to the human genome reference. See the <a href="https://github.com/MRCIEU/gwasglue" class="external-link">gwasglue</a> package on some
+functions to do this.</p>
 </div>
   </div>
 
@@ -603,11 +703,13 @@ set_bcftools(NULL)</a></code></pre>
 
 
       <footer><div class="copyright">
-  <p>Developed by Gibran Hemani.</p>
+  <p></p>
+<p>Developed by Gibran Hemani.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -615,6 +717,8 @@ set_bcftools(NULL)</a></code></pre>
 
   
 
+
+  
 
   </body>
 </html>

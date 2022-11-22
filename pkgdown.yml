@@ -1,7 +1,10 @@
-pandoc: 2.7.3
-pkgdown: 1.6.1
+pandoc: 2.19.2
+pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   guide: guide.html
-last_built: 2021-05-19T20:37Z
+last_built: 2022-11-22T17:03Z
+urls:
+  reference: https://mrcieu.github.io/gwasvcf/reference
+  article: https://mrcieu.github.io/gwasvcf/articles
 
