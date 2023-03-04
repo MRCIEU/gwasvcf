@@ -49,6 +49,12 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 	if (Sys.info()["sysname"] == "Windows") {
 	  stop("Currently, this function only works on macOS and Linux")
 	}
+	if (!file.exists(outname)) {
+		ld <- data.frame(CHR_A = integer(), BP_A = integer(), SNP_A = character(), MAF_A = double(), CHR_B = integer(), BP_B = integer(), 
+		SNP_B = character(), PHASE = character(), MAF_B = double(), R = double())
+		message("Index SNP not found in the reference panel")
+		return(ld)
+	}
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
 		dplyr::as_tibble() %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
