@@ -33,7 +33,8 @@ Imports:
     stringr,
     SummarizedExperiment,
     utils,
-    VariantAnnotation
+    VariantAnnotation,
+    gwasglue2
 Suggests: 
     knitr,
     rmarkdown,
@@ -41,7 +42,8 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    github::mrcieu/genetics.binaRies
+    github::mrcieu/genetics.binaRies,
+    github::mrcieu/gwasglue2
 Encoding: UTF-8
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 SystemRequirements: GNU unzip
