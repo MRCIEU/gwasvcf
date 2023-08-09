@@ -56,7 +56,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		return(ld)
 	}
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
-		dplyr::as_tibble() %>%
+		dplyr::as_tibble(.data, .name_repair="minimal") %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
 		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
 		dplyr::mutate(PHASE=gsub("/", "", .data[["PHASE"]])) %>%
@@ -99,7 +99,7 @@ sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 	numid <- gsub("rs", "", rsids) %>% paste(collapse=",")
 	query <- paste0("SELECT DISTINCT * FROM tags WHERE SNP_A IN (", numid, ")")
 	ld <- RSQLite::dbGetQuery(conn, query) %>% 
-		dplyr::as_tibble() %>%
+		dplyr::as_tibble(.data, .name_repair="minimal") %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
 		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
 		dplyr::mutate(PHASE=gsub("/", "", .data[["PHASE"]])) %>%
