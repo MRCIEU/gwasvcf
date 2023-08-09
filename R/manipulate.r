@@ -191,7 +191,7 @@ vcf_to_tibble <- function(vcf, id=NULL)
 		return(dplyr::tibble())
 	}
 	S4Vectors::values(a)[["rsid"]] <- names(a)
-	return(dplyr::as_tibble(a))
+	return(dplyr::as_tibble(a, .name_repair = "minimal"))
 }
 
 
