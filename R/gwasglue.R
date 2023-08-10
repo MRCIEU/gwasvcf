@@ -9,13 +9,13 @@
 #' @export
 gwasvcf_to_summaryset <- function(vcf){
 	# get metadata from vcf and create metadata object
-	md <- gwasglue2::create_metadata(id = vcf@metadata$header@samples, build = unique(VariantAnnotation::meta(header(vcf))$contig$assembly) )
+	md <- gwasglue2::create_metadata(id = vcf@metadata$header@samples, build = unique(VariantAnnotation::meta(header(vcf))$contig$assembly))
     
 	# get summary data and create SummarySet
 
     s <- vcf %>% 
-		vcf_to_tibble(.) %>% 
-		gwasglue2::create_summaryset_from_gwasvcf(., metadata = md)
+		vcf_to_tibble() %>% 
+		gwasglue2::create_summaryset_from_gwasvcf(metadata = md)
 
     return(s)
 }
