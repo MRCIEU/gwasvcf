@@ -56,7 +56,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		return(ld)
 	}
 	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
-		dplyr::as_tibble(.data, .name_repair="minimal") %>%
+		dplyr::as_tibble(.name_repair="minimal") %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
 		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
 		dplyr::mutate(PHASE=gsub("/", "", .data[["PHASE"]])) %>%
@@ -70,9 +70,9 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		message("No proxies found")
 		return(ld)
 	}
-	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.data, .name_repair="minimal")
+	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.data, .name_repair="minimal")
+	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.name_repair="minimal")
 	# ld <- dplyr::arrange(ld, desc(abs(R))) %>%
 	# 	dplyr::filter(!duplicated(SNP_A))
 	ld <- dplyr::arrange(ld, dplyr::desc(abs(.data[["R"]])))
@@ -99,16 +99,16 @@ sqlite_ld_proxies <- function(rsids, dbfile, tag_r2)
 	numid <- gsub("rs", "", rsids) %>% paste(collapse=",")
 	query <- paste0("SELECT DISTINCT * FROM tags WHERE SNP_A IN (", numid, ")")
 	ld <- RSQLite::dbGetQuery(conn, query) %>% 
-		dplyr::as_tibble(.data, .name_repair="minimal") %>%
+		dplyr::as_tibble(.name_repair="minimal") %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
 		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
 		dplyr::mutate(PHASE=gsub("/", "", .data[["PHASE"]])) %>%
 		dplyr::filter(nchar(.data[["PHASE"]]) == 4) %>%
 		dplyr::mutate(SNP_A = paste0("rs", .data[["SNP_A"]]), SNP_B = paste0("rs", .data[["SNP_B"]]))
 
-	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.data, .name_repair="minimal")
+	temp <- do.call(rbind, strsplit(ld[["PHASE"]], "")) %>% dplyr::as_tibble(.name_repair="minimal")
 	names(temp) <- c("A1", "B1", "A2", "B2")
-	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.data, .name_repair="minimal")
+	ld <- cbind(ld, temp) %>% dplyr::as_tibble(.name_repair="minimal")
 	ld <- dplyr::arrange(ld, dplyr::desc(abs(.data[["R"]])))
 	message("Found ", nrow(ld), " proxies")
 	RSQLite::dbDisconnect(conn)
