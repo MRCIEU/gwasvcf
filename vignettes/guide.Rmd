@@ -347,7 +347,7 @@ You may want to first harmonise the data so that all the non-effect alleles are 
 
 Although still under development, if compared with its predecessor, the [gwasglue2](https://mrcieu.github.io/gwasglue2/) package has several new features, including the use of S4 R objects.
 
-It is possible to create a `SummarySet` object from a GWAS-VCF file or VCF object e.g. output from `VariantAnnotation::readVcf()`, `gwasvcftools::query_vcf()` or `query_gwas()` using the `gwasvcf_to_summaryset()` function.
+It is possible to create a `SummarySet` object from a GWAS-VCF file or VCF object e.g. output from `VariantAnnotation::readVcf()`, `create_vcf()` or `query_gwas()` using the `gwasvcf_to_summaryset()` function.
 
 
 For example:
