@@ -19,4 +19,3 @@ gwasvcf_to_summaryset <- function(vcf){
 
     return(s)
 }
-
