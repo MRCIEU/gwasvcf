@@ -6,8 +6,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-0920-1055")),
     person("Tom", "Palmer", , "tom.palmer@bristol.ac.uk", role = "ctb",
            comment = c(ORCID = "0000-0003-4655-4511")),
-  person("Rita", "Rasteiro", email="rita.rasteiro@bristol.ac.uk", role = c("ctb"),
-            comment=c(ORCID = "0000-0002-4217-3060"))
+    person("Rita", "Rasteiro", , "rita.rasteiro@bristol.ac.uk", role = "ctb",
+           comment = c(ORCID = "0000-0002-4217-3060"))
   )
 Description: Tools for dealing with GWAS summary data in VCF format.
     Includes reading, querying, writing, as well as helper functions such
@@ -25,6 +25,7 @@ Imports:
     genetics.binaRies,
     GenomeInfoDb,
     GenomicRanges,
+    gwasglue2,
     IRanges,
     magrittr,
     RCurl,
@@ -35,8 +36,7 @@ Imports:
     stringr,
     SummarizedExperiment,
     utils,
-    VariantAnnotation,
-    gwasglue2
+    VariantAnnotation
 Suggests: 
     knitr,
     rmarkdown,
