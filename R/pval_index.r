@@ -1,6 +1,6 @@
 #' Create pval index from GWAS-VCF file
 #'
-#' Create a separate file called <id>.pvali which is used to speed up p-value queries
+#' Create a separate file called `<id>.pvali` which is used to speed up p-value queries.
 #'
 #' @param vcffile VCF filename
 #' @param maximum_pval Maximum p-value to include. Default = 0.05
