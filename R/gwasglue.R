@@ -5,7 +5,7 @@
 #' Create a SummarySet
 #' 
 #' Returns a gwasglue2 SummarySet object
-#' @param vcf Path or URL to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf, gwasvcftools::query_vcf or [query_gwas()]
+#' @param vcf Path or URL to GWAS-VCF file or VCF object e.g. output from [VariantAnnotation::readVcf()], [create_vcf()] or [query_gwas()]
 #' @export
 gwasvcf_to_summaryset <- function(vcf){
 	# get metadata from vcf and create metadata object
