@@ -7,7 +7,7 @@
 gwasvcf_to_summaryset(vcf)
 }
 \arguments{
-\item{vcf}{Path or URL to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf, gwasvcftools::query_vcf or [query_gwas()]}
+\item{vcf}{Path or URL to GWAS-VCF file or VCF object e.g. output from \code{\link[VariantAnnotation:readVcf-methods]{VariantAnnotation::readVcf()}}, \code{\link[=create_vcf]{create_vcf()}} or \code{\link[=query_gwas]{query_gwas()}}}
 }
 \description{
 Returns a gwasglue2 SummarySet object
