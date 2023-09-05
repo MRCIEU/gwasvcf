@@ -7,7 +7,7 @@
 parse_chrompos(chrompos, radius = NULL)
 }
 \arguments{
-\item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.}
+\item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns \code{chrom}, \code{start}, \code{end}.}
 
 \item{radius}{Add radius to the specified positions. Default = NULL}
 }

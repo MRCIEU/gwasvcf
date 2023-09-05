@@ -342,3 +342,19 @@ writeVcf(out, file="temp.vcf")
 ```
 
 You may want to first harmonise the data so that all the non-effect alleles are aligned to the human genome reference. See the [gwasglue](https://github.com/MRCIEU/gwasglue) package on some functions to do this. 
+
+## Creating a gwasglue2 SummarySet object from a vcf file
+
+Although still under development, if compared with its predecessor, the [gwasglue2](https://mrcieu.github.io/gwasglue2/) package has several new features, including the use of S4 R objects.
+
+It is possible to create a `SummarySet` object from a GWAS-VCF file or VCF object e.g. output from `VariantAnnotation::readVcf()`, `create_vcf()` or `query_gwas()` using the `gwasvcf_to_summaryset()` function.
+
+
+For example:
+
+```{r, eval=FALSE}
+summaryset <- readVcf(vcffile) %>% 
+              gwasvcf_to_summaryset()
+```
+
+Once the `SummarySet` objects are created, it is possible to use `gwasglue2` to harmonise data, harmonise against a LD matrix, remap genomic coordinates to a different genome assembly, convert to other formats and more.

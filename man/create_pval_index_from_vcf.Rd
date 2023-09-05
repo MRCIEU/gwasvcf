@@ -14,5 +14,5 @@ create_pval_index_from_vcf(vcffile, maximum_pval, indexname)
 \item{indexname}{index file name to create. Deletes existing file if exists.}
 }
 \description{
-Create a separate file called <id>.pvali which is used to speed up p-value queries
+Create a separate file called \verb{<id>.pvali} which is used to speed up p-value queries.
 }
