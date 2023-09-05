@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gwasvcf</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
@@ -53,6 +53,9 @@
       <a href="../articles/guide.html">Reading, querying and writing GWAS summary data in VCF format</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -212,7 +215,7 @@ GWAS</li>
 class, which is useful for performing fast operations on chromosome
 position information.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/MatrixGenerics/man/rowRanges.html" class="external-link">rowRanges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">rowRanges</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span></span>
 <span><span class="co">#&gt; GRanges object with 92 ranges and 5 metadata columns:</span></span>
 <span><span class="co">#&gt;              seqnames    ranges strand | paramRangeID            REF</span></span>
 <span><span class="co">#&gt;                 &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;factor&gt; &lt;DNAStringSet&gt;</span></span>
@@ -299,21 +302,21 @@ fast chromosome-position operations</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 92 × 20</span></span></span>
-<span><span class="co">#&gt;    seqnames  start    end width strand paramR…¹ REF   ALT    QUAL FILTER      ES</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1        <span style="text-decoration: underline;">721</span>290 <span style="text-decoration: underline;">721</span>290     1 *      <span style="color: #BB0000;">NA</span>       G     C        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1        <span style="text-decoration: underline;">723</span>819 <span style="text-decoration: underline;">723</span>819     1 *      <span style="color: #BB0000;">NA</span>       T     A        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.014</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1        <span style="text-decoration: underline;">723</span>891 <span style="text-decoration: underline;">723</span>891     1 *      <span style="color: #BB0000;">NA</span>       G     C        <span style="color: #BB0000;">NA</span> PASS    0.004<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1        <span style="text-decoration: underline;">752</span>566 <span style="text-decoration: underline;">752</span>566     1 *      <span style="color: #BB0000;">NA</span>       G     A        <span style="color: #BB0000;">NA</span> PASS    0.006 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1        <span style="text-decoration: underline;">753</span>541 <span style="text-decoration: underline;">753</span>541     1 *      <span style="color: #BB0000;">NA</span>       G     A        <span style="color: #BB0000;">NA</span> PASS    0.003<span style="text-decoration: underline;">5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1        <span style="text-decoration: underline;">754</span>192 <span style="text-decoration: underline;">754</span>192     1 *      <span style="color: #BB0000;">NA</span>       A     G        <span style="color: #BB0000;">NA</span> PASS    0.007<span style="text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1        <span style="text-decoration: underline;">768</span>448 <span style="text-decoration: underline;">768</span>448     1 *      <span style="color: #BB0000;">NA</span>       G     A        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1        <span style="text-decoration: underline;">775</span>659 <span style="text-decoration: underline;">775</span>659     1 *      <span style="color: #BB0000;">NA</span>       A     G        <span style="color: #BB0000;">NA</span> PASS    0.002<span style="text-decoration: underline;">9</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1        <span style="text-decoration: underline;">777</span>122 <span style="text-decoration: underline;">777</span>122     1 *      <span style="color: #BB0000;">NA</span>       A     T        <span style="color: #BB0000;">NA</span> PASS    0.003<span style="text-decoration: underline;">1</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1        <span style="text-decoration: underline;">779</span>322 <span style="text-decoration: underline;">779</span>322     1 *      <span style="color: #BB0000;">NA</span>       A     G        <span style="color: #BB0000;">NA</span> PASS   -<span style="color: #BB0000;">0.006</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 82 more rows, 9 more variables: SE &lt;dbl&gt;, LP &lt;dbl&gt;, AF &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   SS &lt;dbl&gt;, EZ &lt;dbl&gt;, SI &lt;dbl&gt;, NC &lt;dbl&gt;, ID &lt;chr&gt;, id &lt;chr&gt;, and abbreviated</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   variable name ¹​paramRangeID</span></span></span></code></pre></div>
+<span><span class="co">#&gt;    seqnames  start    end width strand paramRangeID REF   ALT    QUAL FILTER</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1        <span style="text-decoration: underline;">721</span>290 <span style="text-decoration: underline;">721</span>290     1 *      <span style="color: #BB0000;">NA</span>           G     C        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1        <span style="text-decoration: underline;">723</span>819 <span style="text-decoration: underline;">723</span>819     1 *      <span style="color: #BB0000;">NA</span>           T     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1        <span style="text-decoration: underline;">723</span>891 <span style="text-decoration: underline;">723</span>891     1 *      <span style="color: #BB0000;">NA</span>           G     C        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1        <span style="text-decoration: underline;">752</span>566 <span style="text-decoration: underline;">752</span>566     1 *      <span style="color: #BB0000;">NA</span>           G     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1        <span style="text-decoration: underline;">753</span>541 <span style="text-decoration: underline;">753</span>541     1 *      <span style="color: #BB0000;">NA</span>           G     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1        <span style="text-decoration: underline;">754</span>192 <span style="text-decoration: underline;">754</span>192     1 *      <span style="color: #BB0000;">NA</span>           A     G        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1        <span style="text-decoration: underline;">768</span>448 <span style="text-decoration: underline;">768</span>448     1 *      <span style="color: #BB0000;">NA</span>           G     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1        <span style="text-decoration: underline;">775</span>659 <span style="text-decoration: underline;">775</span>659     1 *      <span style="color: #BB0000;">NA</span>           A     G        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1        <span style="text-decoration: underline;">777</span>122 <span style="text-decoration: underline;">777</span>122     1 *      <span style="color: #BB0000;">NA</span>           A     T        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1        <span style="text-decoration: underline;">779</span>322 <span style="text-decoration: underline;">779</span>322     1 *      <span style="color: #BB0000;">NA</span>           A     G        <span style="color: #BB0000;">NA</span> PASS  </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 82 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 10 more variables: ES &lt;dbl&gt;, SE &lt;dbl&gt;, LP &lt;dbl&gt;, AF &lt;dbl&gt;, SS &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   EZ &lt;dbl&gt;, SI &lt;dbl&gt;, NC &lt;dbl&gt;, ID &lt;chr&gt;, id &lt;chr&gt;</span></span></span></code></pre></div>
 <p>The direct conversion to formats for tools such as TwoSampleMR,
 coloc, and many others can also be made using the <a href="https://github.com/mrcieu/gwasglue" class="external-link">https://github.com/mrcieu/gwasglue</a>
 R package.</p>
@@ -482,7 +485,7 @@ sqlite database linking -log10 pvalues to chromosome and position.</p>
 <span><span class="co">#&gt; Extracting pval info</span></span>
 <span><span class="co">#&gt; [1] "CREATE TABLE pval_to_coord (chrom TEXT NOT NULL DEFAULT NULL, coord INTEGER NOT NULL DEFAULT NULL, LP REAL NOT NULL DEFAULT 0);"</span></span>
 <span><span class="co">#&gt; [2] ".separator ,"                                                                                                                   </span></span>
-<span><span class="co">#&gt; [3] ".import /tmp/Rtmp9CqA4H/file2fd877aadcdc pval_to_coord"                                                                         </span></span>
+<span><span class="co">#&gt; [3] ".import /tmp/Rtmp5nr3Ib/file2f7f429733ad pval_to_coord"                                                                         </span></span>
 <span><span class="co">#&gt; [4] "CREATE INDEX idx_LP ON pval_to_coord (LP)"</span></span>
 <span><span class="co">#&gt; Generating index</span></span></code></pre></div>
 <p>To query using the index:</p>
@@ -563,7 +566,7 @@ query that variant:</p>
 <span><span class="co">#&gt; Determining searchspace...</span></span>
 <span><span class="co">#&gt; Proxy lookup...</span></span>
 <span><span class="co">#&gt; Finding proxies...</span></span>
-<span><span class="co">#&gt; Taking input= as a system command ('gunzip -c /tmp/Rtmp9CqA4H/file2fd812c4c368.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span></span>
+<span><span class="co">#&gt; Taking input= as a system command ('gunzip -c /tmp/Rtmp5nr3Ib/file2f7f6fd34c97.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span></span>
 <span><span class="co">#&gt; Found 10 proxies</span></span>
 <span><span class="co">#&gt; Extrating proxies...</span></span>
 <span><span class="co">#&gt; Identified proxies for 1 of 1 rsids</span></span>
@@ -595,7 +598,7 @@ variants are aligned to the effect alleles of the target variants:</p>
 <span><span class="co">#&gt; Determining searchspace...</span></span>
 <span><span class="co">#&gt; Proxy lookup...</span></span>
 <span><span class="co">#&gt; Finding proxies...</span></span>
-<span><span class="co">#&gt; Taking input= as a system command ('gunzip -c /tmp/Rtmp9CqA4H/file2fd83d4a2926.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span></span>
+<span><span class="co">#&gt; Taking input= as a system command ('gunzip -c /tmp/Rtmp5nr3Ib/file2f7f421adc3a.targets.ld.gz') and a variable has been used in the expression passed to `input=`. Please use fread(cmd=...). There is a security concern if you are creating an app, and the app could have a malicious user, and the app is not running in a secure environment; e.g. the app is running as root. Please read item 5 in the NEWS file for v1.11.6 for more information and for the option to suppress this message.</span></span>
 <span><span class="co">#&gt; Found 270 proxies</span></span>
 <span><span class="co">#&gt; Extrating proxies...</span></span>
 <span><span class="co">#&gt; Identified proxies for 52 of 1 rsids</span></span>
@@ -689,6 +692,26 @@ be converted to a VCF object.</p>
 <p>You may want to first harmonise the data so that all the non-effect
 alleles are aligned to the human genome reference. See the <a href="https://github.com/MRCIEU/gwasglue" class="external-link">gwasglue</a> package on some
 functions to do this.</p>
+</div>
+<div class="section level2">
+<h2 id="creating-a-gwasglue2-summaryset-object-from-a-vcf-file">Creating a gwasglue2 SummarySet object from a vcf file<a class="anchor" aria-label="anchor" href="#creating-a-gwasglue2-summaryset-object-from-a-vcf-file"></a>
+</h2>
+<p>Although still under development, if compared with its predecessor,
+the <a href="https://mrcieu.github.io/gwasglue2/" class="external-link">gwasglue2</a> package
+has several new features, including the use of S4 R objects.</p>
+<p>It is possible to create a <code>SummarySet</code> object from a
+GWAS-VCF file or VCF object e.g. output from
+<code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">VariantAnnotation::readVcf()</a></code>, <code><a href="../reference/create_vcf.html">create_vcf()</a></code> or
+<code><a href="../reference/query_gwas.html">query_gwas()</a></code> using the <code><a href="../reference/gwasvcf_to_summaryset.html">gwasvcf_to_summaryset()</a></code>
+function.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summaryset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></span><span class="op">(</span><span class="va">vcffile</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span>              <span class="fu"><a href="../reference/gwasvcf_to_summaryset.html">gwasvcf_to_summaryset</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Once the <code>SummarySet</code> objects are created, it is possible
+to use <code>gwasglue2</code> to harmonise data, harmonise against a LD
+matrix, remap genomic coordinates to a different genome assembly,
+convert to other formats and more.</p>
 </div>
   </div>
 

@@ -22,6 +22,9 @@
     <loc>https://mrcieu.github.io/gwasvcf/index.html</loc>
   </url>
   <url>
+    <loc>https://mrcieu.github.io/gwasvcf/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://mrcieu.github.io/gwasvcf/reference/VariantAnnotation.html</loc>
   </url>
   <url>
@@ -47,6 +50,9 @@
   </url>
   <url>
     <loc>https://mrcieu.github.io/gwasvcf/reference/get_ld_proxies.html</loc>
+  </url>
+  <url>
+    <loc>https://mrcieu.github.io/gwasvcf/reference/gwasvcf_to_summaryset.html</loc>
   </url>
   <url>
     <loc>https://mrcieu.github.io/gwasvcf/reference/index.html</loc>

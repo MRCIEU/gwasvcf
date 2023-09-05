@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gwasvcf</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
       </span>
     </div>
 
@@ -35,6 +35,9 @@
       <a href="../articles/guide.html">Reading, querying and writing GWAS summary data in VCF format</a>
     </li>
   </ul></li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/mrcieu/gwasvcf/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
@@ -83,11 +86,11 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>vcf</dt>
-<dd><p>Path or URL to GWAS-VCF file or VCF object e.g. output from VariantAnnotation::readVcf or gwasvcftools::query_vcf</p></dd>
+<dd><p>Path or URL to GWAS-VCF file or VCF object e.g. output from <code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">VariantAnnotation::readVcf()</a></code> or <code><a href="create_vcf.html">create_vcf()</a></code></p></dd>
 
 
 <dt>chrompos</dt>
-<dd><p>Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns `chrom`, `start`, `end`.</p></dd>
+<dd><p>Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns <code>chrom</code>, <code>start</code>, <code>end</code>.</p></dd>
 
 
 <dt>rsid</dt>
