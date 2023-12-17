@@ -55,7 +55,7 @@ get_ld_proxies <- function(rsid, bfile, searchspace=NULL, tag_kb=5000, tag_nsnp=
 		message("Index SNP not found in the reference panel")
 		return(ld)
 	}
-	ld <- data.table::fread(paste0("gunzip -c ", outname), header=TRUE) %>%
+	ld <- data.table::fread(cmd = paste0("gunzip -c ", outname), header = TRUE) %>%
 		dplyr::as_tibble(.name_repair="minimal") %>%
 		dplyr::filter(.data[["R"]]^2 > tag_r2) %>%
 		dplyr::filter(.data[["SNP_A"]] != .data[["SNP_B"]]) %>%
