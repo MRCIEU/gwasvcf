@@ -3,8 +3,8 @@
 <!-- badges: start -->
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![codecov](https://codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://codecov.io/github/mrcieu/gwasvcf)
 [![R-CMD-check](https://github.com/MRCIEU/gwasvcf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MRCIEU/gwasvcf/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/MRCIEU/gwasvcf/branch/master/graph/badge.svg)](https://app.codecov.io/gh/MRCIEU/gwasvcf?branch=master)
 <!-- badges: end -->
 
 Complete GWAS summary datasets are now abundant. A large repository of curated, harmonised and QC'd datasets is available in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/). They can be queried via the [API](http://gwasapi.mrcieu.ac.uk/docs/) directly, or through the [ieugwasr](https://github.com/mrcieu/ieugwasr) R package, or the [ieugwaspy](https://github.com/mrcieu/ieugwaspy) python package. However, for faster querying that can be used in a HPC environment, accessing the data directly and not through cloud systems is advantageous. 
