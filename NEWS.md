@@ -1,3 +1,6 @@
+
+* Removed temporarily `gwasvcf_to_summaryset()` function for CRAN submission.
+
 # gwasvcf 0.1.2
 
 * New `gwasvcf_to_summaryset()` function to create a [gwasglue2](https://mrcieu.github.io/gwasglue2) SummarySet object from a vcf file
