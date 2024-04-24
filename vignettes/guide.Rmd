@@ -23,7 +23,8 @@ All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available
 
 For some VCF querying functions it is faster to optionally use [bcftools](https://samtools.github.io/bcftools/bcftools.html), and when available the R package will use that strategy. To set a location for the bcftools package, use
 
-```r
+
+```{r}
 library(gwasvcf)
 set_bcftools('/path/to/bcftools')
 ```
@@ -32,13 +33,13 @@ Note that there is bcftools binary for Windows available, so some querying optio
 
 For LD related functions the package uses [plink 1.90](https://www.cog-genomics.org/plink/1.9). You can specify the location of your plink installation by running
 
-```r
+```{r}
 set_plink('/path/to/plink')
 ```
 
 Alternatively you can automatically use use the binaries bundled here: https://github.com/mrcieu/genetics.binaRies 
 
-```r
+```{r}
 remotes::install_github('mrcieu/genetics.binaRies')
 set_plink()
 set_bcftools()
@@ -46,7 +47,7 @@ set_bcftools()
 
 To unset a path:
 
-```r
+```{r}
 set_plink(NULL)
 set_bcftools(NULL)
 ```
@@ -58,7 +59,6 @@ suppressWarnings(suppressPackageStartupMessages({
   library(gwasvcf)
   library(VariantAnnotation)
   library(dplyr)
-  library(magrittr)
 }))
 ```
 ```{r eval=Sys.info()["sysname"] != "Windows"}
@@ -114,7 +114,7 @@ rowRanges(vcf)
 
 ## Converting to simple dataframes
 
-The VCF object is somewhat complex and you can read more about it in the 'VariantAnnotation package documentation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). You can create various other formats that might be easier to use from it. For example, create a `GRanges` object which is great for fast chromosome-position operations
+The VCF object is somewhat complex and you can read more about it in the [VariantAnnotation package documentation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). You can create various other formats that might be easier to use from it. For example, create a `GRanges` object which is great for fast chromosome-position operations
 
 ```{r}
 vcf_to_granges(vcf)
@@ -343,7 +343,7 @@ writeVcf(out, file="temp.vcf")
 
 You may want to first harmonise the data so that all the non-effect alleles are aligned to the human genome reference. See the [gwasglue](https://github.com/MRCIEU/gwasglue) package on some functions to do this. 
 
-## Creating a gwasglue2 SummarySet object from a vcf file
+## Creating a gwasglue2 SummarySet object from a vcf file (this functionality was removed on the CRAN release)
 
 Although still under development, if compared with its predecessor, the [gwasglue2](https://mrcieu.github.io/gwasglue2/) package has several new features, including the use of S4 R objects.
 
