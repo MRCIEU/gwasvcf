@@ -16,7 +16,7 @@ License: MIT + file LICENSE
 URL: https://github.com/mrcieu/gwasvcf
 BugReports: https://github.com/mrcieu/gwasvcf/issues
 Depends: 
-    R (>= 4.3)
+    R (>= 4.0)
 Imports:
     BiocGenerics,
     Biostrings,
