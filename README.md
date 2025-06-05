@@ -21,6 +21,14 @@ See also the [gwasglue](https://github.com/MRCIEU/gwasglue) R package for method
 
 ## Installation
 
+You can install a binary version from our [MRC IEU r-universe](https://mrcieu.r-universe.dev/builds) with
+
+```r
+install.packages('gwasvcf', repos = c('https://mrcieu.r-universe.dev', 'https://cloud.r-project.org'))
+```
+
+or install from the GitHub repo
+
 ```r
 remotes::install_github("mrcieu/gwasvcf")
 ```
