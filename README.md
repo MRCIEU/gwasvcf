@@ -2,12 +2,12 @@
 
 <!-- badges: start -->
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![codecov](https://codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://codecov.io/github/mrcieu/gwasvcf)
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![codecov](https://app.codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://app.codecov.io/github/mrcieu/gwasvcf)
 [![R-CMD-check](https://github.com/MRCIEU/gwasvcf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MRCIEU/gwasvcf/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Complete GWAS summary datasets are now abundant. A large repository of curated, harmonised and QC'd datasets is available in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/). They can be queried via the [API](http://gwasapi.mrcieu.ac.uk/docs/) directly, or through the [ieugwasr](https://github.com/mrcieu/ieugwasr) R package, or the [ieugwaspy](https://github.com/mrcieu/ieugwaspy) python package. However, for faster querying that can be used in a HPC environment, accessing the data directly and not through cloud systems is advantageous. 
+Complete GWAS summary datasets are now abundant. A large repository of curated, harmonised and QC'd datasets is available in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/). They can be queried via the [API](https://api.opengwas.io/api/) directly, or through the [ieugwasr](https://github.com/mrcieu/ieugwasr) R package, or the [ieugwaspy](https://github.com/mrcieu/ieugwaspy) Python package. However, for faster querying that can be used in a HPC environment, accessing the data directly and not through cloud systems is advantageous. 
 
 We developed a format for storing and harmonising GWAS summary data known as [GWAS VCF format](https://github.com/MRCIEU/gwas-vcf-specification/releases/tag/1.0.0) which can be created using [gwas2vcf](https://github.com/mrcieu/gwas2vcf). All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available for download in this format. This R package provides fast and convenient functions for querying and creating GWAS summary data in GWAS VCF format (v1.0). See also [pygwasvcf](https://github.com/mrcieu/pygwasvcf) a Python3 parser for querying GWAS VCF files.
 
@@ -35,7 +35,7 @@ remotes::install_github("mrcieu/gwasvcf")
 
 ## Usage
 
-See vignettes here: [https://mrcieu.github.io/gwasvcf](https://mrcieu.github.io/gwasvcf).
+See vignettes here: [https://mrcieu.github.io/gwasvcf/](https://mrcieu.github.io/gwasvcf/).
 
 ## Citation
 
