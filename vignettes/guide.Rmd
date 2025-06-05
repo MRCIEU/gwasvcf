@@ -112,7 +112,7 @@ rowRanges(vcf)
 
 ## Converting to simple dataframes
 
-The VCF object is somewhat complex and you can read more about it in the 'VariantAnnotation package documentation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). You can create various other formats that might be easier to use from it. For example, create a `GRanges` object which is great for fast chromosome-position operations
+The VCF object is somewhat complex and you can read more about it in the [VariantAnnotation package documentation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). You can create various other formats that might be easier to use from it. For example, create a `GRanges` object which is great for fast chromosome-position operations
 
 ```{r}
 vcf_to_granges(vcf)
