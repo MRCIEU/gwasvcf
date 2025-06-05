@@ -35,7 +35,7 @@ remotes::install_github("mrcieu/gwasvcf")
 
 ## Usage
 
-See vignettes here: [https://mrcieu.github.io/gwasvcf](https://mrcieu.github.io/gwasvcf).
+See vignettes here: [https://mrcieu.github.io/gwasvcf/](https://mrcieu.github.io/gwasvcf/).
 
 ## Citation
 
