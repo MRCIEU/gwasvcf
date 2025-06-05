@@ -3,7 +3,7 @@
 <!-- badges: start -->
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![codecov](https://app.codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://codecov.io/github/mrcieu/gwasvcf)
+[![codecov](https://app.codecov.io/github/mrcieu/gwasvcf/branch/master/graphs/badge.svg)](https://app.codecov.io/github/mrcieu/gwasvcf)
 [![R-CMD-check](https://github.com/MRCIEU/gwasvcf/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/MRCIEU/gwasvcf/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
