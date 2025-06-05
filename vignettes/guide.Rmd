@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-We developed a format for storing and harmonising GWAS summary data known as [GWAS VCF format](https://github.com/MRCIEU/gwas_vcf_spec). This format is effective for being very fast when querying chromosome and position ranges, handling multiallelic variants and indels. 
+We developed a format for storing and harmonising GWAS summary data known as [GWAS VCF format](https://github.com/MRCIEU/gwas-vcf-specification). This format is effective for being very fast when querying chromosome and position ranges, handling multiallelic variants and indels. 
 
 All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available for download in the GWAS VCF format. This R package provides fast and convenient functions for querying and creating GWAS summary data in GWAS VCF format. The package builds on the [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html) Bioconductor package, which itself is based on the widely used [SummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html) Bioconductor package.
 
