@@ -1,3 +1,7 @@
+# gwasvcf 0.1.3
+
+* Fix for security message in `get_ld_proxies()` (thanks @mattlee821)
+
 # gwasvcf 0.1.2
 
 * New `gwasvcf_to_summaryset()` function to create a [gwasglue2](https://mrcieu.github.io/gwasglue2) SummarySet object from a vcf file
