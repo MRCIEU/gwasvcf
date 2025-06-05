@@ -1,1 +1,4 @@
+template:
+  bootstrap: 5
+  light-switch: true
 url: https://mrcieu.github.io/gwasvcf/
