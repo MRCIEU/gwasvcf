@@ -1,3 +1,7 @@
+# gwasvcf 0.1.4
+
+* Add sqlite3 to DESCRIPTION SystemRequirements for `create_pval_index_from_vcf()`
+
 # gwasvcf 0.1.3
 
 * Fix for security message in `get_ld_proxies()` (thanks @mattlee821)
