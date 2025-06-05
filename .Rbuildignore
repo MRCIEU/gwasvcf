@@ -21,3 +21,4 @@ tests/testthat/temp.vcf
 vignettes/index.rsidx
 vignettes/temp.vcf
 vignettes/index.pvali
+^codecov\.yml$
