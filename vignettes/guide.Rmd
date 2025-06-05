@@ -128,8 +128,7 @@ The direct conversion to formats for tools such as TwoSampleMR, coloc, and many 
 
 ## Reading in with filters
 
-The `query_gwas` function takes either a filename to a vcf file, or vcf object as the main argument. You can then query on `rsid`, `pval` or `chrompos`. For example
-
+The `query_gwas()` function takes either a filename to a vcf file, or vcf object as the main argument. You can then query on `rsid`, `pval` or `chrompos`. For example
 
 ```{r}
 vcfsubset <- query_gwas(vcffile, chrompos=c("1:1097291-1099437"))
