@@ -1,6 +1,7 @@
 # gwasvcf 0.1.4
 
 * Add sqlite3 to DESCRIPTION SystemRequirements for `create_pval_index_from_vcf()`
+* Update some URLs within the package documentation
 
 # gwasvcf 0.1.3
 
