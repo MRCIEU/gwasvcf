@@ -67,7 +67,7 @@
       <h1>Reading, querying and writing GWAS summary data in VCF format</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/mrcieu/gwasvcf/blob/v0.1.4/vignettes/guide.Rmd" class="external-link"><code>vignettes/guide.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/mrcieu/gwasvcf/blob/master/vignettes/guide.Rmd" class="external-link"><code>vignettes/guide.Rmd</code></a></small>
       <div class="d-none name"><code>guide.Rmd</code></div>
     </div>
 
@@ -120,7 +120,6 @@ here: <a href="https://github.com/mrcieu/genetics.binaRies" class="external-link
 <span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/set_bcftools.html">set_bcftools</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required namespace: genetics.binaRies</span></span>
 <span><span class="co">#&gt; Path not provided, using binaries in the MRCIEU/genetics.binaRies package</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -154,15 +153,15 @@ object. A brief summary follows.</p>
 <span><span class="co">#&gt; geno(vcf):</span></span>
 <span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
 <span><span class="co">#&gt; geno(header(vcf)):</span></span>
-<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
-<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
-<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
-<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
-<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
-<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
-<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
-<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
-<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                     </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele         </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                          </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                              </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study             </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                     </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and SE f...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                       </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect                 </span></span>
 <span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <p>There are 92 rows and 1 column which means 92 SNPs and one GWAS. See
 the header information:</p>
@@ -255,53 +254,53 @@ operations</p>
 <span><span class="co">#&gt;    rs6603783        1   1181751      * |           NA           T           C</span></span>
 <span><span class="co">#&gt;    rs6603785        1   1186502      * |           NA           A           T</span></span>
 <span><span class="co">#&gt;    rs6603787        1   1188225      * |           NA           G           T</span></span>
-<span><span class="co">#&gt;                   QUAL      FILTER        ES        SE        LP        AF</span></span>
-<span><span class="co">#&gt;              &lt;numeric&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">#&gt;   rs12565286        NA        PASS   -0.0067    0.0145 0.1930060   0.93220</span></span>
-<span><span class="co">#&gt;   rs11804171        NA        PASS   -0.0146    0.0175 0.3935110   0.96296</span></span>
-<span><span class="co">#&gt;    rs2977670        NA        PASS    0.0044    0.0184 0.0909791   0.07143</span></span>
-<span><span class="co">#&gt;    rs3094315        NA        PASS    0.0060    0.0065 0.4485500   0.15520</span></span>
-<span><span class="co">#&gt;    rs2073813        NA        PASS    0.0035    0.0102 0.1357860        NA</span></span>
-<span><span class="co">#&gt;          ...       ...         ...       ...       ...       ...       ...</span></span>
-<span><span class="co">#&gt;     rs715643        NA        PASS    0.0019    0.0118 0.0594337   0.90833</span></span>
-<span><span class="co">#&gt;    rs6675798        NA        PASS   -0.0013    0.0067 0.0725270   0.89170</span></span>
-<span><span class="co">#&gt;    rs6603783        NA        PASS   -0.0002    0.0069 0.0101499   0.90000</span></span>
-<span><span class="co">#&gt;    rs6603785        NA        PASS    0.0075    0.0104 0.3271640   0.91667</span></span>
-<span><span class="co">#&gt;    rs6603787        NA        PASS    0.0025    0.0089 0.1085740        NA</span></span>
-<span><span class="co">#&gt;                     SS        EZ        SI        NC          ID          id</span></span>
-<span><span class="co">#&gt;              &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">#&gt;   rs12565286  109823.0        NA        NA        NA  rs12565286     IEU-a-2</span></span>
-<span><span class="co">#&gt;   rs11804171   84828.0        NA        NA        NA  rs11804171     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs2977670   68458.9        NA        NA        NA   rs2977670     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs3094315  131544.0        NA        NA        NA   rs3094315     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs2073813   64351.3        NA        NA        NA   rs2073813     IEU-a-2</span></span>
-<span><span class="co">#&gt;          ...       ...       ...       ...       ...         ...         ...</span></span>
-<span><span class="co">#&gt;     rs715643    121822        NA        NA        NA    rs715643     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs6675798    223475        NA        NA        NA   rs6675798     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs6603783    220022        NA        NA        NA   rs6603783     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs6603785    165964        NA        NA        NA   rs6603785     IEU-a-2</span></span>
-<span><span class="co">#&gt;    rs6603787    199099        NA        NA        NA   rs6603787     IEU-a-2</span></span>
+<span><span class="co">#&gt;                   QUAL      FILTER        ES        SE        LP        AF        SS</span></span>
+<span><span class="co">#&gt;              &lt;numeric&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286        NA        PASS   -0.0067    0.0145 0.1930060   0.93220  109823.0</span></span>
+<span><span class="co">#&gt;   rs11804171        NA        PASS   -0.0146    0.0175 0.3935110   0.96296   84828.0</span></span>
+<span><span class="co">#&gt;    rs2977670        NA        PASS    0.0044    0.0184 0.0909791   0.07143   68458.9</span></span>
+<span><span class="co">#&gt;    rs3094315        NA        PASS    0.0060    0.0065 0.4485500   0.15520  131544.0</span></span>
+<span><span class="co">#&gt;    rs2073813        NA        PASS    0.0035    0.0102 0.1357860        NA   64351.3</span></span>
+<span><span class="co">#&gt;          ...       ...         ...       ...       ...       ...       ...       ...</span></span>
+<span><span class="co">#&gt;     rs715643        NA        PASS    0.0019    0.0118 0.0594337   0.90833    121822</span></span>
+<span><span class="co">#&gt;    rs6675798        NA        PASS   -0.0013    0.0067 0.0725270   0.89170    223475</span></span>
+<span><span class="co">#&gt;    rs6603783        NA        PASS   -0.0002    0.0069 0.0101499   0.90000    220022</span></span>
+<span><span class="co">#&gt;    rs6603785        NA        PASS    0.0075    0.0104 0.3271640   0.91667    165964</span></span>
+<span><span class="co">#&gt;    rs6603787        NA        PASS    0.0025    0.0089 0.1085740        NA    199099</span></span>
+<span><span class="co">#&gt;                     EZ        SI        NC          ID          id</span></span>
+<span><span class="co">#&gt;              &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs12565286        NA        NA        NA  rs12565286     IEU-a-2</span></span>
+<span><span class="co">#&gt;   rs11804171        NA        NA        NA  rs11804171     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs2977670        NA        NA        NA   rs2977670     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs3094315        NA        NA        NA   rs3094315     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs2073813        NA        NA        NA   rs2073813     IEU-a-2</span></span>
+<span><span class="co">#&gt;          ...       ...       ...       ...         ...         ...</span></span>
+<span><span class="co">#&gt;     rs715643        NA        NA        NA    rs715643     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6675798        NA        NA        NA   rs6675798     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6603783        NA        NA        NA   rs6603783     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6603785        NA        NA        NA   rs6603785     IEU-a-2</span></span>
+<span><span class="co">#&gt;    rs6603787        NA        NA        NA   rs6603787     IEU-a-2</span></span>
 <span><span class="co">#&gt;   -------</span></span>
 <span><span class="co">#&gt;   seqinfo: 84 sequences from GRCh37 genome</span></span></code></pre></div>
 <p>Create a data frame:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 92 × 20</span></span></span>
-<span><span class="co">#&gt;    seqnames  start    end width strand paramRangeID REF   ALT    QUAL FILTER</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1        <span style="text-decoration: underline;">721</span>290 <span style="text-decoration: underline;">721</span>290     1 *      <span style="color: #BB0000;">NA</span>           G     C        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1        <span style="text-decoration: underline;">723</span>819 <span style="text-decoration: underline;">723</span>819     1 *      <span style="color: #BB0000;">NA</span>           T     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1        <span style="text-decoration: underline;">723</span>891 <span style="text-decoration: underline;">723</span>891     1 *      <span style="color: #BB0000;">NA</span>           G     C        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1        <span style="text-decoration: underline;">752</span>566 <span style="text-decoration: underline;">752</span>566     1 *      <span style="color: #BB0000;">NA</span>           G     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1        <span style="text-decoration: underline;">753</span>541 <span style="text-decoration: underline;">753</span>541     1 *      <span style="color: #BB0000;">NA</span>           G     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1        <span style="text-decoration: underline;">754</span>192 <span style="text-decoration: underline;">754</span>192     1 *      <span style="color: #BB0000;">NA</span>           A     G        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1        <span style="text-decoration: underline;">768</span>448 <span style="text-decoration: underline;">768</span>448     1 *      <span style="color: #BB0000;">NA</span>           G     A        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1        <span style="text-decoration: underline;">775</span>659 <span style="text-decoration: underline;">775</span>659     1 *      <span style="color: #BB0000;">NA</span>           A     G        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1        <span style="text-decoration: underline;">777</span>122 <span style="text-decoration: underline;">777</span>122     1 *      <span style="color: #BB0000;">NA</span>           A     T        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1        <span style="text-decoration: underline;">779</span>322 <span style="text-decoration: underline;">779</span>322     1 *      <span style="color: #BB0000;">NA</span>           A     G        <span style="color: #BB0000;">NA</span> PASS  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 82 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 10 more variables: ES &lt;dbl&gt;, SE &lt;dbl&gt;, LP &lt;dbl&gt;, AF &lt;dbl&gt;, SS &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   EZ &lt;dbl&gt;, SI &lt;dbl&gt;, NC &lt;dbl&gt;, ID &lt;chr&gt;, id &lt;chr&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; # A tibble: 92 × 20</span></span>
+<span><span class="co">#&gt;    seqnames  start    end width strand paramRangeID REF   ALT    QUAL FILTER      ES</span></span>
+<span><span class="co">#&gt;    &lt;fct&gt;     &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;fct&gt;  &lt;fct&gt;        &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 1        721290 721290     1 *      &lt;NA&gt;         G     C        NA PASS   -0.0067</span></span>
+<span><span class="co">#&gt;  2 1        723819 723819     1 *      &lt;NA&gt;         T     A        NA PASS   -0.0146</span></span>
+<span><span class="co">#&gt;  3 1        723891 723891     1 *      &lt;NA&gt;         G     C        NA PASS    0.0044</span></span>
+<span><span class="co">#&gt;  4 1        752566 752566     1 *      &lt;NA&gt;         G     A        NA PASS    0.006 </span></span>
+<span><span class="co">#&gt;  5 1        753541 753541     1 *      &lt;NA&gt;         G     A        NA PASS    0.0035</span></span>
+<span><span class="co">#&gt;  6 1        754192 754192     1 *      &lt;NA&gt;         A     G        NA PASS    0.0077</span></span>
+<span><span class="co">#&gt;  7 1        768448 768448     1 *      &lt;NA&gt;         G     A        NA PASS   -0.0027</span></span>
+<span><span class="co">#&gt;  8 1        775659 775659     1 *      &lt;NA&gt;         A     G        NA PASS    0.0029</span></span>
+<span><span class="co">#&gt;  9 1        777122 777122     1 *      &lt;NA&gt;         A     T        NA PASS    0.0031</span></span>
+<span><span class="co">#&gt; 10 1        779322 779322     1 *      &lt;NA&gt;         A     G        NA PASS   -0.0062</span></span>
+<span><span class="co">#&gt; # ℹ 82 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 9 more variables: SE &lt;dbl&gt;, LP &lt;dbl&gt;, AF &lt;dbl&gt;, SS &lt;dbl&gt;, EZ &lt;dbl&gt;, SI &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   NC &lt;dbl&gt;, ID &lt;chr&gt;, id &lt;chr&gt;</span></span></code></pre></div>
 <p>The direct conversion to formats for tools such as TwoSampleMR,
 coloc, and many others can also be made using the <a href="https://github.com/mrcieu/gwasglue" class="external-link">https://github.com/mrcieu/gwasglue</a>
 R package.</p>
@@ -340,15 +339,15 @@ required.</p>
 <span><span class="co">#&gt; geno(vcf):</span></span>
 <span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
 <span><span class="co">#&gt; geno(header(vcf)):</span></span>
-<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
-<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
-<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
-<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
-<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
-<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
-<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
-<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
-<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                     </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele         </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                          </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                              </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study             </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                     </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and SE f...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                       </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect                 </span></span>
 <span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, pval<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></span>
@@ -367,15 +366,15 @@ required.</p>
 <span><span class="co">#&gt; geno(vcf):</span></span>
 <span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
 <span><span class="co">#&gt; geno(header(vcf)):</span></span>
-<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
-<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
-<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
-<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
-<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
-<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
-<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
-<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
-<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                     </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele         </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                          </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                              </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study             </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                     </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and SE f...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                       </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect                 </span></span>
 <span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_gwas.html">query_gwas</a></span><span class="op">(</span><span class="va">vcffile</span>, chrompos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1:1097291-1099437"</span><span class="op">)</span><span class="op">)</span></span>
@@ -394,15 +393,15 @@ required.</p>
 <span><span class="co">#&gt; geno(vcf):</span></span>
 <span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
 <span><span class="co">#&gt; geno(header(vcf)):</span></span>
-<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
-<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
-<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
-<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
-<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
-<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
-<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
-<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
-<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                     </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele         </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                          </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                              </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study             </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                     </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and SE f...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                       </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect                 </span></span>
 <span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <p>It’s possible to chain filters together e.g.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
@@ -423,15 +422,15 @@ required.</p>
 <span><span class="co">#&gt; geno(vcf):</span></span>
 <span><span class="co">#&gt;   List of length 9: ES, SE, LP, AF, SS, EZ, SI, NC, ID</span></span>
 <span><span class="co">#&gt; geno(header(vcf)):</span></span>
-<span><span class="co">#&gt;       Number Type   Description                                                </span></span>
-<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele    </span></span>
-<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                     </span></span>
-<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                         </span></span>
-<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study        </span></span>
-<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                </span></span>
-<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and...</span></span>
-<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                  </span></span>
-<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect            </span></span>
+<span><span class="co">#&gt;       Number Type   Description                                                     </span></span>
+<span><span class="co">#&gt;    ES A      Float  Effect size estimate relative to the alternative allele         </span></span>
+<span><span class="co">#&gt;    SE A      Float  Standard error of effect size estimate                          </span></span>
+<span><span class="co">#&gt;    LP A      Float  -log10 p-value for effect estimate                              </span></span>
+<span><span class="co">#&gt;    AF A      Float  Alternate allele frequency in the association study             </span></span>
+<span><span class="co">#&gt;    SS A      Float  Sample size used to estimate genetic effect                     </span></span>
+<span><span class="co">#&gt;    EZ A      Float  Z-score provided if it was used to derive the EFFECT and SE f...</span></span>
+<span><span class="co">#&gt;    SI A      Float  Accuracy score of summary data imputation                       </span></span>
+<span><span class="co">#&gt;    NC A      Float  Number of cases used to estimate genetic effect                 </span></span>
 <span><span class="co">#&gt;    ID 1      String Study variant identifier</span></span></code></pre></div>
 <p>It’s possible to have multiple GWAS studies per vcf. You can specify
 specific GWAS studies to read in using e.g.</p>
@@ -470,7 +469,7 @@ sqlite database linking -log10 pvalues to chromosome and position.</p>
 <span><span class="co">#&gt; Extracting pval info</span></span>
 <span><span class="co">#&gt; [1] "CREATE TABLE pval_to_coord (chrom TEXT NOT NULL DEFAULT NULL, coord INTEGER NOT NULL DEFAULT NULL, LP REAL NOT NULL DEFAULT 0);"</span></span>
 <span><span class="co">#&gt; [2] ".separator ,"                                                                                                                   </span></span>
-<span><span class="co">#&gt; [3] ".import /tmp/Rtmpo2h68L/file1eae727668c6 pval_to_coord"                                                                         </span></span>
+<span><span class="co">#&gt; [3] ".import /var/folders/9j/bw4vdrw94yndry3z9cv8ms1m0000gn/T//RtmpFnAKs1/file22f4fdc3a4d pval_to_coord"                             </span></span>
 <span><span class="co">#&gt; [4] "CREATE INDEX idx_LP ON pval_to_coord (LP)"</span></span>
 <span><span class="co">#&gt; Generating index</span></span></code></pre></div>
 <p>To query using the index:</p>
@@ -560,12 +559,12 @@ query that variant:</p>
 <span><span class="co">#&gt;             seqnames    ranges strand |         REF         ALT      QUAL</span></span>
 <span><span class="co">#&gt;                &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt; &lt;numeric&gt;</span></span>
 <span><span class="co">#&gt;   rs4442317        1   1106784      * |           T           C        NA</span></span>
-<span><span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS</span></span>
-<span><span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">#&gt;   rs4442317        PASS    0.0059    0.0071  0.391474    0.8559    138001</span></span>
-<span><span class="co">#&gt;                    EZ        SI        NC          ID          PR          id</span></span>
-<span><span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">#&gt;   rs4442317        NA        NA        NA   rs4970420   rs4970420     IEU-a-2</span></span>
+<span><span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS        EZ</span></span>
+<span><span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        PASS    0.0059    0.0071  0.391474    0.8559    138001        NA</span></span>
+<span><span class="co">#&gt;                    SI        NC          ID          PR          id</span></span>
+<span><span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        NA        NA   rs4970420   rs4970420     IEU-a-2</span></span>
 <span><span class="co">#&gt;   -------</span></span>
 <span><span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></span></code></pre></div>
 <p>Here we see that the proxy variant is rs4970420.</p>
@@ -592,7 +591,11 @@ variants are aligned to the effect alleles of the target variants:</p>
 <span></span>
 <span><span class="co"># Plot the target data effects against the proxy data effects</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">b</span><span class="op">)</span><span class="op">$</span><span class="va">ES</span>, <span class="fu"><a href="../reference/vcf_to_granges.html">vcf_to_granges</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">$</span><span class="va">ES</span><span class="op">[</span><span class="va">index</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="guide_files/figure-html/unnamed-chunk-29-1.png" alt="Plot of the target data effects against the proxy data effects" width="700"></p>
+<div class="figure">
+<img src="figure/target-effects-plot-1.png" alt="Plot of the target data effects against the proxy data effects"><p class="caption">
+Plot the target data effects against the proxy data effects
+</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="compiling-a-list-of-tagging-variants">Compiling a list of tagging variants<a class="anchor" aria-label="anchor" href="#compiling-a-list-of-tagging-variants"></a>
@@ -633,12 +636,12 @@ LD calculations. This can be done through the
 <span><span class="co">#&gt;             seqnames    ranges strand |         REF         ALT      QUAL</span></span>
 <span><span class="co">#&gt;                &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt; &lt;numeric&gt;</span></span>
 <span><span class="co">#&gt;   rs4442317        1   1106784      * |           T           C        NA</span></span>
-<span><span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS</span></span>
-<span><span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">#&gt;   rs4442317        PASS    -4e-04    0.0066 0.0214999       0.9    233073</span></span>
-<span><span class="co">#&gt;                    EZ        SI        NC          ID          PR          id</span></span>
-<span><span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">#&gt;   rs4442317        NA        NA        NA  rs10907175  rs10907175     IEU-a-2</span></span>
+<span><span class="co">#&gt;                  FILTER        ES        SE        LP        AF        SS        EZ</span></span>
+<span><span class="co">#&gt;             &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        PASS    -4e-04    0.0066 0.0214999       0.9    233073        NA</span></span>
+<span><span class="co">#&gt;                    SI        NC          ID          PR          id</span></span>
+<span><span class="co">#&gt;             &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">#&gt;   rs4442317        NA        NA  rs10907175  rs10907175     IEU-a-2</span></span>
 <span><span class="co">#&gt;   -------</span></span>
 <span><span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></span></code></pre></div>
 </div>
