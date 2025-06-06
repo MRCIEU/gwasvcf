@@ -1,0 +1,352 @@
+---
+title: "Reading, querying and writing GWAS summary data in VCF format"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reading, querying and writing GWAS summary data in VCF format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+We developed a format for storing and harmonising GWAS summary data known as [GWAS VCF format](https://github.com/MRCIEU/gwas-vcf-specification). This format is effective for being very fast when querying chromosome and position ranges, handling multiallelic variants and indels. 
+
+All the data in the [IEU GWAS database](https://gwas.mrcieu.ac.uk/) is available for download in the GWAS VCF format. This R package provides fast and convenient functions for querying and creating GWAS summary data in GWAS VCF format. The package builds on the [VariantAnnotation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html) Bioconductor package, which itself is based on the widely used [SummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html) Bioconductor package.
+
+
+## External tools
+
+For some VCF querying functions it is faster to optionally use [bcftools](https://samtools.github.io/bcftools/bcftools.html), and when available the R package will use that strategy. To set a location for the bcftools package, use
+
+```r
+library(gwasvcf)
+set_bcftools('/path/to/bcftools')
+```
+
+Note that there is bcftools binary for Windows available, so some querying options will be slower on Windows.
+
+For LD related functions the package uses [plink 1.90](https://www.cog-genomics.org/plink/1.9). You can specify the location of your plink installation by running
+
+```r
+set_plink('/path/to/plink')
+```
+
+Alternatively you can automatically use use the binaries bundled here: https://github.com/mrcieu/genetics.binaRies 
+
+```r
+remotes::install_github('mrcieu/genetics.binaRies')
+set_plink()
+set_bcftools()
+```
+
+To unset a path:
+
+```r
+set_plink(NULL)
+set_bcftools(NULL)
+```
+
+For this vignette we will use the bundled binaries in `genetics.binaRies`.
+
+```{r}
+suppressWarnings(suppressPackageStartupMessages({
+  library(gwasvcf)
+  library(VariantAnnotation)
+  library(dplyr)
+  library(magrittr)
+}))
+```
+```{r eval=Sys.info()["sysname"] != "Windows"}
+set_bcftools()
+```
+
+## Reading in everything
+
+To read an entire dataset use the `readVcf` function. As an example we'll use the bundled data which is a small subset of the Speliotes et al 2010 BMI GWAS.
+
+```{r}
+vcffile <- system.file("extdata", "data.vcf.gz", package="gwasvcf")
+vcf <- readVcf(vcffile)
+class(vcf)
+```
+
+Please refer to the `VariantAnnotation` package documentation for full details about the `CollapsedVCF` object. A brief summary follows.
+
+General info about the dataset can be obtained by calling it:
+
+```{r}
+vcf
+```
+
+There are 92 rows and 1 column which means 92 SNPs and one GWAS. See the header information:
+
+```{r}
+header(vcf)
+```
+
+See the names of the GWAS datasets (in this case just one, and it refers to the IEU GWAS database ID name):
+
+```{r}
+samples(header(vcf))
+```
+
+In this case you can obtain information about this study through the `ieugwasr` package e.g. `ieugwasr::gwasinfo("IEU-a-2")`.
+
+There are a few components within the object:
+
+- `header` which has the meta data describing the dataset, including the association result variables
+- `rowRanges` which is information about each variant
+- `info` which is further metadata about each variant
+- `geno` which is the actual association results for each GWAS
+
+the `rowRanges` object is a `GenomicRanges` class, which is useful for performing fast operations on chromosome position information.
+
+```{r}
+rowRanges(vcf)
+```
+
+## Converting to simple dataframes
+
+The VCF object is somewhat complex and you can read more about it in the [VariantAnnotation package documentation](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html). You can create various other formats that might be easier to use from it. For example, create a `GRanges` object which is great for fast chromosome-position operations
+
+```{r}
+vcf_to_granges(vcf)
+```
+
+Create a data frame:
+
+```{r}
+vcf_to_granges(vcf) %>% dplyr::as_tibble()
+```
+
+The direct conversion to formats for tools such as TwoSampleMR, coloc, and many others can also be made using the [https://github.com/mrcieu/gwasglue](https://github.com/mrcieu/gwasglue) R package.
+
+## Reading in with filters
+
+The `query_gwas()` function takes either a filename to a vcf file, or vcf object as the main argument. You can then query on `rsid`, `pval` or `chrompos`. For example
+
+```{r}
+vcfsubset <- query_gwas(vcffile, chrompos=c("1:1097291-1099437"))
+```
+
+and
+
+```{r}
+vcf <- readVcf(vcffile)
+vcfsubset <- query_gwas(vcf, chrompos=c("1:1097291-1099437"))
+```
+
+are each identical, but the former saves time and memory because it is querying the file using an index and only reading in what is required.
+
+Examples of other filters are here:
+
+```{r}
+vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"))
+vcf
+```
+
+```{r}
+vcf <- query_gwas(vcffile, pval=0.5)
+vcf
+```
+
+```{r}
+vcf <- query_gwas(vcffile, chrompos=c("1:1097291-1099437"))
+vcf
+```
+
+It's possible to chain filters together e.g.
+
+```{r}
+vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193")) %>%
+    query_gwas(pval=0.5)
+vcf
+```
+
+It's possible to have multiple GWAS studies per vcf. You can specify specific GWAS studies to read in using e.g.
+
+```{r}
+vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), id="IEU-a-2")
+```
+
+Note that querying by chrompos is the fastest way to deal with VCFs, use this over rsid where possible when speed is an issue.
+
+## Indexing rsid values
+
+Querying by rsid is slow. If a large number of queries by rsid are to be performed then it could be worth generating an index which would speed up the querying. This approach uses [SQLite](https://www.sqlite.org/index.html) to create a local database, linking rsid to chromosome and position. It strips out the 'rs' from the rs identifiers to make fast searchers by integer. The concept is based on that developed here: [bioforensics/rsidx](https://github.com/bioforensics/rsidx).
+
+To create the index:
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+create_rsidx_index_from_vcf(vcffile, "index.rsidx")
+```
+
+To query using the index:
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), rsidx="index.rsidx")
+```
+
+## Indexing p-values
+
+Querying by p-value is slow. It could be worth generating an index file for p-values to speed this up. Similar to rsid queries, it uses an sqlite database linking -log10 pvalues to chromosome and position. 
+
+To create the index:
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+create_pval_index_from_vcf(vcffile, maximum_pval=0.05, "index.pvali")
+```
+
+To query using the index:
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+vcf <- query_gwas(vcffile, pval=0.05, pvali="index.pvali")
+```
+
+## A note about chrompos
+
+The fastest way to query VCFs is by specifying chromosome and position. Can specify specific positions, or ranges. e.g.
+
+```{r}
+cp <- c("1:10000", "2:10000-20000")
+```
+
+or as a data frame
+
+```{r}
+cp <- dplyr::tibble(chrom=c(1,2), start=c(10000,10000), end=c(10000, 20000))
+```
+
+You can check what will be parsed out with:
+
+```{r}
+parse_chrompos(cp)
+```
+
+Querying by p-value or rsid is also possible but is slower as only chrompos is indexed. On Mac and Linux, rsid and p-value queries are performed by calls to bcftools. On Windows it uses VariantAnnotation directly, because bcftools binaries are not available. This is unfortunately somewhat slower. If many operations are being performed it might be faster to read in the whole dataset and perform queries that way.
+
+## LD proxies
+
+If a set of rsids are requested from a vcf but some are absent, a reference panel can be used to search for LD proxies, extract them, and align the effects and alleles against the original variants that were requested.
+
+There are two ways to perform the LD proxy search:
+
+- using a set of genotyped samples as an LD reference panel (e.g. 1000 genomes data) - this is slow but relatively convenient
+- compiling an LD tag list from an LD reference panel - once generated this is very fast
+
+### Using an LD reference panel
+
+An LD reference panel can be obtained from here: [http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz](http://fileserve.mrcieu.ac.uk/ld/data_maf0.01_rs_ref.tgz). This dataset comprises Europeans from the 1000 genomes project, in plink format, and including only SNPs with MAF > 0.01, and with the reference alleles aligned to the human genome reference sequence. For this vignette we can use a small subset of that dataset:
+
+```{r}
+ldfile <- system.file("extdata", "eur.bed", package="gwasvcf") %>% 
+  gsub(".bed", "", .)
+```
+
+We also need to provide a path to the plink binary used to generate LD calculations. This can be done through the `genetics.binaRies` package as with bcftools
+
+```{r}
+set_plink()
+```
+
+The rs4442317 variant is not present in the vcf file, i.e. if we query that variant:
+
+```{r}
+query_gwas(vcffile, rsid="rs4442317") %>% nrow
+```
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", bfile=ldfile, tag_r2=0.05)
+vcf %>% vcf_to_granges()
+```
+
+Here we see that the proxy variant is `r vcf_to_granges(vcf)$PR`.
+
+You may also extract only the best available proxies even if the requested rsids are present, by using `proxies="only"`. An example of this shows that the effect size estimates for the proxy variants are aligned to the effect alleles of the target variants:
+
+
+```{r target-effects-plot, eval=Sys.info()["sysname"] != "Windows", fig.alt="Plot of the target data effects against the proxy data effects", fig.cap="Plot the target data effects against the proxy data effects"}
+# Read vcf
+a <- readVcf(vcffile)
+
+# Obtain the best LD proxy for each of the rsids
+b <- query_gwas(vcffile, rsid=names(a), proxies="only", bfile=ldfile, tag_r2=0.6)
+
+# Match the target data to the proxy data
+index <- match(names(b), names(a))
+
+# Plot the target data effects against the proxy data effects
+plot(vcf_to_granges(b)$ES, vcf_to_granges(a)$ES[index])
+```
+
+### Compiling a list of tagging variants
+
+Using the LD reference panel described above, it is possible to create a sqlite tag reference panel using the following commands. First get an example LD reference panel:
+
+```{r}
+ldfile <- system.file("extdata", "eur.bed", package="gwasvcf") %>% 
+  gsub(".bed", "", .)
+```
+
+We also need to provide a path to the plink binary used to generate LD calculations. This can be done through the `genetics.binaRies` package as with bcftools
+
+```{r}
+set_plink()
+```
+
+Now generate the tagging database
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+dbfile <- tempfile()
+create_ldref_sqlite(ldfile, dbfile, tag_r2 = 0.05)
+```
+
+Perform the query
+
+```{r eval=Sys.info()["sysname"] != "Windows"}
+vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.05)
+vcf %>% vcf_to_granges()
+```
+
+```{r, echo=FALSE, eval=Sys.info()["sysname"] != "Windows"}
+unlink(dbfile)
+```
+
+## Creating the VCF object from a data frame
+
+If you have GWAS summary data in a text file or data frame, this can be converted to a VCF object.
+
+```{r}
+vcf <- readVcf(vcffile)
+vv <- vcf_to_granges(vcf) %>% dplyr::as_tibble()
+out <- vv %$% create_vcf(chrom=seqnames, pos=start, nea=REF, ea=ALT, snp=ID, ea_af=AF, effect=ES, se=SE, pval=10^-LP, n=SS, name="a")
+out
+```
+
+It's possible to write the vcf file:
+
+```{r, eval=FALSE}
+writeVcf(out, file="temp.vcf")
+```
+
+You may want to first harmonise the data so that all the non-effect alleles are aligned to the human genome reference. See the [gwasglue](https://github.com/MRCIEU/gwasglue) package on some functions to do this. 
+
+## Creating a gwasglue2 SummarySet object from a vcf file
+
+Although still under development, if compared with its predecessor, the [gwasglue2](https://mrcieu.github.io/gwasglue2/) package has several new features, including the use of S4 R objects.
+
+It is possible to create a `SummarySet` object from a GWAS-VCF file or VCF object e.g. output from `VariantAnnotation::readVcf()`, `create_vcf()` or `query_gwas()` using the `gwasvcf_to_summaryset()` function.
+
+For example:
+
+```{r, eval=FALSE}
+summaryset <- readVcf(vcffile) %>% 
+              gwasvcf_to_summaryset()
+```
+
+Once the `SummarySet` objects are created, it is possible to use `gwasglue2` to harmonise data, harmonise against a LD matrix, remap genomic coordinates to a different genome assembly, convert to other formats and more.
