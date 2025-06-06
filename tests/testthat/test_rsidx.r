@@ -8,26 +8,26 @@ vcf <- VariantAnnotation::readVcf(fn)
 indexname <- tempfile()
 
 test_that("create index", {
-  skip_on_os("windows")
+  skip_on_os(c("windows", "linux"))
 	create_rsidx_index_from_vcf(fn, indexname)
 	expect_true(file.exists(indexname))
 })
 
 test_that("read in", {
-  skip_on_os("windows")
+  skip_on_os(c("windows", "linux"))
 	out <- query_rsidx(head(names(vcf)), indexname)
 	expect_true(nrow(out) == 6)
 })
 
 test_that("create sub index", {
-  skip_on_os("windows")
+  skip_on_os(c("windows", "linux"))
 	newname <- tempfile()
 	create_rsidx_sub_index(head(names(vcf)), indexname, newname)
 	expect_true(file.exists(newname))
 })
 
 test_that("query with rsidx", {
-  skip_on_os("windows")
+  skip_on_os(c("windows", "linux"))
 	a <- query_gwas(fn, rsid=head(names(vcf)))
 	b <- query_gwas(fn, rsid=head(names(vcf)), rsidx=indexname)
 	expect_true(all(names(a) == names(b)))
@@ -41,7 +41,7 @@ dbfile <- tempfile()
 set_plink()
 
 test_that("tag db", {
-  skip_on_os("windows")
+  skip_on_os(c("windows", "linux"))
 	create_ldref_sqlite(fn, dbfile, 0.04)
 	expect_true(file.exists(dbfile))
 })
@@ -80,7 +80,7 @@ test_that("sqlite proxy only", {
 })
 
 test_that("sqlite proxy no result", {
-  skip_on_os("windows")
+  skip_on_os(c("windows", "linux"))
   vcffile <- system.file("extdata","data.vcf.gz", package="gwasvcf")
 	set_bcftools()
 	a <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.5)
