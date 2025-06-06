@@ -270,7 +270,7 @@ Here we see that the proxy variant is `r vcf_to_granges(vcf)$PR`.
 You may also extract only the best available proxies even if the requested rsids are present, by using `proxies="only"`. An example of this shows that the effect size estimates for the proxy variants are aligned to the effect alleles of the target variants:
 
 
-```{r target-effects-plot, eval=Sys.info()["sysname"] != "Windows", fig.alt="Plot of the target data effects against the proxy data effects"}
+```{r target-effects-plot, eval=Sys.info()["sysname"] != "Windows", fig.alt="Plot of the target data effects against the proxy data effects", fig.cap="Plot the target data effects against the proxy data effects"}
 # Read vcf
 a <- readVcf(vcffile)
 
