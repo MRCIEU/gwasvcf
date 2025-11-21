@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   guide: guide.html
-last_built: 2025-11-21T14:35Z
+last_built: 2025-11-21T14:37Z
 urls:
   reference: https://mrcieu.github.io/gwasvcf/reference
   article: https://mrcieu.github.io/gwasvcf/articles
