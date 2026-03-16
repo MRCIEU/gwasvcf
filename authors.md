@@ -13,16 +13,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mrcieu/gwasvcf/blob/v0.1.5/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mrcieu/gwasvcf/blob/master/DESCRIPTION)
 
-Hemani G (2025). *gwasvcf: Tools for Dealing with GWAS Summary Data in
-VCF Format*. R package version 0.1.5,
+Hemani G (2026). *gwasvcf: Tools for Dealing with GWAS Summary Data in
+VCF Format*. R package version 0.1.6,
 <https://github.com/mrcieu/gwasvcf>.
 
     @Manual{,
       title = {gwasvcf: Tools for Dealing with GWAS Summary Data in VCF Format},
       author = {Gibran Hemani},
-      year = {2025},
-      note = {R package version 0.1.5},
+      year = {2026},
+      note = {R package version 0.1.6},
       url = {https://github.com/mrcieu/gwasvcf},
     }
