@@ -13,7 +13,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mrcieu/gwasvcf/blob/v0.1.6/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mrcieu/gwasvcf/blob/master/DESCRIPTION)
 
 Hemani G (2026). *gwasvcf: Tools for Dealing with GWAS Summary Data in
 VCF Format*. R package version 0.1.6,

@@ -23,6 +23,7 @@ available the R package will use that strategy. To set a location for
 the bcftools package, use
 
 ``` r
+
 library(gwasvcf)
 set_bcftools('/path/to/bcftools')
 ```
@@ -35,6 +36,7 @@ For LD related functions the package uses [plink
 location of your plink installation by running
 
 ``` r
+
 set_plink('/path/to/plink')
 ```
 
@@ -42,6 +44,7 @@ Alternatively you can automatically use use the binaries bundled here:
 <https://github.com/mrcieu/genetics.binaRies>
 
 ``` r
+
 remotes::install_github('mrcieu/genetics.binaRies')
 set_plink()
 set_bcftools()
@@ -50,6 +53,7 @@ set_bcftools()
 To unset a path:
 
 ``` r
+
 set_plink(NULL)
 set_bcftools(NULL)
 ```
@@ -58,6 +62,7 @@ For this vignette we will use the bundled binaries in
 `genetics.binaRies`.
 
 ``` r
+
 suppressWarnings(suppressPackageStartupMessages({
   library(gwasvcf)
   library(VariantAnnotation)
@@ -67,6 +72,7 @@ suppressWarnings(suppressPackageStartupMessages({
 ```
 
 ``` r
+
 set_bcftools()
 #> Path not provided, using binaries in the MRCIEU/genetics.binaRies package
 ```
@@ -78,6 +84,7 @@ we’ll use the bundled data which is a small subset of the Speliotes et
 al 2010 BMI GWAS.
 
 ``` r
+
 vcffile <- system.file("extdata", "data.vcf.gz", package="gwasvcf")
 vcf <- readVcf(vcffile)
 class(vcf)
@@ -92,6 +99,7 @@ details about the `CollapsedVCF` object. A brief summary follows.
 General info about the dataset can be obtained by calling it:
 
 ``` r
+
 vcf
 #> class: CollapsedVCF 
 #> dim: 92 1 
@@ -121,6 +129,7 @@ There are 92 rows and 1 column which means 92 SNPs and one GWAS. See the
 header information:
 
 ``` r
+
 header(vcf)
 #> class: VCFHeader 
 #> samples(1): IEU-a-2
@@ -134,6 +143,7 @@ See the names of the GWAS datasets (in this case just one, and it refers
 to the IEU GWAS database ID name):
 
 ``` r
+
 samples(header(vcf))
 #> [1] "IEU-a-2"
 ```
@@ -153,6 +163,7 @@ the `rowRanges` object is a `GenomicRanges` class, which is useful for
 performing fast operations on chromosome position information.
 
 ``` r
+
 rowRanges(vcf)
 #> GRanges object with 92 ranges and 5 metadata columns:
 #>              seqnames    ranges strand | paramRangeID            REF
@@ -195,6 +206,7 @@ it. For example, create a `GRanges` object which is great for fast
 chromosome-position operations
 
 ``` r
+
 vcf_to_granges(vcf)
 #> GRanges object with 92 ranges and 15 metadata columns:
 #>              seqnames    ranges strand | paramRangeID         REF         ALT
@@ -243,6 +255,7 @@ vcf_to_granges(vcf)
 Create a data frame:
 
 ``` r
+
 vcf_to_granges(vcf) %>% dplyr::as_tibble()
 #> # A tibble: 92 × 20
 #>    seqnames  start    end width strand paramRangeID REF   ALT    QUAL FILTER      ES
@@ -275,12 +288,14 @@ main argument. You can then query on `rsid`, `pval` or `chrompos`. For
 example
 
 ``` r
+
 vcfsubset <- query_gwas(vcffile, chrompos=c("1:1097291-1099437"))
 ```
 
 and
 
 ``` r
+
 vcf <- readVcf(vcffile)
 vcfsubset <- query_gwas(vcf, chrompos=c("1:1097291-1099437"))
 ```
@@ -291,6 +306,7 @@ querying the file using an index and only reading in what is required.
 Examples of other filters are here:
 
 ``` r
+
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"))
 vcf
 #> class: CollapsedVCF 
@@ -320,6 +336,7 @@ vcf
 ```
 
 ``` r
+
 vcf <- query_gwas(vcffile, pval=0.5)
 vcf
 #> class: CollapsedVCF 
@@ -349,6 +366,7 @@ vcf
 ```
 
 ``` r
+
 vcf <- query_gwas(vcffile, chrompos=c("1:1097291-1099437"))
 vcf
 #> class: CollapsedVCF 
@@ -380,6 +398,7 @@ vcf
 It’s possible to chain filters together e.g.
 
 ``` r
+
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193")) %>%
     query_gwas(pval=0.5)
 vcf
@@ -413,6 +432,7 @@ It’s possible to have multiple GWAS studies per vcf. You can specify
 specific GWAS studies to read in using e.g.
 
 ``` r
+
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), id="IEU-a-2")
 ```
 
@@ -433,6 +453,7 @@ on that developed here:
 To create the index:
 
 ``` r
+
 create_rsidx_index_from_vcf(vcffile, "index.rsidx")
 #> Extracting position info
 #> Generating index
@@ -441,6 +462,7 @@ create_rsidx_index_from_vcf(vcffile, "index.rsidx")
 To query using the index:
 
 ``` r
+
 vcf <- query_gwas(vcffile, rsid=c("rs3128126", "rs3121561", "rs3813193"), rsidx="index.rsidx")
 ```
 
@@ -453,6 +475,7 @@ sqlite database linking -log10 pvalues to chromosome and position.
 To create the index:
 
 ``` r
+
 create_pval_index_from_vcf(vcffile, maximum_pval=0.05, "index.pvali")
 #> Extracting pval info
 #> [1] "CREATE TABLE pval_to_coord (chrom TEXT NOT NULL DEFAULT NULL, coord INTEGER NOT NULL DEFAULT NULL, LP REAL NOT NULL DEFAULT 0);"
@@ -465,6 +488,7 @@ create_pval_index_from_vcf(vcffile, maximum_pval=0.05, "index.pvali")
 To query using the index:
 
 ``` r
+
 vcf <- query_gwas(vcffile, pval=0.05, pvali="index.pvali")
 #> Using pval index
 #> Identified 7 variants passing threshold. Extracting...
@@ -476,18 +500,21 @@ The fastest way to query VCFs is by specifying chromosome and position.
 Can specify specific positions, or ranges. e.g.
 
 ``` r
+
 cp <- c("1:10000", "2:10000-20000")
 ```
 
 or as a data frame
 
 ``` r
+
 cp <- dplyr::tibble(chrom=c(1,2), start=c(10000,10000), end=c(10000, 20000))
 ```
 
 You can check what will be parsed out with:
 
 ``` r
+
 parse_chrompos(cp)
 #> GRanges object with 2 ranges and 0 metadata columns:
 #>       seqnames      ranges strand
@@ -530,6 +557,7 @@ aligned to the human genome reference sequence. For this vignette we can
 use a small subset of that dataset:
 
 ``` r
+
 ldfile <- system.file("extdata", "eur.bed", package="gwasvcf") %>% 
   gsub(".bed", "", .)
 ```
@@ -539,6 +567,7 @@ calculations. This can be done through the `genetics.binaRies` package
 as with bcftools
 
 ``` r
+
 set_plink()
 #> Path not provided, using binaries in the MRCIEU/genetics.binaRies package
 ```
@@ -547,11 +576,13 @@ The rs4442317 variant is not present in the vcf file, i.e. if we query
 that variant:
 
 ``` r
+
 query_gwas(vcffile, rsid="rs4442317") %>% nrow
 #> [1] 0
 ```
 
 ``` r
+
 vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", bfile=ldfile, tag_r2=0.05)
 #> Initial search...
 #> Extracted 0 out of 1 rsids
@@ -586,6 +617,7 @@ this shows that the effect size estimates for the proxy variants are
 aligned to the effect alleles of the target variants:
 
 ``` r
+
 # Read vcf
 a <- readVcf(vcffile)
 
@@ -618,6 +650,7 @@ sqlite tag reference panel using the following commands. First get an
 example LD reference panel:
 
 ``` r
+
 ldfile <- system.file("extdata", "eur.bed", package="gwasvcf") %>% 
   gsub(".bed", "", .)
 ```
@@ -627,6 +660,7 @@ calculations. This can be done through the `genetics.binaRies` package
 as with bcftools
 
 ``` r
+
 set_plink()
 #> Path not provided, using binaries in the MRCIEU/genetics.binaRies package
 ```
@@ -634,6 +668,7 @@ set_plink()
 Now generate the tagging database
 
 ``` r
+
 dbfile <- tempfile()
 create_ldref_sqlite(ldfile, dbfile, tag_r2 = 0.05)
 #> identifying indels to remove
@@ -645,6 +680,7 @@ create_ldref_sqlite(ldfile, dbfile, tag_r2 = 0.05)
 Perform the query
 
 ``` r
+
 vcf <- query_gwas(vcffile, rsid="rs4442317", proxies="yes", dbfile=dbfile, tag_r2=0.05)
 #> Initial search...
 #> Extracted 0 out of 1 rsids
@@ -675,6 +711,7 @@ If you have GWAS summary data in a text file or data frame, this can be
 converted to a VCF object.
 
 ``` r
+
 vcf <- readVcf(vcffile)
 vv <- vcf_to_granges(vcf) %>% dplyr::as_tibble()
 out <- vv %$% create_vcf(chrom=seqnames, pos=start, nea=REF, ea=ALT, snp=ID, ea_af=AF, effect=ES, se=SE, pval=10^-LP, n=SS, name="a")
@@ -700,6 +737,7 @@ out
 It’s possible to write the vcf file:
 
 ``` r
+
 writeVcf(out, file="temp.vcf")
 ```
 
@@ -727,6 +765,7 @@ function.
 For example:
 
 ``` r
+
 summaryset <- readVcf(vcffile) %>% 
               gwasvcf_to_summaryset()
 ```
