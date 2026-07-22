@@ -24,7 +24,7 @@ query_gwas(
 )
 }
 \arguments{
-\item{vcf}{Path or URL to GWAS-VCF file or VCF object e.g. output from \code{\link[VariantAnnotation:readVcf-methods]{VariantAnnotation::readVcf()}} or \code{\link[=create_vcf]{create_vcf()}}}
+\item{vcf}{Path or URL to GWAS-VCF file or VCF object e.g. output from \code{\link[VariantAnnotation:readVcf]{VariantAnnotation::readVcf()}} or \code{\link[=create_vcf]{create_vcf()}}}
 
 \item{chrompos}{Either vector of chromosome and position ranges e.g. "1:1000" or "1:1000-2000", or data frame with columns \code{chrom}, \code{start}, \code{end}.}
 
